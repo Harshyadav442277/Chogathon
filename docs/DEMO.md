@@ -1,12 +1,12 @@
 # Demo and verification
 
-Status: blank template. No working application, deployment or demo has been verified.
+Status: deployed 21 Oct 2026; signed-out pages and APIs verified over HTTP (see [ARCHITECTURE.md](ARCHITECTURE.md#deployment-record)). The demo flow and video are not done yet.
 
 ## Access
 
 | Field | Value |
 | :--- | :--- |
-| App URL | Not available |
+| App URL | https://chog-hivemind.vercel.app |
 | Prerequisites | To document |
 | Public setup instructions | To document in ARCHITECTURE.md |
 | Demo video | Not recorded |

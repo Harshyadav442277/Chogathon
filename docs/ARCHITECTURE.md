@@ -62,4 +62,14 @@ In the Vercel project settings, connect the GitHub repository with Root Director
 | `GET /api/cron/edition` without the header | `401` |
 | Judge code sign-in, then a command on a judge Chog | Energy drops by 1 and the holder log shows it after the next tick |
 
+### Deployment record
+
+| Date (UTC) | What | Evidence |
+| :--- | :--- | :--- |
+| 2026-10-21 | Turso account (GitHub sign-in) and database `chog-hivemind`; database token expires after 30 days | Seed inserted 1,963 rows into `chogs`; 3 offline ticks ran with `"errors":0` |
+| 2026-10-21 | Vercel project `wukong4/chog-hivemind` created; 9 production env vars set (`ANTHROPIC_API_KEY` and `JUDGE_CHOG_IDS` still empty) | `vercel env ls production` |
+| 2026-10-21 | GitHub Actions secrets `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` set | `hive-tick` run [39562962044](https://github.com/Harshyadav442277/Chogathon/actions/runs/39562962044) succeeded on `main`, ticks 4–5 |
+| 2026-10-21 | **Production deploy** of branch `claude/repo-status-check-394210` at `7cd3320` (PR #1, not yet merged), with the CLI from a clean `git archive` export: **https://chog-hivemind.vercel.app** | `vercel inspect`: target production, status Ready. Signed out: `/`, `/about`, `/times`, `/leaderboard`, `/chog/130`, `/api/stats`, `/api/feed` all 200; stats show tick 5 and 1,962 citizens from Turso; cron and care endpoints return 401 without auth; judge code sign-in 200 with 6/6 energy and 0 judge Chogs |
+| 2026-10-21 07:34 | **Leak:** the Turso CLI session token was shared in a chat screenshot. All Turso sessions were invalidated (`turso auth logout --all`). The database token was not exposed and still works | CLI: "Invalidated all sessions started before 2026-10-21 07:34:57 UTC" |
+
 The deployed app refuses to start a session without `SESSION_SECRET`, and both the app and the cron refuse to run without `TURSO_DATABASE_URL`, so a missing secret fails loudly instead of writing to a throwaway file.
