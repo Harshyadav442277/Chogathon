@@ -26,6 +26,7 @@ func _ready() -> void:
 	else:
 		swarm = ChogSwarm.new()
 	swarm.set("terrain", terrain)
+	swarm.set("towns", towns)  # wandering Chogs stay out of buildings
 	add_child(swarm)
 	rig = CameraRig.new()
 	rig.terrain = terrain

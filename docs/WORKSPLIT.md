@@ -47,7 +47,8 @@ func position_of(chog_id: int) -> Vector3                     # current world po
   - `track`: the job's track, `civic` / `craft` / `service` / `land` / `adventurer` (`""` without a season job); picks the work animation
   - `jobi`: job index in `chog-hivemind/data/jobs.json` order, or -1 without a season job; picks the outfit, tool and work action (added 2026-10-22)
   - `role`: `""` for civilians, or `main_dps` / `sub_dps` / `tank` / `healer` / `support` / `buffer`
-  - `state`: `"work"` or `"fight"`
+  - `state`: from the season simulation (2026-10-22): `work`, `idle`, `quest`, `fight`, `rest` or `raid` (older servers: `work` / `fight`)
+  - `lvl`: the agent's level this season
   - `mood`
 - `GameState.ids`: the same ids as a `PackedInt32Array`. JSON numbers arrive as floats, so use this for lookups.
 - **Walking is decided on the client:** when a Chog's new `x`/`z` differs from where it stands, it walks there (state `walk`), then resumes the server's state.

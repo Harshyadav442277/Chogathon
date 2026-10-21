@@ -5,7 +5,7 @@ import { mulberry32 } from "../world/terrain";
 
 export type Affinity = { trait: string; match: string[]; weight: number };
 export type Job = {
-  id: string; name: string; track: "civic" | "craft" | "service" | "land" | "adventurer";
+  id: string; name: string; track: "civic" | "craft" | "service" | "land" | "adventurer" | "demon";
   role?: string; workplace: string; quota: number; titles: string[]; affinity: Affinity[];
 };
 export const JOBS = (jobsJson as { jobs: Job[] }).jobs;
@@ -20,6 +20,7 @@ const ROLE_BIAS: Record<string, Partial<Stats>> = {
   tank: { VIT: 4, STR: 2 }, main_dps: { STR: 3, INT: 2, AGI: 1 }, sub_dps: { AGI: 4, LUK: 1 },
   healer: { WIS: 4, VIT: 1 }, support: { INT: 3, LUK: 2 }, buffer: { WIS: 3, LUK: 2 },
   civic: { VIT: 1, STR: 1 }, craft: { STR: 1, INT: 1 }, service: { WIS: 1, LUK: 1 }, land: { VIT: 1, AGI: 1 },
+  demon_king: { STR: 6, VIT: 6, INT: 6 }, demon_general: { STR: 4, VIT: 4, INT: 2 }, henchman: { STR: 2, AGI: 1 },
 };
 
 export const SCHEMA_V2 = [

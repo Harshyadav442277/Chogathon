@@ -9,6 +9,13 @@ const ROOF := {
 	"wastes": Color("#6d675e"), "demon": Color("#5a1f6a"),
 }
 
+## Footprint radius per building type for is_open() (same values as the server's FOOT in src/world/data.ts).
+const OPEN_FOOT := {
+	"castle": 10.0, "keep": 6.5, "colosseum": 12.0, "spire": 10.0, "demon_castle": 11.0, "guild_hall": 5.5, "temple": 5.0,
+	"library": 5.0, "barracks": 5.5, "academy": 5.0, "market": 6.0, "dungeon": 3.5, "tavern": 3.8, "fountain": 3.6,
+	"wall": 3.2, "gate": 3.5, "tower": 2.5, "house_large": 3.6,
+}
+
 const FOOTPRINT := {
 	"castle": 9.0, "keep": 6.0, "colosseum": 11.0, "spire": 10.0, "demon_castle": 11.0, "guild_hall": 5.0,
 	"temple": 4.5, "library": 4.5, "barracks": 5.0, "academy": 4.5, "market": 6.0, "dungeon": 3.5, "tavern": 3.5,
@@ -88,6 +95,11 @@ func _build_buildings(list: Array) -> void:
 		if t == "spire":
 			y = maxf(y, 0.0)
 		_building_pos[int(b["id"])] = Vector3(x, y + 3.0 * s, z)
+		var fr: float = OPEN_FOOT.get(t, 3.0) * s
+		var cell := Vector2i(floori(x / OPEN_CELL), floori(z / OPEN_CELL))
+		if not _foot_grid.has(cell):
+			_foot_grid[cell] = []
+		(_foot_grid[cell] as Array).append(Vector3(x, z, fr))
 		var basis := Basis(Vector3.UP, float(b["rot"])).scaled(Vector3.ONE * s)
 		(by_type[t]["x"] as Array[Transform3D]).append(Transform3D(basis, Vector3(x, y, z)))
 		var roof: Color = ROOF.get(str(b["region"]), Color.WHITE)
@@ -109,6 +121,25 @@ func _process(delta: float) -> void:
 	if cam.global_position.distance_to(_lod_cam) > 8.0:
 		_lod_cam = cam.global_position
 		FrameJobs.add(func() -> void: _refresh_lod(_lod_cam), FrameJobs.PRIO_HIGH, "settlements-lod")
+
+
+const OPEN_CELL := 16.0
+var _foot_grid := {}  # Vector2i cell -> Array of Vector3(x, z, radius)
+
+
+## True when (x, z) is outside every building footprint (fountains and walls included). Used by wandering Chogs.
+func is_open(x: float, z: float) -> bool:
+	var c := Vector2i(floori(x / OPEN_CELL), floori(z / OPEN_CELL))
+	for dx in range(-1, 2):
+		for dz in range(-1, 2):
+			var list = _foot_grid.get(Vector2i(c.x + dx, c.y + dz))
+			if list == null:
+				continue
+			for f in list:
+				var v: Vector3 = f
+				if (v.x - x) * (v.x - x) + (v.y - z) * (v.y - z) < v.z * v.z:
+					return false
+	return true
 
 
 ## Index of the enterable building under the cursor (screen space), or -1. Only when zoomed in enough.

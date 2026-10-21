@@ -6,12 +6,27 @@ const SUPPLY := 1969
 const WALK_SPEED := 4.0  # units/s
 const MAX_TRIP := 30.0   # s; long trips speed up so a cross-continent move still lands before the next sim tick (~45 s)
 const MIN_SCREEN := 0.0065  # character.gdshader min_screen
-const STATES := {"walk": 0, "work": 1, "fight": 2}
+## Server state (season simulation) -> animation: 0 walk, 1 work, 2 fight, 3 idle.
+const STATES := {"walk": 0, "work": 1, "fight": 2, "idle": 3, "rest": 3, "quest": 1, "raid": 2}
+## Wandering per server state: radius around the server's spot, chance to move when a pause ends, pause range (s).
+const WANDER := {
+	"work": [2.5, 0.35, 5.0, 14.0], "idle": [9.0, 0.75, 2.0, 6.0], "quest": [5.0, 0.6, 3.0, 8.0],
+	"fight": [3.0, 0.5, 2.0, 5.0], "rest": [1.5, 0.1, 8.0, 20.0], "raid": [6.0, 0.7, 1.0, 3.0],
+}
+const WANDER_SPEED := 1.6
+const WANDER_SLICE := 160  # agents whose pause timer is checked per frame
+const SIZE := {31: 2.4, 32: 1.6}  # job index -> body size (Demon King, Demon Generals)
 const ROLES := {"main_dps": 1, "sub_dps": 2, "tank": 3, "healer": 4, "support": 5, "buffer": 6}
 ## Work animation per job track (character.gdshader): hammer, bow, dig, salute, sword drill.
 const TRACKS := {"craft": 0, "service": 1, "land": 2, "civic": 3, "adventurer": 4}
 
 var terrain: Terrain
+var towns: Node  # Settlements (optional): is_open(x, z) keeps wanderers out of buildings and fountains
+var _anchor := PackedVector3Array()  # the server's spot for each Chog; it wanders around it
+var _wait := PackedFloat32Array()    # time (s) when its current pause ends
+var _wstate := PackedStringArray()   # server state, for wander settings
+var _rng := RandomNumberGenerator.new()
+var _wander_cursor := 0
 var _mmi := MultiMeshInstance3D.new()
 var _cur := PackedVector3Array()
 var _tgt := PackedVector3Array()
@@ -70,6 +85,12 @@ func _on_positions() -> void:
 		_speed.resize(n)
 		_walking.resize(n)
 		_walking.fill(0)
+		_anchor.resize(n)
+		_wait.resize(n)
+		_wstate.resize(n)
+		var now0 := Time.get_ticks_msec() / 1000.0
+		for i in n:
+			_wait[i] = now0 + _rng.randf_range(0.5, 6.0)
 	var mm := _mmi.multimesh
 	for i in n:
 		var x: float = p["x"][i]
@@ -77,18 +98,25 @@ func _on_positions() -> void:
 		var y := maxf(terrain.height_at(x, z), 0.3) if terrain else 0.0
 		_tgt[i] = Vector3(x, y, z)
 		_ids[i] = int(ids[i])
+		var sname: String = str(p["state"][i]) if p.has("state") else "work"
+		_wstate[i] = sname if WANDER.has(sname) else "work"
+		_anchor[i] = _tgt[i]
 		if first:
 			_cur[i] = _tgt[i]
 			_yaw[i] = fmod(_ids[i] * 2.39996, TAU)  # golden-angle spread so idle crowds don't all face one way
 			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), _cur[i]))
+		elif _cur[i].distance_to(_tgt[i]) > float(WANDER[_wstate[i]][0]) * 1.5:
+			_walk_to_target(i)  # the server sent it somewhere else: walk there
 		else:
-			_walk_to_target(i)
-		var state: int = STATES.get(str(p["state"][i]), 1) if p.has("state") else 1
+			_tgt[i] = _cur[i]  # same place: keep wandering around the new anchor
+		var state: int = STATES.get(sname, 1)
 		var role: int = ROLES.get(str(p["role"][i]), 0) if p.has("role") else 0
 		var work: int = TRACKS.get(str(p["track"][i]), 1) if p.has("track") else 1
 		var job: int = int(p["jobi"][i]) if p.has("jobi") else -1  # outfit, tool and work action per job
 		_code[i] = state + 4 * role + 32 * work + 256 * (job + 1)
-		mm.set_instance_color(i, GameState.HOUSE_COLORS[int(p["house"][i])])
+		var house: Color = GameState.HOUSE_COLORS[int(p["house"][i])]
+		house.a = float(SIZE.get(job, 1.0)) / 3.0  # character.gdshader reads COLOR.a as size / 3
+		mm.set_instance_color(i, house)
 	mm.visible_instance_count = n
 	if first and _dev_flag("walk-test"):
 		_scatter()
@@ -98,13 +126,45 @@ func _on_positions() -> void:
 		_lineup()
 
 
+## Random movement and standing still: a slice of Chogs per frame checks whether its pause is over, then
+## either walks to a random open spot near its server anchor (on land, outside buildings) or keeps standing.
+func _wander() -> void:
+	var n := _anchor.size()
+	if n == 0:
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	for k in mini(WANDER_SLICE, n):
+		var i := (_wander_cursor + k) % n
+		if _walking[i] == 1 or now < _wait[i]:
+			continue
+		var w: Array = WANDER[_wstate[i]]
+		_wait[i] = now + _rng.randf_range(w[2], w[3])
+		if _rng.randf() > float(w[1]):
+			continue  # stays still this time
+		var a := _anchor[i]
+		for _try in 4:
+			var ang := _rng.randf() * TAU
+			var r := float(w[0]) * (0.3 + 0.7 * _rng.randf())
+			var x := a.x + cos(ang) * r
+			var z := a.z + sin(ang) * r
+			var h := terrain.height_at(x, z) if terrain else 0.0
+			if terrain and h < 0.8:
+				continue  # water
+			if towns and towns.has_method("is_open") and not towns.is_open(x, z):
+				continue  # inside a building, fountain or wall
+			_tgt[i] = Vector3(x, maxf(h, 0.3), z)
+			_walk_to_target(i, WANDER_SPEED)
+			break
+	_wander_cursor = (_wander_cursor + WANDER_SLICE) % n
+
+
 ## Starts a walk when the server moved this Chog: constant speed, facing the direction of travel.
-func _walk_to_target(i: int) -> void:
+func _walk_to_target(i: int, speed := WALK_SPEED) -> void:
 	var d := _tgt[i] - _cur[i]
 	var dist := Vector2(d.x, d.z).length()
 	if dist < 0.05:
 		return
-	_speed[i] = maxf(WALK_SPEED, dist / MAX_TRIP)
+	_speed[i] = maxf(speed, dist / MAX_TRIP)
 	_yaw[i] = atan2(d.x, d.z)
 	if _walking[i] == 0:
 		_walking[i] = 1
@@ -127,6 +187,7 @@ func _set_custom(i: int) -> void:
 
 func _process(delta: float) -> void:
 	var t0 := Time.get_ticks_usec()
+	_wander()
 	_walk(delta)
 	if _perf:
 		_log_perf(Time.get_ticks_usec() - t0)
@@ -149,6 +210,8 @@ func _walk(delta: float) -> void:
 			c = to
 			_walking[i] = 0
 			_set_custom(i)
+			var w: Array = WANDER[_wstate[i]] if i < _wstate.size() else WANDER["work"]
+			_wait[i] = Time.get_ticks_msec() / 1000.0 + _rng.randf_range(w[2], w[3])
 		else:
 			c.x += dx / dist * step
 			c.z += dz / dist * step

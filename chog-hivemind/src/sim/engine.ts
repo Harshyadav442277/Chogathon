@@ -7,6 +7,7 @@ import { rankFeed } from "./feed";
 import { HOLDER_KINDS, type Agent, type Decision, type FeedItem, type Injection, type Memory, type StepInput, type WorldContext } from "./types";
 import { LOCATION_IDS, MOODS } from "./world";
 import { runDirector } from "./director";
+import { simTick } from "../sim3/sim";
 import { cleanText } from "../lib/moderation";
 
 const now = () => Date.now();
@@ -214,6 +215,9 @@ export async function tick(opts: { agents?: number; brain?: "auto" | "offline" |
   }
   // Rumors that nobody picked up this tick expire after a while.
   await run(`UPDATE injections SET status = 'faded' WHERE kind = 'rumor' AND status = 'pending' AND created_at < ?`, [now() - 6 * 3600_000]);
+  // Season simulation: every Chog acts as an agent (quests, raids, bosses, meetings, gifts). docs/SIM_PLAN.md
+  const season = await simTick(t);
+  (stats as any).season = season;
   // Marks the world as changed: cached API responses (src/lib/cache.ts) rebuild on the next request.
   await setState("tick_done", t);
   return stats;

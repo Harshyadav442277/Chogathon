@@ -1,0 +1,845 @@
+{
+ "version": 1,
+ "skills": [
+  {
+   "id": "blade_1",
+   "name": "Quick Slash",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A sword technique. Rank E: +9 power; quests needing combat or melee go 22% faster."
+  },
+  {
+   "id": "blade_2",
+   "name": "Twin Cut",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A sword technique. Rank E: +9 power; quests needing combat or melee go 22% faster."
+  },
+  {
+   "id": "blade_3",
+   "name": "Riposte",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A sword technique. Rank D: +14 power; quests needing combat or melee go 29% faster."
+  },
+  {
+   "id": "blade_4",
+   "name": "Cleave",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A sword technique. Rank D: +14 power; quests needing combat or melee go 29% faster."
+  },
+  {
+   "id": "blade_5",
+   "name": "Whirlwind",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A sword technique. Rank C: +19 power; quests needing combat or melee go 36% faster."
+  },
+  {
+   "id": "blade_6",
+   "name": "Moonfang Edge",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A sword technique. Rank C: +19 power; quests needing combat or melee go 36% faster."
+  },
+  {
+   "id": "blade_7",
+   "name": "Thousand Cuts",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A sword technique. Rank B: +24 power; quests needing combat or melee go 43% faster."
+  },
+  {
+   "id": "blade_8",
+   "name": "Dragonsplitter",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A sword technique. Rank B: +24 power; quests needing combat or melee go 43% faster."
+  },
+  {
+   "id": "blade_9",
+   "name": "Blade Dance",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A sword technique. Rank A: +29 power; quests needing combat or melee go 50% faster."
+  },
+  {
+   "id": "blade_10",
+   "name": "Sword Saint's Stance",
+   "school": "blade",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A sword technique. Rank A: +29 power; quests needing combat or melee go 50% faster."
+  },
+  {
+   "id": "bulwark_1",
+   "name": "Brace",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A defensive art. Rank E: +9 power; quests needing defense or combat go 22% faster."
+  },
+  {
+   "id": "bulwark_2",
+   "name": "Shield Wall",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A defensive art. Rank E: +9 power; quests needing defense or combat go 22% faster."
+  },
+  {
+   "id": "bulwark_3",
+   "name": "Taunt",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A defensive art. Rank D: +14 power; quests needing defense or combat go 29% faster."
+  },
+  {
+   "id": "bulwark_4",
+   "name": "Iron Skin",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A defensive art. Rank D: +14 power; quests needing defense or combat go 29% faster."
+  },
+  {
+   "id": "bulwark_5",
+   "name": "Guardian's Oath",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A defensive art. Rank C: +19 power; quests needing defense or combat go 36% faster."
+  },
+  {
+   "id": "bulwark_6",
+   "name": "Bastion",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A defensive art. Rank C: +19 power; quests needing defense or combat go 36% faster."
+  },
+  {
+   "id": "bulwark_7",
+   "name": "Unbreakable",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A defensive art. Rank B: +24 power; quests needing defense or combat go 43% faster."
+  },
+  {
+   "id": "bulwark_8",
+   "name": "Aegis of Dawn",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A defensive art. Rank B: +24 power; quests needing defense or combat go 43% faster."
+  },
+  {
+   "id": "bulwark_9",
+   "name": "Last Bastion",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A defensive art. Rank A: +29 power; quests needing defense or combat go 50% faster."
+  },
+  {
+   "id": "bulwark_10",
+   "name": "Fortress Heart",
+   "school": "bulwark",
+   "tags": [
+    "defense",
+    "combat"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A defensive art. Rank A: +29 power; quests needing defense or combat go 50% faster."
+  },
+  {
+   "id": "arcane_1",
+   "name": "Spark",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A spell from the academy. Rank E: +9 power; quests needing magic or lore go 22% faster."
+  },
+  {
+   "id": "arcane_2",
+   "name": "Frost Bolt",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A spell from the academy. Rank E: +9 power; quests needing magic or lore go 22% faster."
+  },
+  {
+   "id": "arcane_3",
+   "name": "Arcane Missile",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A spell from the academy. Rank D: +14 power; quests needing magic or lore go 29% faster."
+  },
+  {
+   "id": "arcane_4",
+   "name": "Fireball",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A spell from the academy. Rank D: +14 power; quests needing magic or lore go 29% faster."
+  },
+  {
+   "id": "arcane_5",
+   "name": "Chain Lightning",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A spell from the academy. Rank C: +19 power; quests needing magic or lore go 36% faster."
+  },
+  {
+   "id": "arcane_6",
+   "name": "Mana Shield",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A spell from the academy. Rank C: +19 power; quests needing magic or lore go 36% faster."
+  },
+  {
+   "id": "arcane_7",
+   "name": "Meteor Call",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A spell from the academy. Rank B: +24 power; quests needing magic or lore go 43% faster."
+  },
+  {
+   "id": "arcane_8",
+   "name": "Time Skip",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A spell from the academy. Rank B: +24 power; quests needing magic or lore go 43% faster."
+  },
+  {
+   "id": "arcane_9",
+   "name": "Gravity Well",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A spell from the academy. Rank A: +29 power; quests needing magic or lore go 50% faster."
+  },
+  {
+   "id": "arcane_10",
+   "name": "Starfall",
+   "school": "arcane",
+   "tags": [
+    "magic",
+    "lore"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A spell from the academy. Rank A: +29 power; quests needing magic or lore go 50% faster."
+  },
+  {
+   "id": "holy_1",
+   "name": "Mend",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A prayer the temples teach. Rank E: +9 power; quests needing heal or faith go 22% faster."
+  },
+  {
+   "id": "holy_2",
+   "name": "Bless",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A prayer the temples teach. Rank E: +9 power; quests needing heal or faith go 22% faster."
+  },
+  {
+   "id": "holy_3",
+   "name": "Purify",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A prayer the temples teach. Rank D: +14 power; quests needing heal or faith go 29% faster."
+  },
+  {
+   "id": "holy_4",
+   "name": "Sanctuary",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A prayer the temples teach. Rank D: +14 power; quests needing heal or faith go 29% faster."
+  },
+  {
+   "id": "holy_5",
+   "name": "Holy Light",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A prayer the temples teach. Rank C: +19 power; quests needing heal or faith go 36% faster."
+  },
+  {
+   "id": "holy_6",
+   "name": "Revive",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A prayer the temples teach. Rank C: +19 power; quests needing heal or faith go 36% faster."
+  },
+  {
+   "id": "holy_7",
+   "name": "Divine Shield",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A prayer the temples teach. Rank B: +24 power; quests needing heal or faith go 43% faster."
+  },
+  {
+   "id": "holy_8",
+   "name": "Smite the Unclean",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A prayer the temples teach. Rank B: +24 power; quests needing heal or faith go 43% faster."
+  },
+  {
+   "id": "holy_9",
+   "name": "Choir of Stars",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A prayer the temples teach. Rank A: +29 power; quests needing heal or faith go 50% faster."
+  },
+  {
+   "id": "holy_10",
+   "name": "Miracle",
+   "school": "holy",
+   "tags": [
+    "heal",
+    "faith"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A prayer the temples teach. Rank A: +29 power; quests needing heal or faith go 50% faster."
+  },
+  {
+   "id": "craft_1",
+   "name": "Haggle",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A trade secret. Rank E: +9 power; quests needing craft or trade go 22% faster."
+  },
+  {
+   "id": "craft_2",
+   "name": "Quick Hands",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A trade secret. Rank E: +9 power; quests needing craft or trade go 22% faster."
+  },
+  {
+   "id": "craft_3",
+   "name": "Sturdy Build",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A trade secret. Rank D: +14 power; quests needing craft or trade go 29% faster."
+  },
+  {
+   "id": "craft_4",
+   "name": "Master Forge",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A trade secret. Rank D: +14 power; quests needing craft or trade go 29% faster."
+  },
+  {
+   "id": "craft_5",
+   "name": "Potion Brewing",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A trade secret. Rank C: +19 power; quests needing craft or trade go 36% faster."
+  },
+  {
+   "id": "craft_6",
+   "name": "Enchanting",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A trade secret. Rank C: +19 power; quests needing craft or trade go 36% faster."
+  },
+  {
+   "id": "craft_7",
+   "name": "Rune Carving",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A trade secret. Rank B: +24 power; quests needing craft or trade go 43% faster."
+  },
+  {
+   "id": "craft_8",
+   "name": "Golem Assembly",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A trade secret. Rank B: +24 power; quests needing craft or trade go 43% faster."
+  },
+  {
+   "id": "craft_9",
+   "name": "Philosopher's Touch",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A trade secret. Rank A: +29 power; quests needing craft or trade go 50% faster."
+  },
+  {
+   "id": "craft_10",
+   "name": "Legendary Craft",
+   "school": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A trade secret. Rank A: +29 power; quests needing craft or trade go 50% faster."
+  },
+  {
+   "id": "wild_1",
+   "name": "Forage",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A wilderness skill. Rank E: +9 power; quests needing survival or scout go 22% faster."
+  },
+  {
+   "id": "wild_2",
+   "name": "Track",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "E",
+   "tier": 1,
+   "power": 9,
+   "speed": 0.22,
+   "desc": "A wilderness skill. Rank E: +9 power; quests needing survival or scout go 22% faster."
+  },
+  {
+   "id": "wild_3",
+   "name": "Camouflage",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A wilderness skill. Rank D: +14 power; quests needing survival or scout go 29% faster."
+  },
+  {
+   "id": "wild_4",
+   "name": "Beast Friend",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "D",
+   "tier": 2,
+   "power": 14,
+   "speed": 0.29,
+   "desc": "A wilderness skill. Rank D: +14 power; quests needing survival or scout go 29% faster."
+  },
+  {
+   "id": "wild_5",
+   "name": "Eagle Eye",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A wilderness skill. Rank C: +19 power; quests needing survival or scout go 36% faster."
+  },
+  {
+   "id": "wild_6",
+   "name": "Trailblazer",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "C",
+   "tier": 3,
+   "power": 19,
+   "speed": 0.36,
+   "desc": "A wilderness skill. Rank C: +19 power; quests needing survival or scout go 36% faster."
+  },
+  {
+   "id": "wild_7",
+   "name": "Pathfinder",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A wilderness skill. Rank B: +24 power; quests needing survival or scout go 43% faster."
+  },
+  {
+   "id": "wild_8",
+   "name": "Storm Rider",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "B",
+   "tier": 4,
+   "power": 24,
+   "speed": 0.43,
+   "desc": "A wilderness skill. Rank B: +24 power; quests needing survival or scout go 43% faster."
+  },
+  {
+   "id": "wild_9",
+   "name": "Wild Heart",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A wilderness skill. Rank A: +29 power; quests needing survival or scout go 50% faster."
+  },
+  {
+   "id": "wild_10",
+   "name": "Spirit of the Forest",
+   "school": "wild",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "rank": "A",
+   "tier": 5,
+   "power": 29,
+   "speed": 0.5,
+   "desc": "A wilderness skill. Rank A: +29 power; quests needing survival or scout go 50% faster."
+  }
+ ]
+}

@@ -26,6 +26,15 @@ Weights from [RULES.md](../RULES.md#judging).
 | Daily Hive Times | Retention | `/times` | Works locally (offline template) |
 | Status Window, search and fly-to in 3D | Clarity, Execution | Search "Mochi" → camera flies → panel opens | Works locally |
 
+## Season simulation prototype (2026-10-22, see [SIM_PLAN.md](SIM_PLAN.md))
+| Feature | Judging criterion it serves |
+|---|---|
+| All 1,969 Chogs are agents (work, wander, quest, meet, fight, rest), including a Demon King, 4 generals and 195 henchmen | Novelty, Chog NFT essential |
+| Season arc: generals break the seals, march on the castle, any job can land the final blow and become Hero | Fun, Retention (a new season re-rolls jobs) |
+| Constellation powers: 3 Star Points a day to grant skills (60) or give quests (36) to any Chog; skills change how long quests take | Retention, Chog NFT essential (holders only) |
+| Live view: season bar, Star Stream chronicle, Status Window with quest progress, skills and recent actions | Clarity |
+| Template narration (no model needed); deterministic, seeded mechanics; fast-forward check `npx tsx scripts/season-sim.ts` | Execution |
+
 ## Out of scope for the deadline
 
 Jobs, unique cheats and the 10,080-skill catalog from WORLD_BIBLE.md (planned, not built), $CHOG integration, real-time multiplayer, mobile-native apps.

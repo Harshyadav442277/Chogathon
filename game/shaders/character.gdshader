@@ -22,7 +22,10 @@ const float HIP = 0.34;
 const float SHOULDER = 0.78;
 
 // Per-job looks, tool shapes and material colors live in a lookup texture (scripts/characters/outfits.gd):
-// rows 0..31 jobs, rows 32.. tool pieces (4 per tool), row 152 materials. texelFetch keeps the shader fast.
+// rows 0..39 jobs (39 = none), rows 40.. tool pieces (4 per tool), row 164 materials. texelFetch keeps the shader fast.
+const int JOB_NONE = 39;
+const int PROP_ROW = 40;
+const int MAT_ROW = 164;
 uniform sampler2D looks : filter_nearest;
 
 vec4 look(int x, int y) {
@@ -79,7 +82,8 @@ void hat_shape(float h, out vec4 crown, out vec3 brim) {
 	else if (h < 9.5) { crown = vec4(0.25, 0.55, 0.3, 0.0); brim = vec3(0.27, 0.05, 0.0); }       // mitre
 	else if (h < 10.5) { crown = vec4(0.23, 0.5, 1.05, 0.0); brim = vec3(0.4, 0.03, 0.0); }       // top hat
 	else if (h < 11.5) { crown = vec4(0.38, 0.28, 0.8, -0.05); brim = vec3(0.4, 0.1, 0.0); }      // turban
-	else { crown = vec4(0.4, 0.1, 0.85, 0.0); }                                                    // beret
+	else if (h < 12.5) { crown = vec4(0.4, 0.1, 0.85, 0.0); }                                     // beret
+	else { crown = vec4(0.3, 0.14, 1.0, -0.02); }                                                  // horns (spikes added below)
 }
 
 void vertex() {
@@ -91,8 +95,8 @@ void vertex() {
 	float role = mod(floor(code / 4.0), 8.0);
 	float work = mod(floor(code / 32.0), 8.0);
 	int job = int(floor(code / 256.0)) - 1;
-	if (job < 0 || job > 30) {
-		job = 31;
+	if (job < 0 || job > 35) {
+		job = JOB_NONE;
 	}
 	// Each job has its own tool; without a season job, adventurers carry their role prop, others their track's tool.
 	vec4 j0 = look(0, job);  // shirt, hat
@@ -105,11 +109,11 @@ void vertex() {
 		prop = int(role > 0.5 ? role : 7.0 + work);
 	}
 	int idx = prop * 4 + int(piece) - 1;
-	vec4 pbase = piece > 0.5 ? look(0, 32 + idx) : vec4(0.0);  // base.xyz, tilt
-	vec4 psize = piece > 0.5 ? look(1, 32 + idx) : vec4(0.0);  // size.xyz, material
+	vec4 pbase = piece > 0.5 ? look(0, PROP_ROW + idx) : vec4(0.0);  // base.xyz, tilt
+	vec4 psize = piece > 0.5 ? look(1, PROP_ROW + idx) : vec4(0.0);  // size.xyz, material
 	bool hidden = piece > 0.5 && psize.x == 0.0;  // this prop has no such piece
 	float dist = length(INV_VIEW_MATRIX[3].xyz - origin);
-	float s = max(1.0, dist * min_screen) * (1.0 + INSTANCE_CUSTOM.a * 0.5);
+	float s = max(1.0, dist * min_screen) * (1.0 + INSTANCE_CUSTOM.a * 0.5) * max(0.5, COLOR.a * 3.0);  // COLOR.a = size / 3
 	float phase = INSTANCE_CUSTOM.b * TAU;
 	float t = TIME + INSTANCE_CUSTOM.b * 7.0;
 
@@ -134,7 +138,7 @@ void vertex() {
 			float k = sin(t * 5.0);
 			leg_l = 0.6 * k; leg_r = -0.6 * k; arm_l = -0.6 * k; arm_r = -0.15;
 			shift.y = abs(k) * 0.06;
-		} else if (job == 2 || (job == 31 && work < 0.5)) {  // blacksmith: slow lift, fast strike, dip on impact
+		} else if (job == 2 || (job == JOB_NONE && work < 0.5)) {  // blacksmith: slow lift, fast strike, dip on impact
 			float lift = f < 0.75 ? smoothstep(0.0, 0.75, f) : 1.0 - (f - 0.75) / 0.25;
 			arm_r = -(0.3 + 2.3 * lift);
 			bow = 0.3 * (1.0 - lift);
@@ -188,7 +192,7 @@ void vertex() {
 		} else if (job == 19) {  // courier: jog on the spot
 			float k = sin(t * 9.0);
 			leg_l = 0.8 * k; leg_r = -0.8 * k; arm_l = -0.7 * k; arm_r = -0.9 + 0.3 * k; shift.y = abs(k) * 0.12; bow = 0.12;
-		} else if (job == 20 || (job == 31 && work > 1.5 && work < 2.5)) {  // farmer: both arms drive the shovel down
+		} else if (job == 20 || (job == JOB_NONE && work > 1.5 && work < 2.5)) {  // farmer: both arms drive the shovel down
 			float d = 0.5 + 0.5 * sin(f * TAU);
 			arm_l = -(0.4 + 1.0 * d); arm_r = arm_l; bow = 0.1 + 0.35 * d;
 		} else if (job == 21) {  // fisher: cast, wait, reel in
@@ -206,7 +210,7 @@ void vertex() {
 		} else if (job == 24) {  // stablehand: scoop hay, toss it over the shoulder
 			float toss = smoothstep(0.45, 0.6, f) * (1.0 - smoothstep(0.75, 0.95, f));
 			arm_r = -0.5 - 1.9 * toss; arm_l = arm_r; bow = 0.5 * (1.0 - toss) - 0.2 * toss; twist = 0.6 * toss;
-		} else if (job == 25 || (job == 31 && work > 3.5)) {  // main dps: quick forward sword strikes
+		} else if (job == 25 || (job == JOB_NONE && work > 3.5)) {  // main dps: quick forward sword strikes
 			float k = abs(sin(f * TAU));
 			arm_r = -(0.4 + 1.6 * k); bow = 0.25 * k; shift.z = 0.15 * k;
 		} else if (job == 26) {  // sub dps: alternating dagger stabs from a crouch
@@ -223,6 +227,19 @@ void vertex() {
 			shift.y = 0.03 * abs(sin(t * 4.0));
 		} else if (job == 30) {  // buffer: wave the banner
 			arm_r = -2.3 + 0.45 * sin(t * 3.0); out_r = 0.4 * sin(t * 3.0); twist = 0.12 * sin(t * 3.0);
+		} else if (job == 31) {  // Demon King: arms spread wide, hovering, menacing
+			arm_r = -1.5; arm_l = -1.5; out_r = 0.9 + 0.2 * sin(t * 1.2); out_l = out_r;
+			shift.y = 0.12 + 0.08 * sin(t * 1.2); bow = -0.15;
+		} else if (job == 32) {  // Demon General: brandish the blade overhead
+			arm_r = -2.4 + 0.5 * sin(t * 2.0); out_r = 0.3 * sin(t * 2.0); arm_l = -0.6; bow = -0.1;
+		} else if (job == 33) {  // Dark Knight: slow patrol step, spear and guard up
+			float k = sin(t * 2.5);
+			leg_l = 0.3 * k; leg_r = -0.3 * k; arm_r = -0.3; arm_l = -0.8;
+		} else if (job == 34) {  // Imp: hop and flail
+			float k = sin(t * 12.0);
+			shift.y = abs(sin(t * 6.0)) * 0.25; arm_r = -1.5 + 0.8 * k; arm_l = -1.5 - 0.8 * k; twist = 0.3 * sin(t * 3.0);
+		} else if (job == 35) {  // Cultist: chant with raised arms
+			arm_r = -1.9 + 0.2 * sin(t * 3.0); arm_l = arm_r; bow = 0.15 + 0.1 * sin(t * 3.0);
 		} else if (work < 1.5) {  // no job, service track: a polite bow every other cycle
 			float g = fract(TIME * 0.4 + INSTANCE_CUSTOM.b);
 			bow = 0.55 * (smoothstep(0.1, 0.3, g) - smoothstep(0.55, 0.8, g));
@@ -231,6 +248,12 @@ void vertex() {
 			float up = smoothstep(0.05, 0.15, g) - smoothstep(0.6, 0.7, g);
 			arm_r = -2.7 * up; bow = -0.2 * up;
 		}
+	} else if (state > 2.5) {
+		// Idle: breathe, shift weight, glance around now and then.
+		float g = fract(TIME * 0.15 + INSTANCE_CUSTOM.b);
+		shift.y = 0.015 * sin(t * 2.0);
+		twist = 0.5 * (smoothstep(0.6, 0.7, g) - smoothstep(0.8, 0.9, g));
+		arm_l = 0.05 * sin(t * 2.0); arm_r = -0.05 * sin(t * 2.0);
 	} else {
 		// Fight: lunge forward and strike, recoil with a shake and a red/white flash as the hit lands.
 		float f = fract(TIME * 0.9 + INSTANCE_CUSTOM.b);
@@ -265,7 +288,11 @@ void vertex() {
 		hat_shape(hat, crown, brim);
 		float hy = head_y + head_size * 0.3 + crown.w;
 		if (part == 5) {
-			float k = mix(1.0, crown.z, m.y);
+			if (hat > 12.5 && m.y > 0.5 && abs(m.x) > 0.4) {
+				m.y += 2.4;   // horns: the two side corners of the band shoot up and out
+				m.x *= 1.6;
+			}
+			float k = mix(1.0, crown.z, min(m.y, 1.0));
 			m = vec3(m.x * 2.0 * crown.x * k, hy + m.y * crown.y, m.z * 2.0 * crown.x * k);
 			if (hat > 6.5 && hat < 7.5) {
 				m.z -= 0.24;  // the hood frames the portrait from behind instead of covering it
@@ -372,7 +399,7 @@ void fragment() {
 		vec3 alb = v_base;
 		if (v_mat > 0.5) {
 			int mi = int(v_mat + 0.5);
-			alb = mi == 4 ? v_color : look(mi, 152).rgb;
+			alb = mi == 4 ? v_color : look(mi, MAT_ROW).rgb;
 			if (mi == 6) {
 				EMISSION = vec3(0.4, 0.85, 1.0);
 			} else if (mi == 11) {

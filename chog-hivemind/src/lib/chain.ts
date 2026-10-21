@@ -21,7 +21,30 @@ const erc721 = [
     inputs: [{ name: "tokenId", type: "uint256" }],
     outputs: [{ name: "", type: "address" }],
   },
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "owner", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
 ] as const;
+
+const holderCache = new Map<string, { n: number; at: number }>();
+
+/** How many Chogs `address` holds (live balanceOf, cached for 10 minutes). Null if the RPC failed. */
+export async function chogBalance(address: string): Promise<number | null> {
+  const key = address.toLowerCase();
+  const hit = holderCache.get(key);
+  if (hit && Date.now() - hit.at < 600_000) return hit.n;
+  try {
+    const n = Number(await publicClient.readContract({ address: CHOG_CONTRACT, abi: erc721, functionName: "balanceOf", args: [key as Address] }));
+    holderCache.set(key, { n, at: Date.now() });
+    return n;
+  } catch {
+    return null;
+  }
+}
 
 export async function ownerOf(tokenId: number): Promise<Address | null> {
   try {

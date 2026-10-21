@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
 async function buildStream() {
   const season = Number(await getState("season", "0"));
-  const [events, memes, injections, seasons] = await Promise.all([
+  const [events, memes, injections, seasons, chronicle] = await Promise.all([
     all<any>(`SELECT kind, title, body, created_at FROM events ORDER BY id DESC LIMIT 15`),
     all<any>(
       `SELECT m.text, m.adopters, m.created_at, c.id AS chog, c.name FROM memes m JOIN chogs c ON c.id = m.origin_chog ORDER BY m.id DESC LIMIT 10`,
@@ -23,6 +23,7 @@ async function buildStream() {
        WHERE i.status != 'pending' ORDER BY i.id DESC LIMIT 10`,
     ),
     all<any>(`SELECT n, started_at FROM seasons ORDER BY n DESC LIMIT 1`).catch(() => []),
+    all<any>(`SELECT at, kind, chog, text FROM chronicle WHERE season = ? ORDER BY id DESC LIMIT 25`, [season]).catch(() => []),
   ]);
   const lines: Line[] = [];
   for (const s of seasons)
@@ -38,6 +39,12 @@ async function buildStream() {
       at: Number(i.created_at), kind: "constellation", chog: i.chog == null ? undefined : Number(i.chog),
       text: i.kind === "rumor" ? `[RUMOR] ${who} ${verb} a rumor whispered in the streets.` : `[CONSTELLATION] ${who} ${verb} a message from the stars.`,
     });
+  }
+  // Season simulation chronicle: raids, seals, quests, gifts, the Hero.
+  const SYSTEM = new Set(["hero", "general_down", "march", "last_stand", "season"]);
+  for (const c of chronicle) {
+    const kind = SYSTEM.has(c.kind) ? "system" : c.kind.startsWith("raid") ? "event" : c.kind.startsWith("gift") ? "constellation" : "meme";
+    lines.push({ at: Number(c.at), kind, chog: c.chog == null ? undefined : Number(c.chog), text: String(c.text) });
   }
   lines.sort((a, b) => b.at - a.at);
   return { season, lines: lines.slice(0, 40) };
