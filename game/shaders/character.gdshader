@@ -1,10 +1,12 @@
 shader_type spatial;
 // One MultiMesh draws every Chog as a little chibi (mesh from scripts/characters/chibi_mesh.gd).
-// UV2.x = body part (0 torso, 1 legs, 2 left arm, 3 right arm, 4 face).
+// UV2.x = body part (0 torso, 1 legs, 2 left arm, 3 right arm, 4 face). UV2.y = prop (ChibiMesh.Prop, 0 none);
+// a prop is tagged with the arm that holds it. UV.x on non-face parts = material (ChibiMesh.Mat).
 // The face is the Chog's NFT portrait from the atlas, turned toward the camera and ringed in its house color.
 // Instance COLOR = house color (sRGB). INSTANCE_CUSTOM: r = atlas slot (tokenId - 1),
 // g = state + 4 * role + 32 * work (state 0 walk, 1 work, 2 fight; role 0 civilian, 1..6 adventurer roles;
 // work 0 hammer, 1 bow, 2 dig, 3 salute, 4 sword drill), b = phase offset 0..1, a = highlight 0..1.
+// Each Chog shows one prop: its role prop if it is an adventurer (prop = role), else its job tool (prop = 7 + work).
 // All animation is rigid rotation of parts around hip and shoulder pivots: no skeletons.
 render_mode world_vertex_coords, cull_back, depth_draw_opaque;
 
@@ -24,6 +26,7 @@ varying flat float v_slot;
 varying vec3 v_color;
 varying float v_sel;
 varying float v_flash;
+varying flat float v_mat;
 
 vec3 srgb_to_linear(vec3 c) {
 	return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
@@ -38,11 +41,14 @@ vec3 rot_x(vec3 p, float pivot, float a) {
 void vertex() {
 	float part = floor(UV2.x + 0.5);
 	vec3 origin = MODEL_MATRIX[3].xyz;
+	float code = floor(INSTANCE_CUSTOM.g + 0.5);
+	float role = mod(floor(code / 4.0), 8.0);
+	float work = floor(code / 32.0);
+	float prop = floor(UV2.y + 0.5);
+	bool hidden = prop > 0.5 && abs(prop - (role > 0.5 ? role : 7.0 + work)) > 0.5;  // not this Chog's prop
 	float dist = length(INV_VIEW_MATRIX[3].xyz - origin);
 	float s = max(1.0, dist * min_screen) * (1.0 + INSTANCE_CUSTOM.a * 0.5);
-	float code = floor(INSTANCE_CUSTOM.g + 0.5);
 	float state = mod(code, 4.0);
-	float work = floor(code / 32.0);
 	float phase = INSTANCE_CUSTOM.b * TAU;
 
 	// Pose for this frame: limb angles, forward bend of the upper body, and a whole-body offset.
@@ -126,12 +132,13 @@ void vertex() {
 		local += (right * (UV.x - 0.5) + up * (0.5 - UV.y)) * head_size + back * 0.25;
 		NORMAL = back;
 	}
-	VERTEX = origin + local * s;
+	VERTEX = hidden ? origin : origin + local * s;  // a collapsed triangle draws nothing
 	v_part = part;
 	v_slot = INSTANCE_CUSTOM.r;
 	v_sel = INSTANCE_CUSTOM.a;
 	v_color = srgb_to_linear(COLOR.rgb);
 	v_flash = flash;
+	v_mat = part > 3.5 ? 0.0 : floor(UV.x + 0.5);
 }
 
 void fragment() {
@@ -157,13 +164,20 @@ void fragment() {
 		ALBEDO = vec3(0.0);
 		EMISSION = col;
 	} else {
-		if (v_part > 1.5) {
+		if (v_mat > 0.5) {
+			// Prop materials: steel, wood, gold, house color, paper, glowing orb.
+			ALBEDO = v_mat < 1.5 ? vec3(0.72, 0.76, 0.82) : v_mat < 2.5 ? vec3(0.42, 0.26, 0.13) : v_mat < 3.5 ? vec3(1.0, 0.76, 0.2)
+				: v_mat < 4.5 ? v_color : v_mat < 5.5 ? vec3(0.95, 0.92, 0.82) : vec3(0.55, 0.95, 1.0);
+			if (v_mat > 5.5) {
+				EMISSION = vec3(0.4, 0.85, 1.0);
+			}
+		} else if (v_part > 1.5) {
 			ALBEDO = mix(v_color, vec3(1.0), 0.3);
 		} else if (v_part > 0.5) {
 			ALBEDO = v_color * 0.3;
 		} else {
 			ALBEDO = v_color;
 		}
-		EMISSION = flash_col * v_flash * 0.8;
+		EMISSION += flash_col * v_flash * 0.8;
 	}
 }
