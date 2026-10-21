@@ -1,0 +1,35 @@
+name: hive-tick
+
+# The Hive's heartbeat. Free on public repos. GitHub may delay scheduled runs by a few minutes.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: hive-tick
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: chog-hivemind
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: chog-hivemind/package-lock.json
+      - run: npm ci
+      - name: Run ticks
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TICK_AGENTS: ${{ vars.TICK_AGENTS || '30' }}
+        run: npm run tick -- 2

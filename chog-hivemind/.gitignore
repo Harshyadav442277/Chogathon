@@ -7,3 +7,6 @@ node_modules
 data/snapshot.log
 next-env.d.ts
 *.tsbuildinfo
+data/*.log
+test.db
+siwe-test.tmp.mjs
