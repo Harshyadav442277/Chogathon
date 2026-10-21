@@ -37,7 +37,8 @@ export function workplaceBuilding(id: number, house: string, workplace?: string)
   if (!workplace) return -1;
   const type = WORKPLACE_BUILDING[workplace] ?? workplace;
   const region = HOUSE_REGION[house] ?? "capital";
-  const toCapital = (workplace === "guild" || workplace === "castle") && hash(`cap:${id}`) % 100 < 30;
+  // About a quarter of every trade works in the Hive Capital (if it has that building), so its shops are lively too.
+  const toCapital = hash(`cap:${id}`) % 100 < ((workplace === "guild" || workplace === "castle") ? 30 : 22);
   const pick = (list?: number[]) => (list && list.length ? list[hash(`work:${id}`) % list.length] : -1);
   if (toCapital) {
     const hq = pick(buildingsBy.get(`${workplace === "castle" ? "castle" : type}:capital`));
@@ -53,8 +54,21 @@ export function poiFor(location: string): number {
 
 const SPREAD: Record<string, number> = { capital: 16, district: 8, town: 7, village: 5, tavern: 5, wild: 6, dungeon: 5, obelisk: 3, dock: 5, lighthouse: 3 };
 
-/** A dry spot near (cx, cz): tries a few angles/radii so nobody stands in a lake or river. */
+const spotCache = new Map<string, [number, number]>();
+
+/** A dry spot near (cx, cz): tries a few angles/radii so nobody stands in a lake or river. Cached: a Chog's
+ *  spot depends only on its id and the place, and the terrain height function is expensive. */
 function dryNear(id: number, cx: number, cz: number, spread: number, minR = 2): [number, number] {
+  const key = `${id}:${cx}:${cz}`;
+  const hit = spotCache.get(key);
+  if (hit) return hit;
+  if (spotCache.size > 50000) spotCache.clear();
+  const spot = findDry(id, cx, cz, spread, minR);
+  spotCache.set(key, spot);
+  return spot;
+}
+
+function findDry(id: number, cx: number, cz: number, spread: number, minR: number): [number, number] {
   for (let k = 0; k < 10; k++) {
     const a = ((hash(`ja:${id}:${k}`) % 3600) / 3600) * Math.PI * 2;
     const r = minR + Math.sqrt((hash(`jr:${id}:${k}`) % 1000) / 1000) * spread;
@@ -81,12 +95,12 @@ export async function positions() {
   let rows: any[];
   try {
     rows = await all<any>(
-      `SELECT c.id, c.name, c.house, c.location, c.mood, c.persona, cs.job FROM chogs c
+      `SELECT c.id, c.name, c.house, c.location, c.mood, json_extract(c.persona, '$.home') AS home, cs.job FROM chogs c
        LEFT JOIN chog_season cs ON cs.chog_id = c.id AND cs.season = (SELECT CAST(value AS INTEGER) FROM state WHERE key = 'season')
        WHERE c.id > 0 ORDER BY c.id`,
     );
   } catch {
-    rows = await all<any>(`SELECT id, name, house, location, mood, persona, NULL AS job FROM chogs WHERE id > 0 ORDER BY id`);
+    rows = await all<any>(`SELECT id, name, house, location, mood, json_extract(persona, '$.home') AS home, NULL AS job FROM chogs WHERE id > 0 ORDER BY id`);
   }
   const n = rows.length;
   const out = {
@@ -96,7 +110,7 @@ export async function positions() {
   };
   rows.forEach((r, k) => {
     const id = Number(r.id);
-    const home = (() => { try { return JSON.parse(r.persona).home as string; } catch { return "plaza"; } })();
+    const home = (r.home as string) ?? "plaza";
     const job = r.job ? JOB_BY_ID[r.job] : undefined;
     const atWork = r.location === home && r.location !== "cave";
     const bi = atWork ? workplaceBuilding(id, r.house, job?.workplace) : -1;

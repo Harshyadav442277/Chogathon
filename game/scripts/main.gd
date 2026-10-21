@@ -7,6 +7,8 @@ var terrain: Terrain
 var swarm: Node3D
 const CHARACTERS_SCRIPT := "res://scripts/characters/characters.gd"
 var rig: CameraRig
+var towns: Settlements
+var interiors: Interiors
 
 
 func _ready() -> void:
@@ -14,7 +16,7 @@ func _ready() -> void:
 	terrain = Terrain.new()
 	add_child(terrain)
 	_build_water()
-	var towns := Settlements.new()
+	towns = Settlements.new()
 	towns.terrain = terrain
 	add_child(towns)
 	towns.build(GameState.world)
@@ -27,6 +29,9 @@ func _ready() -> void:
 	rig = CameraRig.new()
 	add_child(rig)
 	rig.clicked.connect(_on_click)
+	interiors = Interiors.new()
+	interiors.world_rig = rig
+	add_child(interiors)
 	add_child(Hud.new())
 	GameState.selection_changed.connect(_on_selected)
 	if not GameState.positions.is_empty():
@@ -46,6 +51,22 @@ func _maybe_screenshot() -> void:
 			if v.size() > 4:
 				rig.yaw = deg_to_rad(float(v[4]))
 			rig._apply()
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--click="):  # dev: simulate a click at screen x,y (tests the real picking path)
+			await get_tree().create_timer(3.0).timeout
+			var c := arg.trim_prefix("--click=").split(",")
+			_on_click(Vector2(float(c[0]), float(c[1])))
+		if arg.begins_with("--enter="):  # dev: open a building interior by index
+			await get_tree().create_timer(2.0).timeout
+			interiors.enter(int(arg.trim_prefix("--enter=")))
+	if OS.get_cmdline_user_args().has("--perf"):  # dev: print frame stats after warm-up
+		await get_tree().create_timer(6.0).timeout
+		var rs := RenderingServer
+		print("CAM pos=%s rig=%s dist=%.0f selected=%d" % [rig.camera.global_position, rig.global_position, rig.dist, GameState.selected])
+		print("PERF fps=%d draw_calls=%d primitives=%d objects=%d" % [Engine.get_frames_per_second(),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)])
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--shot="):
 			await get_tree().create_timer(6.0).timeout
@@ -112,7 +133,15 @@ func _build_water() -> void:
 
 func _on_click(screen_pos: Vector2) -> void:
 	var i: int = swarm.call("pick", rig.camera, screen_pos)
-	GameState.select(swarm.call("id_at", i) if i >= 0 else -1)
+	if i >= 0:
+		GameState.select(swarm.call("id_at", i))
+		return
+	# No Chog under the cursor: step inside an enterable building (tavern, guild, smithy, castle...).
+	var b := towns.pick_building(rig.camera, screen_pos)
+	if b >= 0:
+		interiors.enter(b)
+	else:
+		GameState.select(-1)
 
 
 func _on_selected(chog_id: int) -> void:

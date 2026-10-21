@@ -53,7 +53,24 @@ Roads run from the capital to the nation capitals, the towns and the frontier, d
 - `game/scripts/settlements.gd`: buildings, props, roads and labels from `world.json`
 - `game/shaders/water.gdshader`: animated water
 
-## 7. Checks
+## 7. Building detail and interiors (added 2026-10-21)
+- **Exterior detail:** every house-style building has a stone foundation, timber corner posts and floor beams, a framed door with step and lamp, framed windows with sills and region-tinted shutters, side windows, roof trim and a ridge beam.
+- **Interiors:** click an enterable building to open a cutaway room with its own camera.
+  - Built procedurally by `game/scripts/interior_catalog.gd` and shown by `game/scripts/interiors.gd`.
+  - Enterable (25 types): tavern, guild hall, blacksmith, weaponsmith, armorsmith, alchemist, general store, library, academy, temple, keep, castle, barracks, restaurant, bakery, flower shop, toy shop, tailor, jeweler, colosseum, spire (Election Hall), Demon King's throne room, dungeon, post office, market.
+- **Who's inside:** the Chogs whose workplace is that building, as round NFT portraits wandering around the room. Click one for its Status Window.
+- **Story panel:** `GET /api/v2/building/:id` (`chog-hivemind/src/world/buildings.ts`) returns the building's story beat (tied to the season and the region's Demon General), who works there with job titles, and overheard posts.
+- **Leaving:** Esc or the Back button.
+
+## 8. Level of detail (added 2026-10-21)
+- **Terrain:** the height/color grid is now 641 x 561 (about 1.4 units per cell, double the old resolution). `game/scripts/terrain.gd` splits it into 64 x 64-cell chunks. Each chunk has three meshes: full detail within 170 units of the camera, half detail within 360, quarter detail beyond. Meshes are built on demand, two per frame. Skirts hide cracks between neighbouring detail levels.
+- **Ground cover:** full-detail chunks add grass tufts on green ground and pebbles on sand and rock. They are hidden once the camera moves away.
+- **Shader detail:** `game/shaders/terrain.gdshader` adds colour patches, speckle and grain that fade out with distance, plus an animated foam line on the shore.
+- **Buildings:** above a camera height of 250, buildings switch to simple stand-ins and small props are hidden.
+- **Flat cities:** the four capitals sit on fixed sites (`CITY_SITES` in `chog-hivemind/src/world/terrain.ts`). The ground is flattened under each one, so buildings and roads no longer float or sink on slopes.
+- **Measured natively (Intel integrated GPU):** wide view about 36–45 fps; mid zoom 60 fps with 103 draw calls; Zapstone close-up 56 fps with 117 draw calls. The web pck grew from 4.96 MB to 6.8 MB.
+
+## 9. Checks
 - Native and web screenshots: wide view, mid zoom over a capital, close-up of the volcano.
 - Draw calls under 150.
 - Headless import and run show no errors.

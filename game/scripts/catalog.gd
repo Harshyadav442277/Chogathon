@@ -308,6 +308,35 @@ static func building(type: String) -> ArrayMesh:
 	return a.commit()
 
 
+## Cheap stand-in used when the camera is far away (a few dozen triangles): body + roof in the right size.
+static func building_simple(type: String) -> ArrayMesh:
+	var a := A.new()
+	var tall := ["tower", "lighthouse", "obelisk", "spire", "windmill", "alchemist"]
+	var sizes := {
+		"house_small": Vector3(4, 3, 3.4), "house_large": Vector3(5.6, 4.6, 4), "keep": Vector3(9, 9, 9),
+		"castle": Vector3(15, 8, 13), "barracks": Vector3(10, 3.6, 5), "guild_hall": Vector3(9, 5, 7),
+		"library": Vector3(8, 5, 6.6), "academy": Vector3(7, 4, 5), "temple": Vector3(6, 5, 8), "tavern": Vector3(5.6, 5, 4.6),
+		"stables": Vector3(8, 3, 4), "farm": Vector3(6, 4, 4.5), "market": Vector3(11, 2.4, 3), "colosseum": Vector3(20, 6, 20),
+		"demon_castle": Vector3(16, 10, 14), "dungeon": Vector3(6, 5, 2.2), "mine": Vector3(9, 4, 7), "fishery": Vector3(5, 4, 4),
+		"dock": Vector3(3, 0.6, 10), "wall": Vector3(1.6, 4.4, 7.2), "gate": Vector3(3, 7.5, 9), "fountain": Vector3(6, 1.2, 6),
+	}
+	if tall.has(type):
+		var h: float = {"tower": 9.0, "lighthouse": 14.0, "obelisk": 10.0, "spire": 30.0, "windmill": 7.0, "alchemist": 5.0}[type]
+		var r: float = {"tower": 1.9, "lighthouse": 1.8, "obelisk": 0.9, "spire": 4.0, "windmill": 1.8, "alchemist": 2.4}[type]
+		a.cyl(Vector3.ZERO, r, h, STONE if type != "lighthouse" else Color("#f5f5f5"), 6)
+		a.cone(Vector3(0, h, 0), r * 1.2, r * 1.6, TINT, 6, 0.0, 1.0)
+		return a.commit()
+	var sz: Vector3 = sizes.get(type, Vector3(4.4, 3.2, 3.8))
+	var wall := STONE if ["keep", "castle", "barracks", "library", "temple", "wall", "gate", "colosseum", "fountain"].has(type) else PLASTER
+	if type == "demon_castle":
+		wall = Color("#2a1f33")
+	a.box(Vector3.ZERO, sz, wall)
+	if not ["wall", "dock", "market", "colosseum", "fountain", "dungeon"].has(type):
+		a.gable(Vector3(0, sz.y, 0), sz.x, sz.z, minf(sz.x, sz.z) * 0.55, TINT, 1.0)
+	a.box(Vector3(0, sz.y * 0.35, sz.z / 2.0), Vector3(sz.x * 0.6, 0.5, 0.1), Color("#ffd27a"), 0.5)  # a strip of lit windows
+	return a.commit()
+
+
 static func prop(type: String) -> ArrayMesh:
 	var a := A.new()
 	match type:
@@ -318,12 +347,12 @@ static func prop(type: String) -> ArrayMesh:
 			a.cone(Vector3(0, 4.0, 0), 0.9, 2.0, Color("#468f66"), 7)
 		"oak":
 			a.cyl(Vector3.ZERO, 0.35, 2.0, DWOOD, 5)
-			a.ball(Vector3(0, 3.0, 0), 1.9, Color("#5a9a4a"))
-			a.ball(Vector3(0.9, 2.6, 0.4), 1.2, Color("#4f8f42"))
+			a.ball(Vector3(0, 3.0, 0), 1.9, Color("#5a9a4a"), 0.0, 0.0, 1.0, 3, 6)
+			a.ball(Vector3(0.9, 2.6, 0.4), 1.2, Color("#4f8f42"), 0.0, 0.0, 1.0, 3, 5)
 		"goldtree":
 			a.cyl(Vector3.ZERO, 0.35, 2.0, DWOOD, 5)
-			a.ball(Vector3(0, 3.0, 0), 2.0, Color("#f2c94c"))
-			a.ball(Vector3(-0.8, 2.6, 0.5), 1.2, Color("#e9b83a"))
+			a.ball(Vector3(0, 3.0, 0), 2.0, Color("#f2c94c"), 0.0, 0.0, 1.0, 3, 6)
+			a.ball(Vector3(-0.8, 2.6, 0.5), 1.2, Color("#e9b83a"), 0.0, 0.0, 1.0, 3, 5)
 		"palm":
 			for i in 4:
 				a.cyl(Vector3(i * 0.25, i * 1.1, 0), 0.28 - i * 0.03, 1.1, Color("#9a7348"), 5)
@@ -335,7 +364,7 @@ static func prop(type: String) -> ArrayMesh:
 			a.box(Vector3(0.6, 2.0, 0), Vector3(1.4, 0.15, 0.15), Color("#3b302b"))
 			a.box(Vector3(-0.4, 2.6, 0.2), Vector3(0.15, 0.15, 1.2), Color("#3b302b"))
 		"rock":
-			a.ball(Vector3(0, 0.3, 0), 0.8, Color("#8d867c"), 0.0, 0.0, 0.7)
+			a.ball(Vector3(0, 0.3, 0), 0.8, Color("#8d867c"), 0.0, 0.0, 0.7, 3, 5)
 		"boulder":
 			a.ball(Vector3(0, 0.6, 0), 1.6, Color("#6d675e"), 0.0, 0.0, 0.75)
 			a.ball(Vector3(1.0, 0.3, 0.6), 0.8, Color("#7d776d"), 0.0, 0.0, 0.7)
@@ -344,11 +373,12 @@ static func prop(type: String) -> ArrayMesh:
 			a.crystal(Vector3(0.7, 0, 0.3), 0.4, 1.8, Color("#9fe6ff"))
 			a.crystal(Vector3(-0.5, 0, -0.4), 0.35, 1.4, Color("#e7c6ff"))
 		"flowers":
+			# cheap patch: leafy base + 5 low-poly blossoms (~60 triangles)
 			var fc := [Color("#ff7aa8"), Color("#ffd43b"), Color("#b197fc"), Color("#ffffff")]
-			for i in 6:
-				var ang := TAU * i / 6
-				a.cyl(Vector3(cos(ang) * 0.7, 0, sin(ang) * 0.7), 0.05, 0.5, LEAF, 4)
-				a.ball(Vector3(cos(ang) * 0.7, 0.55, sin(ang) * 0.7), 0.2, fc[i % 4])
+			a.cyl(Vector3.ZERO, 0.9, 0.15, LEAF, 6)
+			for i in 5:
+				var ang := TAU * i / 5
+				a.crystal(Vector3(cos(ang) * 0.55, 0.15, sin(ang) * 0.55), 0.18, 0.45, fc[i % 4], 0.0)
 		"reeds":
 			for i in 5:
 				a.box(Vector3(-0.6 + i * 0.3, 0, (i % 2) * 0.3), Vector3(0.08, 1.6 + (i % 3) * 0.4, 0.08), Color("#7a9a4a"))
