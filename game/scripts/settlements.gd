@@ -17,18 +17,19 @@ const FOOTPRINT := {
 var terrain: Terrain
 var material: ShaderMaterial
 var _buildings: Array = []
-var _detail_nodes: Array[Node3D] = []   # detailed buildings + small props (near view)
-var _simple_nodes: Array[Node3D] = []   # stand-ins (far view)
-var _far := false
 var _lod_tick := 0.0
 const SMALL_PROPS := ["flowers", "reeds", "lily", "rock", "mushroom", "bonespike", "lavarock"]
-const FAR_HEIGHT := 250.0  # camera height above which the far LOD is used
+const PROP_NEAR := 150.0      # props within this distance of the camera use their detailed mesh
+const BUILDING_NEAR := 190.0  # ... buildings
+var _lod_sets: Array = []
+var _lod_cam := Vector3(1e9, 0, 0)
 var _building_pos := PackedVector3Array()
 
 
 func build(world: Dictionary) -> void:
 	material = ShaderMaterial.new()
 	material.shader = preload("res://shaders/vcol.gdshader")
+	material.set_shader_parameter("noise_tex", preload("res://textures/noise.png"))
 	var hour: int = Time.get_datetime_dict_from_system(true)["hour"]
 	material.set_shader_parameter("night", 1.0 if (hour < 6 or hour >= 19) else 0.0)
 	_build_buildings(world.get("buildings", []))
@@ -87,16 +88,10 @@ func _build_buildings(list: Array) -> void:
 		var roof: Color = ROOF.get(str(b["region"]), Color.WHITE)
 		(by_type[t]["c"] as Array[Color]).append(Color(roof.r, roof.g, roof.b, 1.0))
 	for t in by_type:
-		var near_mmi := _instances(Catalog.building(t), by_type[t]["x"], by_type[t]["c"])
-		var far_mmi := _instances(Catalog.building_simple(t), by_type[t]["x"], by_type[t]["c"])
-		if near_mmi:
-			_detail_nodes.append(near_mmi)
-		if far_mmi:
-			far_mmi.visible = false
-			_simple_nodes.append(far_mmi)
+		_add_lod_set(Catalog.building(t), Catalog.building_simple(t), by_type[t]["x"], by_type[t]["c"], BUILDING_NEAR)
 
 
-## Swap detailed buildings/small props for stand-ins when the camera is high above the map.
+## Every 0.25 s: when the camera has moved, re-pick which buildings and props get their detailed mesh.
 func _process(delta: float) -> void:
 	_lod_tick -= delta
 	if _lod_tick > 0.0:
@@ -105,15 +100,9 @@ func _process(delta: float) -> void:
 	var cam := get_viewport().get_camera_3d()
 	if cam == null or cam.global_position.y < -500.0:  # inside an interior
 		return
-	var h := cam.global_position.y
-	var far := h > FAR_HEIGHT + (15.0 if not _far else -15.0)  # hysteresis
-	if far == _far:
-		return
-	_far = far
-	for n in _detail_nodes:
-		n.visible = not far
-	for n in _simple_nodes:
-		n.visible = far
+	if cam.global_position.distance_to(_lod_cam) > 8.0:
+		_lod_cam = cam.global_position
+		_refresh_lod(_lod_cam)
 
 
 ## Index of the enterable building under the cursor (screen space), or -1. Only when zoomed in enough.
@@ -161,9 +150,77 @@ func _build_props(props: Dictionary) -> void:
 		(groups[ti]["x"] as Array[Transform3D]).append(Transform3D(Basis(Vector3.UP, float(props["r"][i])).scaled(Vector3.ONE * s), Vector3(x, y - 0.1, z)))
 		(groups[ti]["c"] as Array[Color]).append(Color(1, 1, 1, 0))
 	for ti in groups:
-		var mmi := _instances(Catalog.prop(str(types[ti])), groups[ti]["x"], groups[ti]["c"])
-		if mmi and SMALL_PROPS.has(str(types[ti])):
-			_detail_nodes.append(mmi)  # tiny props only when zoomed in
+		var name: String = types[ti]
+		var far_mesh: ArrayMesh = null if SMALL_PROPS.has(name) else Catalog.prop_simple(name)
+		_add_lod_set(Catalog.prop(name), far_mesh, groups[ti]["x"], groups[ti]["c"], PROP_NEAR)
+
+
+## A detailed MultiMesh for instances near the camera plus a cheap one (or nothing) for the rest.
+func _add_lod_set(near_mesh: ArrayMesh, far_mesh: ArrayMesh, xf: Array[Transform3D], tints: Array[Color], radius: float) -> void:
+	var far_mmi: MultiMeshInstance3D = _instances(far_mesh, xf, tints) if far_mesh else null
+	var near_mmi := _instances(near_mesh, xf, tints)
+	if near_mmi == null:
+		return
+	near_mmi.multimesh.visible_instance_count = 0
+	var pos := PackedVector3Array()
+	for t in xf:
+		pos.append(t.origin)
+	near_mmi.visible = false
+	_lod_sets.append({"near": near_mmi.multimesh, "far": far_mmi.multimesh if far_mmi else null, "r": radius,
+		"near_node": near_mmi, "far_node": far_mmi,
+		"base": _buffer(xf, tints) if far_mmi else PackedFloat32Array(), "pos": pos, "xf": xf, "c": tints})
+
+
+## MultiMesh buffer built on the CPU (reading `multimesh.buffer` back is empty on some renderers).
+## Per instance: 12 transform floats (row-major 3x4), 4 color (white), 4 custom (tint).
+func _buffer(xf: Array[Transform3D], tints: Array[Color]) -> PackedFloat32Array:
+	var buf := PackedFloat32Array()
+	buf.resize(xf.size() * 20)
+	for i in xf.size():
+		var t := xf[i]
+		var b := t.basis
+		var o := i * 20
+		buf[o] = b.x.x; buf[o + 1] = b.y.x; buf[o + 2] = b.z.x; buf[o + 3] = t.origin.x
+		buf[o + 4] = b.x.y; buf[o + 5] = b.y.y; buf[o + 6] = b.z.y; buf[o + 7] = t.origin.y
+		buf[o + 8] = b.x.z; buf[o + 9] = b.y.z; buf[o + 10] = b.z.z; buf[o + 11] = t.origin.z
+		for k in 4:
+			buf[o + 12 + k] = 1.0
+		var c := tints[i]
+		buf[o + 16] = c.r; buf[o + 17] = c.g; buf[o + 18] = c.b; buf[o + 19] = c.a
+	return buf
+
+
+## Detailed buildings/props near the camera, cheap ones (or nothing, for tiny props) everywhere else.
+## Each type keeps one near and one far MultiMesh; near instances are hidden in the far one by zeroing
+## their transform in the buffer, so the draw-call count never grows with the number of objects.
+func _refresh_lod(cam_pos: Vector3) -> void:
+	for ps in _lod_sets:
+		var r: float = ps["r"]
+		var r2 := r * r
+		var tints: Array[Color] = ps["c"]
+		var pos: PackedVector3Array = ps["pos"]
+		var xf: Array[Transform3D] = ps["xf"]
+		var near: MultiMesh = ps["near"]
+		var far: MultiMesh = ps["far"]
+		var buf := PackedFloat32Array()
+		if far:
+			buf = (ps["base"] as PackedFloat32Array).duplicate()
+		var n := 0
+		for i in pos.size():
+			if pos[i].distance_squared_to(cam_pos) > r2:
+				continue
+			near.set_instance_transform(n, xf[i])
+			near.set_instance_custom_data(n, tints[i])
+			n += 1
+			if far:
+				var o := i * 20  # 12 transform + 4 color + 4 custom floats per instance
+				for k in 12:
+					buf[o + k] = 0.0
+		near.visible_instance_count = n
+		(ps["near_node"] as Node3D).visible = n > 0  # skip empty draws
+		if far:
+			far.buffer = buf
+			(ps["far_node"] as Node3D).visible = n < pos.size()
 
 
 func _build_roads(roads: Array) -> void:

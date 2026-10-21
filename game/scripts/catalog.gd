@@ -337,7 +337,148 @@ static func building_simple(type: String) -> ArrayMesh:
 	return a.commit()
 
 
+## Detailed near version of a prop (trees, rocks, flowers); falls back to the simple mesh for the rest.
 static func prop(type: String) -> ArrayMesh:
+	var a := A.new()
+	match type:
+		"pine":
+			_trunk(a, 0.34, 1.6, 11)
+			a.mat = A.M_LEAF
+			var greens := [Color("#24573f"), Color("#2c6649"), Color("#357453"), Color("#3f845e"), Color("#4b9468")]
+			for k in 5:
+				var t := k / 4.0
+				_star_cone(a, Vector3(0, 0.9 + k * 1.05, 0), lerpf(2.1, 0.65, t), lerpf(2.0, 1.5, t), greens[k], 8, k * 0.37)
+			a.mat = -1
+		"oak", "goldtree":
+			var gold := type == "goldtree"
+			_trunk(a, 0.4, 2.2, 23)
+			a.mat = A.M_BARK
+			a.beam(Vector3(0, 1.8, 0), Vector3(1.0, 2.9, 0.4), 0.22, DWOOD)
+			a.beam(Vector3(0, 2.0, 0), Vector3(-0.9, 3.0, -0.5), 0.2, DWOOD)
+			a.mat = A.M_LEAF
+			var shades := [Color("#f2c94c"), Color("#e9b83a"), Color("#f7d96a"), Color("#d9a42e")] if gold else [Color("#5a9a4a"), Color("#4f8f42"), Color("#67a855"), Color("#457f3b")]
+			var blobs := [Vector3(0, 3.3, 0), Vector3(1.1, 3.0, 0.5), Vector3(-1.0, 3.1, -0.4), Vector3(0.2, 3.0, -1.1), Vector3(-0.3, 4.2, 0.3), Vector3(0.5, 2.9, 1.1)]
+			var radii := [1.6, 1.15, 1.15, 1.05, 1.0, 0.9]
+			var from := a.verts.size()
+			for k in blobs.size():
+				a.ball(blobs[k], radii[k], shades[k % shades.size()], 0.0, 0.0, 0.85, 4, 7)
+			a.jitter(from, 0.32, 7 if gold else 3)
+			a.mat = -1
+		"palm":
+			a.mat = A.M_BARK
+			var prev_p := Vector3.ZERO
+			for k in 6:
+				var t := (k + 1) / 6.0
+				var p := Vector3(t * t * 1.2, t * 4.4, 0)
+				a.beam(prev_p, p, lerpf(0.42, 0.26, t), Color("#9a7348"))
+				a.beam(prev_p + Vector3(0, 0.05, 0), prev_p + Vector3(0, 0.13, 0), lerpf(0.5, 0.33, t), Color("#7d5c38"))
+				prev_p = p
+			a.mat = A.M_LEAF
+			for k in 7:
+				var ang := TAU * k / 7.0 + 0.2
+				var dir := Vector3(cos(ang), 0, sin(ang))
+				_frond(a, prev_p, dir, 2.6, Color("#4caf50") if k % 2 == 0 else Color("#3f9a45"))
+			a.mat = A.M_PLAIN
+			for k in 3:
+				a.ball(prev_p + Vector3(cos(k * 2.1) * 0.3, -0.25, sin(k * 2.1) * 0.3), 0.2, Color("#6b4a2a"), 0.0, 0.0, 1.0, 3, 5)
+			a.mat = -1
+		"deadtree":
+			a.mat = A.M_BARK
+			var bark := Color("#3b302b")
+			a.beam(Vector3(0, -0.2, 0), Vector3(0.2, 1.6, 0.1), 0.42, bark)
+			a.beam(Vector3(0.2, 1.6, 0.1), Vector3(-0.1, 3.0, 0.0), 0.3, bark)
+			a.beam(Vector3(-0.1, 3.0, 0.0), Vector3(0.3, 3.9, -0.2), 0.16, bark)
+			a.beam(Vector3(0.2, 1.8, 0.1), Vector3(1.4, 2.6, 0.3), 0.18, bark)
+			a.beam(Vector3(1.4, 2.6, 0.3), Vector3(1.9, 3.3, 0.1), 0.1, bark)
+			a.beam(Vector3(0.0, 2.5, 0.0), Vector3(-1.1, 3.2, 0.6), 0.14, bark)
+			a.beam(Vector3(-1.1, 3.2, 0.6), Vector3(-1.4, 3.9, 0.5), 0.08, bark)
+			a.beam(Vector3(0.1, 2.9, 0.0), Vector3(0.4, 3.4, -0.9), 0.1, bark)
+			a.mat = -1
+		"rock":
+			a.mat = A.M_ROCK
+			var f0 := a.verts.size()
+			a.ball(Vector3(0, 0.3, 0), 0.8, Color("#8d867c"), 0.0, 0.0, 0.7, 4, 7)
+			a.ball(Vector3(0.6, 0.15, 0.3), 0.4, Color("#7d776d"), 0.0, 0.0, 0.7, 3, 5)
+			a.jitter(f0, 0.28, 11)
+			a.mat = -1
+		"boulder":
+			a.mat = A.M_ROCK
+			var f1 := a.verts.size()
+			a.ball(Vector3(0, 0.6, 0), 1.6, Color("#6d675e"), 0.0, 0.0, 0.75, 5, 8)
+			a.ball(Vector3(1.1, 0.3, 0.6), 0.8, Color("#7d776d"), 0.0, 0.0, 0.7, 4, 6)
+			a.ball(Vector3(-0.9, 0.2, 0.8), 0.5, Color("#5f5a52"), 0.0, 0.0, 0.7, 3, 5)
+			a.jitter(f1, 0.45, 13)
+			a.mat = A.M_LEAF
+			a.ball(Vector3(0.1, 1.55, -0.2), 0.7, Color("#5f8f4a"), 0.0, 0.0, 0.3, 2, 6)  # moss cap
+			a.mat = -1
+		"flowers":
+			var fc := [Color("#ff7aa8"), Color("#ffd43b"), Color("#b197fc"), Color("#ffffff"), Color("#ff8a5c")]
+			a.mat = A.M_LEAF
+			for i in 4:
+				var ang := TAU * i / 4 + 0.4
+				a.ball(Vector3(cos(ang) * 0.45, 0.12, sin(ang) * 0.45), 0.35, LEAF.lightened(0.05 * i), 0.0, 0.0, 0.5, 2, 5)
+			for i in 7:
+				var ang := TAU * i / 7
+				var r := 0.25 + 0.4 * ((i * 37) % 10) / 10.0
+				var base := Vector3(cos(ang) * r, 0, sin(ang) * r)
+				var tip := base + Vector3(0.05, 0.45 + 0.1 * (i % 3), 0.0)
+				a.mat = A.M_PLAIN
+				a.beam(base, tip, 0.04, Color("#3f7a3a"))
+				a.ball(tip, 0.13, fc[i % fc.size()], 0.0, 0.0, 0.6, 2, 5)
+				a.ball(tip + Vector3(0, 0.05, 0), 0.05, Color("#ffd43b"), 0.0, 0.0, 1.0, 2, 3)
+			a.mat = -1
+		_:
+			return prop_simple(type)
+	return a.commit()
+
+
+## Tapered trunk with three root flares.
+static func _trunk(a: Architect, r: float, h: float, seed_v: int) -> void:
+	a.mat = A.M_BARK
+	a.cyl(Vector3(0, -0.2, 0), r, h + 0.2, DWOOD, 7, r * 0.6)
+	for k in 3:
+		var ang := TAU * k / 3.0 + seed_v * 0.3
+		a.beam(Vector3(cos(ang) * r * 1.9, -0.1, sin(ang) * r * 1.9), Vector3(0, 0.7, 0), r * 0.5, DWOOD)
+	a.mat = -1
+
+
+## Jagged cone tier for conifers: alternating long/short spikes whose tips droop.
+static func _star_cone(a: Architect, base: Vector3, r: float, h: float, col: Color, points: int, phase: float) -> void:
+	var top := base + Vector3(0, h, 0)
+	var c := base + Vector3(0, h * 0.3, 0)
+	var ring: Array[Vector3] = []
+	for i in points * 2:
+		var ang := TAU * i / (points * 2) + phase
+		var rr := r if i % 2 == 0 else r * 0.6
+		var dy := -0.28 if i % 2 == 0 else 0.12
+		ring.append(base + Vector3(cos(ang) * rr, dy, sin(ang) * rr))
+	var under := base + Vector3(0, 0.35, 0)
+	for i in ring.size():
+		var p0 := ring[i]
+		var p1 := ring[(i + 1) % ring.size()]
+		a._tri(p0, p1, top, col, c, 0.0, 0.0)
+		a._tri(p0, p1, under, col.darkened(0.35), c + Vector3(0, 2.0, 0), 0.0, 0.0)
+
+
+## Drooping palm frond: a tapered strip that rises, then arcs down.
+static func _frond(a: Architect, root: Vector3, dir: Vector3, length: float, col: Color) -> void:
+	var side := dir.cross(Vector3.UP).normalized()
+	var pts: Array[Vector3] = []
+	for k in 5:
+		var t := k / 4.0
+		pts.append(root + dir * length * t + Vector3(0, 0.6 * t - 1.5 * t * t, 0))
+	for k in 4:
+		var w0 := 0.42 * sin(PI * (k / 4.0) * 0.9 + 0.15)
+		var w1 := 0.42 * sin(PI * ((k + 1) / 4.0) * 0.9 + 0.15)
+		var p0 := pts[k]
+		var p1 := pts[k + 1]
+		var c := (p0 + p1) / 2.0 + Vector3(0, -0.4, 0)
+		a._quad(p0 - side * w0, p0 + side * w0, p1 + side * w1, p1 - side * w1, col, c, 0.0, 0.0)
+		a._quad(p0 - side * w0, p0 + side * w0, p1 + side * w1, p1 - side * w1, col.darkened(0.25), c + Vector3(0, 0.8, 0), 0.0, 0.0)
+
+
+## Cheap far version of a prop.
+static func prop_simple(type: String) -> ArrayMesh:
 	var a := A.new()
 	match type:
 		"pine":
