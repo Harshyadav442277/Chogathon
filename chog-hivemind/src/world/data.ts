@@ -105,7 +105,7 @@ export async function positions() {
   const n = rows.length;
   const out = {
     tick: Number(await getState("tick", "0")), season: Number(await getState("season", "0")),
-    ids: new Array<number>(n), names: new Array<string>(n), job: new Array<string>(n), role: new Array<string>(n), state: new Array<string>(n),
+    ids: new Array<number>(n), names: new Array<string>(n), job: new Array<string>(n), track: new Array<string>(n), role: new Array<string>(n), state: new Array<string>(n),
     x: new Array<number>(n), z: new Array<number>(n), house: new Array<number>(n), poi: new Array<number>(n), building: new Array<number>(n), mood: new Array<string>(n),
   };
   rows.forEach((r, k) => {
@@ -125,6 +125,7 @@ export async function positions() {
     }
     out.ids[k] = id; out.names[k] = r.name; out.x[k] = x; out.z[k] = z; out.house[k] = HOUSE_CODE[r.house] ?? 0;
     out.poi[k] = pi; out.building[k] = bi; out.mood[k] = r.mood; out.job[k] = job?.name ?? "";
+    out.track[k] = job?.track ?? "";
     out.role[k] = job?.role ?? "";
     // Activity contract for the character renderer: "work" or "fight" from the server.
     // The client shows "walk" by itself whenever a Chog's position changes between polls.
