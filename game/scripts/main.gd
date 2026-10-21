@@ -59,6 +59,13 @@ func _maybe_screenshot() -> void:
 		if arg.begins_with("--enter="):  # dev: open a building interior by index
 			await get_tree().create_timer(2.0).timeout
 			interiors.enter(int(arg.trim_prefix("--enter=")))
+	if OS.get_cmdline_user_args().has("--perf"):  # dev: print frame stats after warm-up
+		await get_tree().create_timer(6.0).timeout
+		var rs := RenderingServer
+		print("PERF fps=%d draw_calls=%d primitives=%d objects=%d" % [Engine.get_frames_per_second(),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)])
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--shot="):
 			await get_tree().create_timer(6.0).timeout

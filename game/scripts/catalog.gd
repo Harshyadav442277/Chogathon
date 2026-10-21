@@ -318,12 +318,12 @@ static func prop(type: String) -> ArrayMesh:
 			a.cone(Vector3(0, 4.0, 0), 0.9, 2.0, Color("#468f66"), 7)
 		"oak":
 			a.cyl(Vector3.ZERO, 0.35, 2.0, DWOOD, 5)
-			a.ball(Vector3(0, 3.0, 0), 1.9, Color("#5a9a4a"))
-			a.ball(Vector3(0.9, 2.6, 0.4), 1.2, Color("#4f8f42"))
+			a.ball(Vector3(0, 3.0, 0), 1.9, Color("#5a9a4a"), 0.0, 0.0, 1.0, 3, 6)
+			a.ball(Vector3(0.9, 2.6, 0.4), 1.2, Color("#4f8f42"), 0.0, 0.0, 1.0, 3, 5)
 		"goldtree":
 			a.cyl(Vector3.ZERO, 0.35, 2.0, DWOOD, 5)
-			a.ball(Vector3(0, 3.0, 0), 2.0, Color("#f2c94c"))
-			a.ball(Vector3(-0.8, 2.6, 0.5), 1.2, Color("#e9b83a"))
+			a.ball(Vector3(0, 3.0, 0), 2.0, Color("#f2c94c"), 0.0, 0.0, 1.0, 3, 6)
+			a.ball(Vector3(-0.8, 2.6, 0.5), 1.2, Color("#e9b83a"), 0.0, 0.0, 1.0, 3, 5)
 		"palm":
 			for i in 4:
 				a.cyl(Vector3(i * 0.25, i * 1.1, 0), 0.28 - i * 0.03, 1.1, Color("#9a7348"), 5)
@@ -335,7 +335,7 @@ static func prop(type: String) -> ArrayMesh:
 			a.box(Vector3(0.6, 2.0, 0), Vector3(1.4, 0.15, 0.15), Color("#3b302b"))
 			a.box(Vector3(-0.4, 2.6, 0.2), Vector3(0.15, 0.15, 1.2), Color("#3b302b"))
 		"rock":
-			a.ball(Vector3(0, 0.3, 0), 0.8, Color("#8d867c"), 0.0, 0.0, 0.7)
+			a.ball(Vector3(0, 0.3, 0), 0.8, Color("#8d867c"), 0.0, 0.0, 0.7, 3, 5)
 		"boulder":
 			a.ball(Vector3(0, 0.6, 0), 1.6, Color("#6d675e"), 0.0, 0.0, 0.75)
 			a.ball(Vector3(1.0, 0.3, 0.6), 0.8, Color("#7d776d"), 0.0, 0.0, 0.7)
@@ -344,11 +344,12 @@ static func prop(type: String) -> ArrayMesh:
 			a.crystal(Vector3(0.7, 0, 0.3), 0.4, 1.8, Color("#9fe6ff"))
 			a.crystal(Vector3(-0.5, 0, -0.4), 0.35, 1.4, Color("#e7c6ff"))
 		"flowers":
+			# cheap patch: leafy base + 5 low-poly blossoms (~60 triangles)
 			var fc := [Color("#ff7aa8"), Color("#ffd43b"), Color("#b197fc"), Color("#ffffff")]
-			for i in 6:
-				var ang := TAU * i / 6
-				a.cyl(Vector3(cos(ang) * 0.7, 0, sin(ang) * 0.7), 0.05, 0.5, LEAF, 4)
-				a.ball(Vector3(cos(ang) * 0.7, 0.55, sin(ang) * 0.7), 0.2, fc[i % 4])
+			a.cyl(Vector3.ZERO, 0.9, 0.15, LEAF, 6)
+			for i in 5:
+				var ang := TAU * i / 5
+				a.crystal(Vector3(cos(ang) * 0.55, 0.15, sin(ang) * 0.55), 0.18, 0.45, fc[i % 4], 0.0)
 		"reeds":
 			for i in 5:
 				a.box(Vector3(-0.6 + i * 0.3, 0, (i % 2) * 0.3), Vector3(0.08, 1.6 + (i % 3) * 0.4, 0.08), Color("#7a9a4a"))
