@@ -64,3 +64,12 @@ func position_of(chog_id: int) -> Vector3
 
 ## Prompt to paste into Claude Code (Developer B)
 > Read CLAUDE.md, docs/WORKSPLIT.md and docs/HANDOFF_CHARACTERS.md. I'm Developer B on branch feat/characters. Build game/scripts/characters/characters.gd and game/shaders/character.gdshader per the handoff: 1,969 MultiMesh chibi characters with the NFT portrait as the face, walk/work/fight animated in the shader, screen-space picking, within the performance budget. Only edit files I own. Use the godot-shaders, godot-3d-essentials and performance-optimization skills. Verify with the headless checks and a native screenshot, then commit on feat/characters.
+
+## Update 2026-10-22: per-job outfits, tools and work actions (done on `main`)
+At the user's request, `feat/characters` was merged into `main` and the characters were extended there:
+- **Outfits per job:** shirt, trousers and pattern (stripes, plaid, armour, robe), headgear (helmet, crown, chef toque, straw hat, wizard hat, cap, hood, bandana, mitre, top hat, turban, beret), an optional front piece (apron, tabard in the house colour, tool apron, overall bib, stole) and back piece (cape, satchel, quiver, backpack, mantle). The house colour stays on the portrait ring and a belt.
+- **A tool and a work action per job:** 31 distinct actions (stamping, marching, hammering, grinding, riveting, shaking a flask, sewing, inspecting a gem, sawing, juggling, stocking crates, reading, casting, praying, polishing, flipping a pan, rolling dough, smelling a flower, strumming, jogging, digging, fishing, mining, haggling, pitching hay, sword drill, dagger stabs, shield bash, healing, chanting, waving a banner). Arms can now also lift sideways and the body can twist.
+- **Portrait disc 18% smaller** (`head_size` 0.82).
+- **Data:** the server sends `jobi` (see WORKSPLIT). All per-job and per-tool numbers live in `scripts/characters/outfits.gd`, a lookup texture read with `texelFetch`. Large constant arrays indexed per vertex made the shader about 10x slower on Intel/ANGLE (measured 249 ms GPU per frame), so keep new tables in that texture.
+- **Mesh:** four extra unit pieces (hat crown, hat brim, front, back) that the shader shapes or collapses per job.
+- **Dev check:** `-- --lineup=136,-28 --look=136,-28,17,32,0 --day` shows all 31 jobs side by side.

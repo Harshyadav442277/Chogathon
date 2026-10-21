@@ -6,11 +6,11 @@ class_name ChibiMesh
 ## with the arm that holds them, so they swing with it. Feet at y = 0, facing +Z. The head is a portrait disc
 ## that the shader turns toward the camera; props are tall so they poke out past it at mid zoom.
 
-enum Part { TORSO, LEGS, ARM_L, ARM_R, FACE }
+enum Part { TORSO, LEGS, ARM_L, ARM_R, FACE, HAT_CROWN, HAT_BRIM, FRONT, BACK }
 enum Piece { NONE, R_POLE, R_HEAD, L_POLE, L_HEAD }
 
 const HEAD_Y := 1.2      # center of the portrait disc (character.gdshader uses the same value)
-const HEAD_SIZE := 1.0   # disc diameter
+const HEAD_SIZE := 0.82  # disc diameter (character.gdshader head_size)
 
 var _v := PackedVector3Array()
 var _n := PackedVector3Array()
@@ -31,6 +31,11 @@ static func build() -> ArrayMesh:
 	var c := Vector3(0, HEAD_Y, 0)
 	b._quad(Part.FACE, c + Vector3(-h, h, 0), c + Vector3(h, h, 0), c + Vector3(h, -h, 0), c + Vector3(-h, -h, 0), Vector3.BACK, true)
 	b._props()
+	# Outfit: unit pieces that character.gdshader sizes, places and colors per job (collapsed when unused).
+	b._prism(Part.HAT_CROWN, Vector3.ZERO, 0.5, 0.5, 1.0, 8)
+	b._prism(Part.HAT_BRIM, Vector3.ZERO, 0.5, 0.5, 1.0, 8)
+	b._box(Part.FRONT, Vector3.ZERO, Vector3.ONE)
+	b._box(Part.BACK, Vector3.ZERO, Vector3.ONE)
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = b._v

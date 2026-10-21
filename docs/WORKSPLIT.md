@@ -45,6 +45,7 @@ func position_of(chog_id: int) -> Vector3                     # current world po
   - `building`: index into `GameState.world.buildings` (the workplace the Chog stands outside), or -1 when it is away; added 2026-10-21
   - `job`: display name
   - `track`: the job's track, `civic` / `craft` / `service` / `land` / `adventurer` (`""` without a season job); picks the work animation
+  - `jobi`: job index in `chog-hivemind/data/jobs.json` order, or -1 without a season job; picks the outfit, tool and work action (added 2026-10-22)
   - `role`: `""` for civilians, or `main_dps` / `sub_dps` / `tank` / `healer` / `support` / `buffer`
   - `state`: `"work"` or `"fight"`
   - `mood`

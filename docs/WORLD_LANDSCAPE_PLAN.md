@@ -87,7 +87,16 @@ Roads run from the capital to the nation capitals, the towns and the frontier, d
   - After this pass: 32–37 fps there (runs vary about ±5 fps). Street close-up 35, forest 33–36, meadow 30–31, wide view 32–34.
   - Wide view uses 157 draw calls, over the 150 budget (90 of them are terrain chunks).
 
-## 10. Checks
+## 10. Performance pass 1 (added 2026-10-22)
+Measured natively on the Intel integrated GPU at 1440 x 900 with vsync off (`-- --profile`, `game/scripts/dev/profiler.gd`):
+- **Panning (stutter):** frames over 33 ms per 8 s went from 37 to 3-6; worst frame 112 ms to about 60 ms; p95 frame time 54 ms to 26 ms.
+- **City view (before characters):** 21.1 ms to 18.0 ms per frame (GPU 19.4 ms to 16.0 ms). Wide view: 21.2 ms to 17.3 ms.
+- **Server:** positions 0.8-2 s to about 0.2 s (304 with no body when unchanged); Star Stream 3.7 s to about 0.2 s.
+- **How:** a frame-budget job queue (`scripts/core/frame_jobs.gd`); indexed terrain meshes built in slices with idle prefetch; a spatial hash and incremental near/far diff for buildings and trees; far trees split into 128-unit cells for frustum culling plus merged ultra-low meshes per cell past 380 units; terrain shader detail skipped where it can't be seen; per-world-version API cache with ETag/304.
+- **With the new characters (all 1,969 drawn):** city view 25.5 ms per frame, GPU 24 ms. Characters are now the largest cost; next step is a crowd LOD (full chibis only for the nearest few hundred in view, portrait tokens for the rest).
+- **Profiling tools:** `--profile[=s]`, `--profile-pan`, `--hide=terrain,cover,buildings,props,labels,roads,water,chogs`, `--scale3d=0.75`.
+
+## 11. Checks
 - Native and web screenshots: wide view, mid zoom over a capital, close-up of the volcano.
 - Draw calls under 150.
 - Headless import and run show no errors.

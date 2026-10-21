@@ -81,7 +81,7 @@ func _maybe_screenshot() -> void:
 
 func _build_environment() -> void:
 	var hour: int = Time.get_datetime_dict_from_system(true)["hour"]
-	var night: bool = hour < 5 or hour >= 20
+	var night: bool = (hour < 5 or hour >= 20) and not OS.get_cmdline_user_args().has("--day")  # dev: --day forces daylight
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
 	var sky_mat := ProceduralSkyMaterial.new()

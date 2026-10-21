@@ -4,7 +4,10 @@
 import worldJson from "../../data/world.json";
 import { all, getState } from "../lib/db";
 import { hash } from "../sim/world";
-import { JOB_BY_ID } from "../sim2/season";
+import { JOB_BY_ID, JOBS } from "../sim2/season";
+
+/** Job index in data/jobs.json order: the character renderer picks outfit, tool and work action by it. */
+const JOB_INDEX = new Map(JOBS.map((j, i) => [j.id, i]));
 import { height } from "./terrain";
 
 export type WorldPoi = { id: string; name: string; kind: string; region: string; x: number; y: number; z: number; legacy?: string; city?: string };
@@ -106,7 +109,7 @@ export async function positions() {
   const out = {
     tick: Number(await getState("tick", "0")), season: Number(await getState("season", "0")),
     ids: new Array<number>(n), names: new Array<string>(n), job: new Array<string>(n), track: new Array<string>(n), role: new Array<string>(n), state: new Array<string>(n),
-    x: new Array<number>(n), z: new Array<number>(n), house: new Array<number>(n), poi: new Array<number>(n), building: new Array<number>(n), mood: new Array<string>(n),
+    x: new Array<number>(n), z: new Array<number>(n), jobi: new Array<number>(n), house: new Array<number>(n), poi: new Array<number>(n), building: new Array<number>(n), mood: new Array<string>(n),
   };
   rows.forEach((r, k) => {
     const id = Number(r.id);
@@ -127,6 +130,7 @@ export async function positions() {
     out.poi[k] = pi; out.building[k] = bi; out.mood[k] = r.mood; out.job[k] = job?.name ?? "";
     out.track[k] = job?.track ?? "";
     out.role[k] = job?.role ?? "";
+    out.jobi[k] = r.job ? (JOB_INDEX.get(r.job) ?? -1) : -1;
     // Activity contract for the character renderer: "work" or "fight" from the server.
     // The client shows "walk" by itself whenever a Chog's position changes between polls.
     out.state[k] = job?.track === "adventurer" && WORLD.pois[pi]?.kind === "dungeon" ? "fight" : "work";

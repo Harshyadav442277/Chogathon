@@ -17,7 +17,7 @@ var _cur := PackedVector3Array()
 var _tgt := PackedVector3Array()
 var _yaw := PackedFloat32Array()
 var _ids := PackedInt32Array()
-var _code := PackedFloat32Array()  # state + 4 * role + 32 * work animation, from the server
+var _code := PackedFloat32Array()  # state + 4 * role + 32 * work track + 256 * (job index + 1), from the server
 var _speed := PackedFloat32Array()
 var _walking := PackedByteArray()
 var _active := PackedInt32Array()  # indices currently walking; only these are touched per frame
@@ -37,6 +37,7 @@ func _ready() -> void:
 	mat.shader = preload("res://shaders/character.gdshader")
 	mat.set_shader_parameter("atlas", preload("res://assets/chogs_atlas.webp"))
 	mat.set_shader_parameter("min_screen", MIN_SCREEN)
+	mat.set_shader_parameter("looks", Outfits.texture())  # per-job outfits, tools and materials
 	mesh.surface_set_material(0, mat)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -85,7 +86,8 @@ func _on_positions() -> void:
 		var state: int = STATES.get(str(p["state"][i]), 1) if p.has("state") else 1
 		var role: int = ROLES.get(str(p["role"][i]), 0) if p.has("role") else 0
 		var work: int = TRACKS.get(str(p["track"][i]), 1) if p.has("track") else 1
-		_code[i] = state + 4 * role + 32 * work
+		var job: int = int(p["jobi"][i]) if p.has("jobi") else -1  # outfit, tool and work action per job
+		_code[i] = state + 4 * role + 32 * work + 256 * (job + 1)
 		mm.set_instance_color(i, GameState.HOUSE_COLORS[int(p["house"][i])])
 	mm.visible_instance_count = n
 	if first and _dev_flag("walk-test"):
@@ -93,6 +95,7 @@ func _on_positions() -> void:
 	_refresh_custom()
 	if first:
 		_maybe_select()
+		_lineup()
 
 
 ## Starts a walk when the server moved this Chog: constant speed, facing the direction of travel.
@@ -182,6 +185,28 @@ func id_at(index: int) -> int:
 func position_of(chog_id: int) -> Vector3:
 	var i := _ids.find(chog_id)
 	return _cur[i] if i >= 0 else Vector3.ZERO
+
+
+## Dev helper: `-- --lineup=x,z` puts one Chog per job (all 31) in rows at x, z, working and facing +Z,
+## to check every outfit, tool and work action in one view (e.g. with --look=x,z,18,25,0 --day).
+func _lineup() -> void:
+	for a in OS.get_cmdline_user_args():
+		if not a.begins_with("--lineup="):
+			continue
+		var v := a.trim_prefix("--lineup=").split(",")
+		var cx := float(v[0])
+		var cz := float(v[1])
+		for k in mini(31, _cur.size()):
+			var x := cx + (k % 8 - 3.5) * 2.6
+			var z := cz + (k / 8 - 1.5) * 3.2
+			var p := Vector3(x, maxf(terrain.height_at(x, z), 0.3) if terrain else 0.0, z)
+			_cur[k] = p
+			_tgt[k] = p
+			_walking[k] = 0
+			_yaw[k] = 0.0
+			_code[k] = 1 + 256 * (k + 1)  # state work, job k
+			_mmi.multimesh.set_instance_transform(k, Transform3D(Basis.IDENTITY, p))
+			_set_custom(k)
 
 
 ## Dev helper: `-- --select=181` selects a Chog once positions arrive (the camera flies to it).
