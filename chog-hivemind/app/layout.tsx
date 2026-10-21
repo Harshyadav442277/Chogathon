@@ -22,7 +22,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="dot" /> CHOG HIVEMIND
             </Link>
             <nav>
-              <Link href="/">Live</Link>
+              <Link href="/world">🌍 World</Link>
+              <Link href="/">Feed</Link>
               <Link href="/times">Hive Times</Link>
               <Link href="/leaderboard">Influence</Link>
               <Link href="/about">How it works</Link>

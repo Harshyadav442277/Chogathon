@@ -20,6 +20,7 @@ export default async function Home() {
           ignore you. Ideas that spread make your Chog influential, and the most influential Chogs run for Mayor.
         </p>
         <HeroStats initial={initial} />
+        <Link href="/world" className="btn" style={{ display: "inline-block", marginTop: 16 }}>🌍 Enter Monadia, the 3D world →</Link>
         {ed && (
           <Link href="/times" className="row" style={{ marginTop: 16, gap: 8 }}>
             <span className="pill">THE HIVE TIMES</span>
