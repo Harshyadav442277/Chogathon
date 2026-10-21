@@ -62,6 +62,7 @@ func _maybe_screenshot() -> void:
 	if OS.get_cmdline_user_args().has("--perf"):  # dev: print frame stats after warm-up
 		await get_tree().create_timer(6.0).timeout
 		var rs := RenderingServer
+		print("CAM pos=%s rig=%s dist=%.0f selected=%d" % [rig.camera.global_position, rig.global_position, rig.dist, GameState.selected])
 		print("PERF fps=%d draw_calls=%d primitives=%d objects=%d" % [Engine.get_frames_per_second(),
 			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 			rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),

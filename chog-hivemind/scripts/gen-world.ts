@@ -3,7 +3,7 @@
 //   npm run gen:world
 import { copyFileSync, writeFileSync } from "node:fs";
 import {
-  DEMON_PLATEAU, forestAt, height, HOLLOW_CRATER, isLand, lavaAt, mulberry32, regionAt, REGION_BY_ID, REGIONS,
+  CITY_SITES, DEMON_PLATEAU, forestAt, height, HOLLOW_CRATER, isLand, lavaAt, mulberry32, regionAt, REGION_BY_ID, REGIONS,
   riverDist, SEED, SPIRE_LAKE, VOLCANO, WORLD_D, WORLD_W, type RegionId,
 } from "../src/world/terrain";
 
@@ -134,7 +134,9 @@ const CAPITALS: { region: RegionId; name: string; hint: [number, number]; avoid?
 ];
 for (const C of CAPITALS) {
   let best: { x: number; z: number; score: number } | null = null;
-  for (let i = 0; i < 900; i++) {
+  const fixed = CITY_SITES.find((s) => s.name === C.name);
+  if (fixed) best = { x: fixed.x, z: fixed.z, score: 0 }; // terrain is flattened here
+  for (let i = 0; i < 900 && !fixed; i++) {
     const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * 45;
     const x = C.hint[0] + Math.cos(a) * d, z = C.hint[1] + Math.sin(a) * d;
     if (C.avoid?.(x, z)) continue;

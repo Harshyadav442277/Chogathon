@@ -308,6 +308,35 @@ static func building(type: String) -> ArrayMesh:
 	return a.commit()
 
 
+## Cheap stand-in used when the camera is far away (a few dozen triangles): body + roof in the right size.
+static func building_simple(type: String) -> ArrayMesh:
+	var a := A.new()
+	var tall := ["tower", "lighthouse", "obelisk", "spire", "windmill", "alchemist"]
+	var sizes := {
+		"house_small": Vector3(4, 3, 3.4), "house_large": Vector3(5.6, 4.6, 4), "keep": Vector3(9, 9, 9),
+		"castle": Vector3(15, 8, 13), "barracks": Vector3(10, 3.6, 5), "guild_hall": Vector3(9, 5, 7),
+		"library": Vector3(8, 5, 6.6), "academy": Vector3(7, 4, 5), "temple": Vector3(6, 5, 8), "tavern": Vector3(5.6, 5, 4.6),
+		"stables": Vector3(8, 3, 4), "farm": Vector3(6, 4, 4.5), "market": Vector3(11, 2.4, 3), "colosseum": Vector3(20, 6, 20),
+		"demon_castle": Vector3(16, 10, 14), "dungeon": Vector3(6, 5, 2.2), "mine": Vector3(9, 4, 7), "fishery": Vector3(5, 4, 4),
+		"dock": Vector3(3, 0.6, 10), "wall": Vector3(1.6, 4.4, 7.2), "gate": Vector3(3, 7.5, 9), "fountain": Vector3(6, 1.2, 6),
+	}
+	if tall.has(type):
+		var h: float = {"tower": 9.0, "lighthouse": 14.0, "obelisk": 10.0, "spire": 30.0, "windmill": 7.0, "alchemist": 5.0}[type]
+		var r: float = {"tower": 1.9, "lighthouse": 1.8, "obelisk": 0.9, "spire": 4.0, "windmill": 1.8, "alchemist": 2.4}[type]
+		a.cyl(Vector3.ZERO, r, h, STONE if type != "lighthouse" else Color("#f5f5f5"), 6)
+		a.cone(Vector3(0, h, 0), r * 1.2, r * 1.6, TINT, 6, 0.0, 1.0)
+		return a.commit()
+	var sz: Vector3 = sizes.get(type, Vector3(4.4, 3.2, 3.8))
+	var wall := STONE if ["keep", "castle", "barracks", "library", "temple", "wall", "gate", "colosseum", "fountain"].has(type) else PLASTER
+	if type == "demon_castle":
+		wall = Color("#2a1f33")
+	a.box(Vector3.ZERO, sz, wall)
+	if not ["wall", "dock", "market", "colosseum", "fountain", "dungeon"].has(type):
+		a.gable(Vector3(0, sz.y, 0), sz.x, sz.z, minf(sz.x, sz.z) * 0.55, TINT, 1.0)
+	a.box(Vector3(0, sz.y * 0.35, sz.z / 2.0), Vector3(sz.x * 0.6, 0.5, 0.1), Color("#ffd27a"), 0.5)  # a strip of lit windows
+	return a.commit()
+
+
 static func prop(type: String) -> ArrayMesh:
 	var a := A.new()
 	match type:

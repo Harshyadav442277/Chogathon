@@ -19,5 +19,6 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Buildings and props are generated procedurally in Godot (`game/scripts/catalog.gd`) instead of downloading Kenney kits | No downloads or licensing, about +0.45 MB to the web build, shapes fit each job |
 | 2026-10-21 | Positions feed: Chogs at work stand outside their job's building (new additive `building` field) and never in water | Makes jobs visible on the map |
 | 2026-10-21 | Enterable interiors for 25 mid/large building types, with a story panel per building | Requested by the user: interiors that go along with the story |
+| 2026-10-21 | Terrain level of detail: grid doubled to 641 x 561, chunked terrain with three detail levels, close-up ground cover and shader detail, building stand-ins when far away, flattened ground under the capitals | Requested by the user: less detail when zoomed out, more when zoomed in |
 
 When a decision changes, add a new dated row explaining what replaced it.
