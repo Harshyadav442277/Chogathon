@@ -9,8 +9,15 @@ const ROOF := {
 	"wastes": Color("#6d675e"), "demon": Color("#5a1f6a"),
 }
 
+const FOOTPRINT := {
+	"castle": 9.0, "keep": 6.0, "colosseum": 11.0, "spire": 10.0, "demon_castle": 11.0, "guild_hall": 5.0,
+	"temple": 4.5, "library": 4.5, "barracks": 5.0, "academy": 4.5, "market": 6.0, "dungeon": 3.5, "tavern": 3.5,
+}
+
 var terrain: Terrain
 var material: ShaderMaterial
+var _buildings: Array = []
+var _building_pos := PackedVector3Array()
 
 
 func build(world: Dictionary) -> void:
@@ -48,6 +55,8 @@ func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> 
 
 
 func _build_buildings(list: Array) -> void:
+	_buildings = list
+	_building_pos.resize(list.size())
 	var by_type := {}
 	for b in list:
 		var t: String = b["type"]
@@ -62,12 +71,38 @@ func _build_buildings(list: Array) -> void:
 			y = 0.0
 		if t == "spire":
 			y = maxf(y, 0.0)
+		_building_pos[int(b["id"])] = Vector3(x, y + 3.0 * s, z)
 		var basis := Basis(Vector3.UP, float(b["rot"])).scaled(Vector3.ONE * s)
 		(by_type[t]["x"] as Array[Transform3D]).append(Transform3D(basis, Vector3(x, y, z)))
 		var roof: Color = ROOF.get(str(b["region"]), Color.WHITE)
 		(by_type[t]["c"] as Array[Color]).append(Color(roof.r, roof.g, roof.b, 1.0))
 	for t in by_type:
 		_instances(Catalog.building(t), by_type[t]["x"], by_type[t]["c"])
+
+
+## Index of the enterable building under the cursor (screen space), or -1. Only when zoomed in enough.
+func pick_building(camera: Camera3D, screen_pos: Vector2) -> int:
+	var best := -1
+	var best_d := INF
+	for i in _buildings.size():
+		if not InteriorCatalog.ENTERABLE.has(str(_buildings[i]["type"])):
+			continue
+		var wp := _building_pos[i]
+		if camera.is_position_behind(wp):
+			continue
+		var dist := camera.global_position.distance_to(wp)
+		if dist > 320.0:
+			continue
+		# Hit radius = the building's half-width projected on screen, so big castles are easy to click.
+		var foot: float = FOOTPRINT.get(str(_buildings[i]["type"]), 3.0) * float(_buildings[i]["s"])
+		var sp := camera.unproject_position(wp)
+		var edge := camera.unproject_position(wp + camera.global_transform.basis.x * foot)
+		var radius := clampf(sp.distance_to(edge), 12.0, 220.0)
+		var d := sp.distance_to(screen_pos)
+		if d < radius and d < best_d:
+			best_d = d
+			best = i
+	return best
 
 
 func _build_props(props: Dictionary) -> void:

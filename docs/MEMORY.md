@@ -18,5 +18,6 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Two-developer split: A = landscape + buildings (`feat/world`), B = characters (`feat/characters`); file ownership and contract in [WORKSPLIT.md](WORKSPLIT.md) | Parallel work without merge conflicts |
 | 2026-10-21 | Buildings and props are generated procedurally in Godot (`game/scripts/catalog.gd`) instead of downloading Kenney kits | No downloads or licensing, about +0.45 MB to the web build, shapes fit each job |
 | 2026-10-21 | Positions feed: Chogs at work stand outside their job's building (new additive `building` field) and never in water | Makes jobs visible on the map |
+| 2026-10-21 | Enterable interiors for 25 mid/large building types, with a story panel per building | Requested by the user: interiors that go along with the story |
 
 When a decision changes, add a new dated row explaining what replaced it.
