@@ -1,7 +1,7 @@
 // Holder commands: whisper, journey (nudge), introduce, gift. Each costs 1 Mon Energy.
 import { err, json } from "@/lib/api";
 import { one, run } from "@/lib/db";
-import { canCommand, energyLeft, holderKey, today } from "@/lib/holder";
+import { canCommand, energyLeft, holderKey, queueCommand } from "@/lib/holder";
 import { cleanText, isAcceptable } from "@/lib/moderation";
 import { getSession } from "@/lib/session";
 import { GIFTS, LOCATION_IDS, locationName } from "@/sim/world";
@@ -44,16 +44,10 @@ export async function POST(req: Request) {
   }
 
   if (!(await canCommand(s, id))) return err("Only this Chog's holder can do that.", 403);
-  const used = await one<{ n: number }>(`SELECT COUNT(*) n FROM injections WHERE kind = ? AND chog_id = ? AND day = ?`, [kind, id, today()]);
-  if (Number(used?.n ?? 0) >= 1) return err(`One ${kind === "nudge" ? "journey" : kind} per Chog per day.`, 429);
   const author = await holderKey(s);
-  const left = await energyLeft(author);
-  if (left < 1) return err("Out of Mon Energy for today. It refills at 00:00 UTC.", 429);
-
-  await run(
-    `INSERT INTO injections(kind, chog_id, location, target_chog, author, text, day, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
-    [kind, id, location, target, author, text, today(), Date.now()],
-  );
+  const queued = await queueCommand({ kind, chogId: id, location, target, author, text });
+  if (queued === "repeat") return err(`One ${kind === "nudge" ? "journey" : kind} per Chog per day.`, 429);
+  if (queued === "empty") return err("Out of Mon Energy for today. It refills at 00:00 UTC.", 429);
   if (kind === "whisper") await run(`UPDATE chogs SET bond = MIN(100, bond + 2) WHERE id = ?`, [id]);
-  return json({ ok: true, message: DONE[kind], energy: left - 1 });
+  return json({ ok: true, message: DONE[kind], energy: await energyLeft(author) });
 }
