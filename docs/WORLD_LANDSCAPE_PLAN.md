@@ -53,7 +53,16 @@ Roads run from the capital to the nation capitals, the towns and the frontier, d
 - `game/scripts/settlements.gd`: buildings, props, roads and labels from `world.json`
 - `game/shaders/water.gdshader`: animated water
 
-## 7. Checks
+## 7. Building detail and interiors (added 2026-10-21)
+- **Exterior detail:** every house-style building has a stone foundation, timber corner posts and floor beams, a framed door with step and lamp, framed windows with sills and region-tinted shutters, side windows, roof trim and a ridge beam.
+- **Interiors:** click an enterable building to open a cutaway room with its own camera.
+  - Built procedurally by `game/scripts/interior_catalog.gd` and shown by `game/scripts/interiors.gd`.
+  - Enterable (25 types): tavern, guild hall, blacksmith, weaponsmith, armorsmith, alchemist, general store, library, academy, temple, keep, castle, barracks, restaurant, bakery, flower shop, toy shop, tailor, jeweler, colosseum, spire (Election Hall), Demon King's throne room, dungeon, post office, market.
+- **Who's inside:** the Chogs whose workplace is that building, as round NFT portraits wandering around the room. Click one for its Status Window.
+- **Story panel:** `GET /api/v2/building/:id` (`chog-hivemind/src/world/buildings.ts`) returns the building's story beat (tied to the season and the region's Demon General), who works there with job titles, and overheard posts.
+- **Leaving:** Esc or the Back button.
+
+## 8. Checks
 - Native and web screenshots: wide view, mid zoom over a capital, close-up of the volcano.
 - Draw calls under 150.
 - Headless import and run show no errors.
