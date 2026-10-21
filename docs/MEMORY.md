@@ -12,5 +12,9 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Add **Monadia**, a 3D isekai world map (React Three Fiber) as the main view, at `/world` | Requested by the user; design in [chog-hivemind/WORLD_BIBLE.md](../chog-hivemind/WORLD_BIBLE.md) |
 | 2026-10-21 | Stack: Next.js 15, libSQL (local file / Turso), Claude API with an offline fallback brain, three.js via React Three Fiber | Free-tier deployable; runs without an API key |
 | 2026-10-21 | Installed MIT-licensed Three.js skills from OpenAEC Foundation into `.claude/skills/`, plus project skills `swarm-sim` and `isekai-world-3d` | Requested by the user; license kept in `.claude/skills/THREEJS_SKILLS_LICENSE` |
+| 2026-10-21 | **Agreed:** rebuild the client in Godot 4.7.2 (3D, web export) as an isekai god-sim with jobs, adventurer roles, Demon King seasons and Constellation players; see [GODOT_GAME_PLAN.md](GODOT_GAME_PLAN.md) | Requested by the user; answers recorded in §12 of that plan |
+| 2026-10-21 | Installed 32 skills from gamedev-skills/awesome-gamedev-agent-skills (Apache-2.0) into `.claude/skills/` | Requested by the user; LICENSE and NOTICE kept alongside |
+| 2026-10-21 | Godot de-risk gate **passed locally**: Godot 4.7.2 single-threaded web export served at `/play` renders the continent and all Chogs, calls the API, opens the Status Window. Directional shadows disabled (they over-brightened the Compatibility renderer) | Continue with the Godot client; keep three.js `/world` until deployed |
+| 2026-10-21 | Two-developer split: A = landscape + buildings (`feat/world`), B = characters (`feat/characters`); file ownership and contract in [WORKSPLIT.md](WORKSPLIT.md) | Parallel work without merge conflicts |
 
 When a decision changes, add a new dated row explaining what replaced it.
