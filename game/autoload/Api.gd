@@ -32,6 +32,42 @@ func get_json(path: String) -> Variant:
 	return JSON.parse_string((res[3] as PackedByteArray).get_string_from_utf8())
 
 
+## Returned by get_json_if_changed() when the server says nothing changed since the last call.
+const NOT_MODIFIED := &"not_modified"
+var _etags := {}  # path -> last ETag
+
+
+## GET a polled endpoint with its last ETag. Returns NOT_MODIFIED when the data is unchanged (HTTP 304 or
+## the same ETag), so callers skip the download, the JSON parse and their own reprocessing; else the parsed
+## Variant, or null on failure.
+func get_json_if_changed(path: String) -> Variant:
+	var req := HTTPRequest.new()
+	req.timeout = 30.0
+	add_child(req)
+	var headers := PackedStringArray(["Accept: application/json"])
+	if _etags.has(path):
+		headers.append("If-None-Match: " + str(_etags[path]))
+	var err := req.request(base_url + path, headers)
+	if err != OK:
+		req.queue_free()
+		return null
+	var res: Array = await req.request_completed
+	req.queue_free()
+	var code: int = res[1]
+	if code == 304:
+		return NOT_MODIFIED
+	if res[0] != HTTPRequest.RESULT_SUCCESS or code < 200 or code >= 300:
+		push_warning("GET %s -> result %s, HTTP %s" % [path, res[0], code])
+		return null
+	for h in (res[2] as PackedStringArray):
+		if h.to_lower().begins_with("etag:"):
+			var tag := h.substr(5).strip_edges()
+			if _etags.get(path, "") == tag:
+				return NOT_MODIFIED  # the browser revalidated from its own cache: same data
+			_etags[path] = tag
+	return JSON.parse_string((res[3] as PackedByteArray).get_string_from_utf8())
+
+
 ## POST JSON. Returns {status, data}.
 func post_json(path: String, body: Dictionary) -> Dictionary:
 	var req := HTTPRequest.new()

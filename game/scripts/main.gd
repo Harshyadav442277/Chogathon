@@ -12,6 +12,7 @@ var interiors: Interiors
 
 
 func _ready() -> void:
+	add_child(FrameJobs.new())  # frame-budgeted work queue used by terrain, LOD and (optionally) characters
 	_build_environment()
 	terrain = Terrain.new()
 	add_child(terrain)
@@ -28,6 +29,8 @@ func _ready() -> void:
 	add_child(swarm)
 	rig = CameraRig.new()
 	rig.terrain = terrain
+	if " ".join(OS.get_cmdline_user_args()).contains("--profile"):
+		add_child(preload("res://scripts/dev/profiler.gd").new())  # dev: frame profiler
 	add_child(rig)
 	rig.clicked.connect(_on_click)
 	interiors = Interiors.new()

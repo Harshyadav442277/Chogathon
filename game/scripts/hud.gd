@@ -102,7 +102,7 @@ const STREAM_COLORS := {"system": "#ffd166", "constellation": "#c9a7ff", "meme":
 
 
 func _refresh_stream() -> void:
-	var data = await Api.get_json("/api/v2/stream")
+	var data = await Api.get_json_if_changed("/api/v2/stream")
 	if not (data is Dictionary) or not data.has("lines"):
 		return
 	var out := PackedStringArray()

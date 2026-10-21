@@ -1,4 +1,5 @@
 // Building interiors: who works there, what they said lately, and the story beat of the place.
+import { perVersion } from "../lib/cache";
 import { all, getState } from "../lib/db";
 import { JOB_BY_ID } from "../sim2/season";
 import { positions, WORLD, type WorldBuilding } from "./data";
@@ -49,7 +50,7 @@ export async function buildingDetail(id: number) {
   const b = WORLD.buildings?.[id];
   if (!b) return null;
   const season = Number(await getState("season", "0"));
-  const pos = await positions();
+  const pos = await perVersion("positions", positions);
   const here: number[] = [];
   pos.building.forEach((bi, k) => {
     if (bi === id) here.push(pos.ids[k]);

@@ -214,6 +214,8 @@ export async function tick(opts: { agents?: number; brain?: "auto" | "offline" |
   }
   // Rumors that nobody picked up this tick expire after a while.
   await run(`UPDATE injections SET status = 'faded' WHERE kind = 'rumor' AND status = 'pending' AND created_at < ?`, [now() - 6 * 3600_000]);
+  // Marks the world as changed: cached API responses (src/lib/cache.ts) rebuild on the next request.
+  await setState("tick_done", t);
   return stats;
 }
 

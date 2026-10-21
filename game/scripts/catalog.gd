@@ -477,6 +477,32 @@ static func _frond(a: Architect, root: Vector3, dir: Vector3, length: float, col
 		a._quad(p0 - side * w0, p0 + side * w0, p1 + side * w1, p1 - side * w1, col.darkened(0.25), c + Vector3(0, 0.8, 0), 0.0, 0.0)
 
 
+## Ultra-low "distant" version (a handful of triangles) for trees seen from far away. These are merged
+## into one static mesh per map cell by Settlements, so the whole distant forest costs a few draw calls.
+static func prop_distant(type: String) -> ArrayMesh:
+	var a := A.new()
+	match type:
+		"pine":
+			a.mat = A.M_LEAF
+			a.cone(Vector3(0, 0.6, 0), 1.9, 5.4, Color("#2f6b4f"), 5)
+		"oak", "goldtree":
+			a.mat = A.M_LEAF
+			a.ball(Vector3(0, 2.9, 0), 2.1, Color("#f2c94c") if type == "goldtree" else Color("#5a9a4a"), 0.0, 0.0, 0.9, 2, 5)
+			a.mat = A.M_BARK
+			a.cone(Vector3.ZERO, 0.4, 2.2, DWOOD, 3)
+		"palm":
+			a.mat = A.M_BARK
+			a.cone(Vector3.ZERO, 0.3, 4.6, Color("#9a7348"), 3)
+			a.mat = A.M_LEAF
+			a.pyramid(Vector3(0.6, 3.9, 0), 3.0, 3.0, 0.6, Color("#4caf50"), 0.0)
+		"deadtree":
+			a.mat = A.M_BARK
+			a.cone(Vector3.ZERO, 0.35, 3.6, Color("#3b302b"), 3)
+		_:
+			return prop_simple(type)
+	return a.commit()
+
+
 ## Cheap far version of a prop.
 static func prop_simple(type: String) -> ArrayMesh:
 	var a := A.new()

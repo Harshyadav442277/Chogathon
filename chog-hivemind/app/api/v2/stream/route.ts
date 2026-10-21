@@ -1,11 +1,17 @@
 // Star Stream: the system channel Constellations watch. Built from what the simulation recorded.
+import { cachedJson } from "@/lib/cache";
 import { all, getState } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 type Line = { at: number; kind: string; text: string; chog?: number };
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Holder actions can resolve between ticks, so the stream also expires after 15 s.
+  return cachedJson(req, "stream", buildStream, { maxAgeMs: 15_000 });
+}
+
+async function buildStream() {
   const season = Number(await getState("season", "0"));
   const [events, memes, injections, seasons] = await Promise.all([
     all<any>(`SELECT kind, title, body, created_at FROM events ORDER BY id DESC LIMIT 15`),
@@ -34,5 +40,5 @@ export async function GET() {
     });
   }
   lines.sort((a, b) => b.at - a.at);
-  return Response.json({ season, lines: lines.slice(0, 40) });
+  return { season, lines: lines.slice(0, 40) };
 }

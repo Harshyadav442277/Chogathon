@@ -48,14 +48,19 @@ void fragment() {
 	float grass_mul = 1.0 + (blades - 0.5) * 0.5 * fine + (mid.r - 0.5) * 0.2 * detail;
 	vec3 grass_tint = mix(vec3(0.9, 1.02, 0.86), vec3(1.1, 1.04, 0.78), smoothstep(0.35, 0.7, broad.b));
 	// dirt: mottled earth with pebbles
-	vec2 pc = floor(p * 2.2);
-	vec2 pf = fract(p * 2.2) - 0.5 + (vec2(hash(pc), hash(pc + 2.0)) - 0.5) * 0.4;
-	float peb = step(0.72, hash(pc + 1.3)) * (1.0 - smoothstep(0.1, 0.2, length(pf)));
+	float peb = 0.0;
+	float grain = 0.0;
+	if (fine > 0.0) {  // per-pixel hashes only where they can be seen
+		vec2 pc = floor(p * 2.2);
+		vec2 pf = fract(p * 2.2) - 0.5 + (vec2(hash(pc), hash(pc + 2.0)) - 0.5) * 0.4;
+		peb = step(0.72, hash(pc + 1.3)) * (1.0 - smoothstep(0.1, 0.2, length(pf)));
+		grain = hash(floor(p * 20.0)) - 0.5;
+	}
 	float dirt_n = mid.g;
 	float dirt_mul = 1.0 + (dirt_n - 0.5) * 0.45 * detail + peb * 0.22 * fine;
 	// sand: gentle wind ripples and grain
 	float rip = sin(dot(p, vec2(0.8, 0.6)) * 4.0 + mid.b * 2.5);
-	float sand_mul = 1.0 + (rip * 0.05 + (hash(floor(p * 20.0)) - 0.5) * 0.08) * fine;
+	float sand_mul = 1.0 + (rip * 0.05 + grain * 0.08) * fine;
 
 	float mul = mix(dirt_mul, grass_mul, green);
 	mul = mix(mul, sand_mul, sand);
@@ -73,11 +78,13 @@ void fragment() {
 	}
 
 	// tiny wildflowers in the grass, only up close
-	vec2 fcell = floor(p * 1.6);
-	float fl = step(0.982, hash(fcell)) * (1.0 - smoothstep(0.07, 0.13, length(fract(p * 1.6) - 0.5)));
-	vec3 flower = mix(vec3(1.0, 0.8, 0.15), vec3(1.0, 0.35, 0.6), hash(fcell + 5.0));
-	flower = mix(flower, vec3(0.95), step(0.75, hash(fcell + 9.0)));
-	albedo = mix(albedo, flower, fl * green * close * (1.0 - rock) * (1.0 - sand));
+	if (close > 0.0) {
+		vec2 fcell = floor(p * 1.6);
+		float fl = step(0.982, hash(fcell)) * (1.0 - smoothstep(0.07, 0.13, length(fract(p * 1.6) - 0.5)));
+		vec3 flower = mix(vec3(1.0, 0.8, 0.15), vec3(1.0, 0.35, 0.6), hash(fcell + 5.0));
+		flower = mix(flower, vec3(0.95), step(0.75, hash(fcell + 9.0)));
+		albedo = mix(albedo, flower, fl * green * close * (1.0 - rock) * (1.0 - sand));
+	}
 
 	// shoreline foam on the beach just above the water
 	float shore = smoothstep(0.9, 0.2, v_world.y) * step(-0.25, v_world.y) * smoothstep(0.55, 0.8, wn.y);  // not on cliffs
@@ -86,19 +93,24 @@ void fragment() {
 	ALBEDO = albedo;
 	ROUGHNESS = 1.0;
 
-	// bump from the same patterns (Mikkelsen surface gradient, view space), close range only
-	float h = mix(mix(dirt_n * 0.03 + peb * 0.05, blades * 0.035, green), rip * 0.006, sand);
-	h = mix(h, rockn * 0.3 + strata * 0.08, rock) * fine;
-	vec3 dpx = dFdx(VERTEX);
-	vec3 dpy = dFdy(VERTEX);
-	float dhx = dFdx(h);
-	float dhy = dFdy(h);
-	vec3 r1 = cross(dpy, NORMAL);
-	vec3 r2 = cross(NORMAL, dpx);
-	float det = dot(dpx, r1);
-	vec3 bumped = abs(det) * NORMAL - sign(det) * (dhx * r1 + dhy * r2);
-	NORMAL = length(bumped) > 1e-8 ? normalize(bumped) : NORMAL;
+	// bump from the same patterns (Mikkelsen surface gradient, view space), close range only. The branch
+	// edge is where `fine` reaches 0, so the height there is ~0 and derivative edge effects can't show.
+	if (fine > 0.0) {
+		float h = mix(mix(dirt_n * 0.03 + peb * 0.05, blades * 0.035, green), rip * 0.006, sand);
+		h = mix(h, rockn * 0.3 + strata * 0.08, rock) * fine;
+		vec3 dpx = dFdx(VERTEX);
+		vec3 dpy = dFdy(VERTEX);
+		float dhx = dFdx(h);
+		float dhy = dFdy(h);
+		vec3 r1 = cross(dpy, NORMAL);
+		vec3 r2 = cross(NORMAL, dpx);
+		float det = dot(dpx, r1);
+		vec3 bumped = abs(det) * NORMAL - sign(det) * (dhx * r1 + dhy * r2);
+		NORMAL = length(bumped) > 1e-8 ? normalize(bumped) : NORMAL;
+	}
 
-	float pulse = 0.75 + 0.25 * sin(TIME * 1.7 + v_world.x * 0.15 + v_world.z * 0.11);
-	EMISSION = albedo * lava * 2.6 * pulse;
+	if (lava > 0.0) {
+		float pulse = 0.75 + 0.25 * sin(TIME * 1.7 + v_world.x * 0.15 + v_world.z * 0.11);
+		EMISSION = albedo * lava * 2.6 * pulse;
+	}
 }
