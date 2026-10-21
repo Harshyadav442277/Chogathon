@@ -1,69 +1,78 @@
 // Server-side helpers that place every Chog on the Monadia map.
+// At "home" a Chog stands outside the building of its job (its nation's smithy, guild hall, farm...).
+// When the simulation sends it somewhere else (legacy location), it stands at that place instead.
 import worldJson from "../../data/world.json";
 import { all, getState } from "../lib/db";
 import { hash } from "../sim/world";
 import { JOB_BY_ID } from "../sim2/season";
+import { height } from "./terrain";
 
-export type WorldPoi = { id: string; name: string; kind: string; region: string; x: number; y: number; z: number; legacy?: string };
+export type WorldPoi = { id: string; name: string; kind: string; region: string; x: number; y: number; z: number; legacy?: string; city?: string };
+export type WorldBuilding = { id: number; type: string; name: string; city: string; region: string; x: number; z: number; rot: number; s: number };
 export type WorldData = {
   seed: number;
   regions: { id: string; name: string; house: string | null; x: number; z: number; y: number; accent: string; blurb: string }[];
   pois: WorldPoi[];
-  roads: [number, number][];
+  buildings: WorldBuilding[];
 };
 
 export const WORLD = worldJson as unknown as WorldData;
 
 const HOUSE_REGION: Record<string, string> = { laser: "emberforge", teardrop: "tidecry", glass: "prism", moonbeam: "dreamveil" };
-const HOMEABLE = new Set(["capital", "district", "town", "village", "tavern"]);
 const legacyIndex = new Map(WORLD.pois.map((p, i) => [p.legacy, i] as const).filter(([k]) => !!k) as [string, number][]);
-const homesByRegion = new Map<string, number[]>();
-WORLD.pois.forEach((p, i) => {
-  if (!HOMEABLE.has(p.kind)) return;
-  homesByRegion.set(p.region, [...(homesByRegion.get(p.region) ?? []), i]);
-});
+const poiByName = new Map(WORLD.pois.map((p, i) => [p.name, i]));
 
-// Which kinds of place each workplace lives in (until per-building plots exist).
-const WORK_KINDS: Record<string, string[]> = {
-  tavern: ["tavern"],
-  farm: ["village", "town"], fishery: ["village", "town", "dock"], mine: ["town", "village", "wild"],
-  lumberyard: ["village", "town"], stables: ["town", "village"], market: ["district", "town"],
-  guild: ["capital"], castle: ["capital", "district"], barracks: ["capital", "district", "town"],
-};
-const DEFAULT_WORK_KINDS = ["district", "capital", "town"]; // shops, temples, libraries, academies...
-const byRegionKind = new Map<string, number[]>();
-WORLD.pois.forEach((p, i) => {
-  const k = `${p.region}:${p.kind}`;
-  byRegionKind.set(k, [...(byRegionKind.get(k) ?? []), i]);
-});
+// Job workplace -> building type in world.json (most names are identical).
+const WORKPLACE_BUILDING: Record<string, string> = { guild: "guild_hall", castle: "keep" };
+const buildingsBy = new Map<string, number[]>(); // "type:region" -> building ids
+const buildingsByType = new Map<string, number[]>();
+for (const b of WORLD.buildings ?? []) {
+  const k = `${b.type}:${b.region}`;
+  buildingsBy.set(k, [...(buildingsBy.get(k) ?? []), b.id]);
+  buildingsByType.set(b.type, [...(buildingsByType.get(b.type) ?? []), b.id]);
+}
 
-/** Which POI a Chog is standing at right now. At "home" it is at its workplace in its own nation. */
-export function poiFor(id: number, house: string, location: string, homeLocation: string, workplace?: string): number {
-  if (location === homeLocation && location !== "cave") {
-    const region = HOUSE_REGION[house] ?? "capital";
-    if (workplace) {
-      const kinds = WORK_KINDS[workplace] ?? DEFAULT_WORK_KINDS;
-      // Adventurers report to the Hive Capital's guild; everyone else works in their own nation.
-      const regions = workplace === "guild" ? ["capital", region] : [region, "capital"];
-      for (const r of regions) {
-        const candidates = kinds.flatMap((k) => byRegionKind.get(`${r}:${k}`) ?? []);
-        if (candidates.length) return candidates[hash(`work:${id}`) % candidates.length];
-      }
-    }
-    const homes = homesByRegion.get(region) ?? [0];
-    return homes[hash(`home:${id}`) % homes.length];
+/** The building a Chog works at, or -1. Some adventurers and administrators serve in the Hive Capital. */
+export function workplaceBuilding(id: number, house: string, workplace?: string): number {
+  if (!workplace) return -1;
+  const type = WORKPLACE_BUILDING[workplace] ?? workplace;
+  const region = HOUSE_REGION[house] ?? "capital";
+  const toCapital = (workplace === "guild" || workplace === "castle") && hash(`cap:${id}`) % 100 < 30;
+  const pick = (list?: number[]) => (list && list.length ? list[hash(`work:${id}`) % list.length] : -1);
+  if (toCapital) {
+    const hq = pick(buildingsBy.get(`${workplace === "castle" ? "castle" : type}:capital`));
+    if (hq >= 0) return hq;
   }
+  return pick(buildingsBy.get(`${type}:${region}`)) >= 0 ? pick(buildingsBy.get(`${type}:${region}`)) : pick(buildingsByType.get(type));
+}
+
+/** Legacy: which POI a Chog is at when it is away from its workplace. */
+export function poiFor(location: string): number {
   return legacyIndex.get(location) ?? 0;
 }
 
-// Ring radius per place kind; capitals and districts hold big crowds (the guild alone has ~500 adventurers).
-const SPREAD: Record<string, number> = { capital: 22, district: 9, town: 8, village: 5, tavern: 5, wild: 6, dungeon: 5, obelisk: 3, dock: 5, lighthouse: 3 };
+const SPREAD: Record<string, number> = { capital: 16, district: 8, town: 7, village: 5, tavern: 5, wild: 6, dungeon: 5, obelisk: 3, dock: 5, lighthouse: 3 };
+
+/** A dry spot near (cx, cz): tries a few angles/radii so nobody stands in a lake or river. */
+function dryNear(id: number, cx: number, cz: number, spread: number, minR = 2): [number, number] {
+  for (let k = 0; k < 10; k++) {
+    const a = ((hash(`ja:${id}:${k}`) % 3600) / 3600) * Math.PI * 2;
+    const r = minR + Math.sqrt((hash(`jr:${id}:${k}`) % 1000) / 1000) * spread;
+    const x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r;
+    if (height(x, z) > 1.0) return [+x.toFixed(2), +z.toFixed(2)];
+  }
+  return [cx, cz];
+}
+
+/** Standing spot in front of a building's door (buildings face +Z in local space, rotated by b.rot). */
+function atBuilding(id: number, b: WorldBuilding): [number, number] {
+  const front = 5.5 * b.s;
+  const fx = b.x + Math.sin(b.rot) * front, fz = b.z + Math.cos(b.rot) * front;
+  return dryNear(id, fx, fz, 3.5, 0.5);
+}
 
 export function jitter(id: number, poi: WorldPoi): [number, number] {
-  const a = ((hash(`ja:${id}`) % 3600) / 3600) * Math.PI * 2;
-  // sqrt for an even disc instead of a dense centre
-  const r = 2 + Math.sqrt((hash(`jr:${id}`) % 1000) / 1000) * (SPREAD[poi.kind] ?? 4);
-  return [+(poi.x + Math.cos(a) * r).toFixed(2), +(poi.z + Math.sin(a) * r).toFixed(2)];
+  return dryNear(id, poi.x, poi.z, SPREAD[poi.kind] ?? 4);
 }
 
 const HOUSE_CODE: Record<string, number> = { laser: 0, teardrop: 1, glass: 2, moonbeam: 3 };
@@ -80,14 +89,28 @@ export async function positions() {
     rows = await all<any>(`SELECT id, name, house, location, mood, persona, NULL AS job FROM chogs WHERE id > 0 ORDER BY id`);
   }
   const n = rows.length;
-  const out = { tick: Number(await getState("tick", "0")), season: Number(await getState("season", "0")), ids: new Array<number>(n), names: new Array<string>(n), job: new Array<string>(n), role: new Array<string>(n), state: new Array<string>(n), x: new Array<number>(n), z: new Array<number>(n), house: new Array<number>(n), poi: new Array<number>(n), mood: new Array<string>(n) };
+  const out = {
+    tick: Number(await getState("tick", "0")), season: Number(await getState("season", "0")),
+    ids: new Array<number>(n), names: new Array<string>(n), job: new Array<string>(n), role: new Array<string>(n), state: new Array<string>(n),
+    x: new Array<number>(n), z: new Array<number>(n), house: new Array<number>(n), poi: new Array<number>(n), building: new Array<number>(n), mood: new Array<string>(n),
+  };
   rows.forEach((r, k) => {
     const id = Number(r.id);
     const home = (() => { try { return JSON.parse(r.persona).home as string; } catch { return "plaza"; } })();
     const job = r.job ? JOB_BY_ID[r.job] : undefined;
-    const pi = poiFor(id, r.house, r.location, home, job?.workplace);
-    const [x, z] = jitter(id, WORLD.pois[pi]);
-    out.ids[k] = id; out.names[k] = r.name; out.x[k] = x; out.z[k] = z; out.house[k] = HOUSE_CODE[r.house] ?? 0; out.poi[k] = pi; out.mood[k] = r.mood; out.job[k] = job?.name ?? "";
+    const atWork = r.location === home && r.location !== "cave";
+    const bi = atWork ? workplaceBuilding(id, r.house, job?.workplace) : -1;
+    let pi: number, x: number, z: number;
+    if (bi >= 0) {
+      const b = WORLD.buildings[bi];
+      [x, z] = atBuilding(id, b);
+      pi = poiByName.get(b.city) ?? 0;
+    } else {
+      pi = poiFor(r.location);
+      [x, z] = jitter(id, WORLD.pois[pi]);
+    }
+    out.ids[k] = id; out.names[k] = r.name; out.x[k] = x; out.z[k] = z; out.house[k] = HOUSE_CODE[r.house] ?? 0;
+    out.poi[k] = pi; out.building[k] = bi; out.mood[k] = r.mood; out.job[k] = job?.name ?? "";
     out.role[k] = job?.role ?? "";
     // Activity contract for the character renderer: "work" or "fight" from the server.
     // The client shows "walk" by itself whenever a Chog's position changes between polls.

@@ -37,6 +37,16 @@ func _ready() -> void:
 ## Dev helper: `godot --path game -- --shot=out.png` renders for a few seconds, saves a screenshot, quits.
 func _maybe_screenshot() -> void:
 	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--look="):  # --look=x,z,distance[,pitch_deg,yaw_deg]
+			var v := arg.trim_prefix("--look=").split(",")
+			rig.position = Vector3(float(v[0]), 0, float(v[1]))
+			rig.dist = float(v[2])
+			if v.size() > 3:
+				rig.pitch = deg_to_rad(float(v[3]))
+			if v.size() > 4:
+				rig.yaw = deg_to_rad(float(v[4]))
+			rig._apply()
+	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--shot="):
 			await get_tree().create_timer(6.0).timeout
 			await RenderingServer.frame_post_draw
@@ -60,21 +70,21 @@ func _build_environment() -> void:
 	# Fixed ambient color: the bright sky as ambient source washed the low-poly colors out to white.
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("#6f78b8") if night else Color("#b9c6e6")
-	env.ambient_light_energy = 0.35 if night else 0.45
+	env.ambient_light_energy = 0.4 if night else 0.75
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED  # no sky glare on matte low-poly
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.0
 	# Light haze only at the horizon: the continent is ~900 units wide, so dense fog washes everything out.
 	env.fog_enabled = true
 	env.fog_light_color = sky_mat.sky_horizon_color
-	env.fog_density = 0.00025
+	env.fog_density = 0.00012
 	env.fog_sky_affect = 0.0
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-50, -35, 0)
-	sun.light_energy = 0.45 if night else 0.85
+	sun.light_energy = 0.5 if night else 1.1
 	sun.light_color = Color("#9fb2ff") if night else Color("#fff1dc")
 	# Directional shadows over-brighten lit surfaces in the Compatibility renderer here, and cost a lot on the web: off.
 	sun.shadow_enabled = false
@@ -90,13 +100,10 @@ func _build_environment() -> void:
 func _build_water() -> void:
 	var water := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(3000, 2400)
+	plane.size = Vector2(3200, 2800)
 	water.mesh = plane
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.13, 0.36, 0.66, 0.88)
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.roughness = 0.55
-	mat.metallic_specular = 0.25
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://shaders/water.gdshader")
 	water.material_override = mat
 	water.position.y = 0.05
 	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

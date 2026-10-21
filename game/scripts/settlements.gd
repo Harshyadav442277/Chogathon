@@ -1,140 +1,209 @@
 class_name Settlements
 extends Node3D
-## Places low-poly buildings, landmarks and region labels from world.json.
-## Placeholder primitives for the de-risk gate; swapped for Kenney 3D kit models later.
+## Places every building, prop, road and label from world.json (v2) using procedural meshes from
+## catalog.gd. One MultiMeshInstance3D per building/prop type, all sharing shaders/vcol.gdshader.
 
-const WALL := {
-	"capital": Color("#ece4ff"), "emberforge": Color("#8a6a5a"), "tidecry": Color("#dfe8ee"), "prism": Color("#f2e6cc"),
-	"dreamveil": Color("#fff4dc"), "hollow": Color("#4a4560"), "frogsong": Color("#cfe3c0"), "rugcoast": Color("#c9a77a"), "wastes": Color("#a59d90"),
-}
 const ROOF := {
-	"capital": Color("#7b4dff"), "emberforge": Color("#c0392b"), "tidecry": Color("#2f6f9f"), "prism": Color("#8e6cd9"),
-	"dreamveil": Color("#e6a93c"), "hollow": Color("#2a2738"), "frogsong": Color("#4f8a3c"), "rugcoast": Color("#7a4b2a"), "wastes": Color("#6d675e"),
+	"capital": Color("#8d74d6"), "emberforge": Color("#c0392b"), "tidecry": Color("#2f6f9f"), "prism": Color("#8e6cd9"),
+	"dreamveil": Color("#e6a93c"), "hollow": Color("#4a4560"), "frogsong": Color("#4f8a3c"), "rugcoast": Color("#7a4b2a"),
+	"wastes": Color("#6d675e"), "demon": Color("#5a1f6a"),
 }
-const HOUSES_PER_KIND := {"capital": 8, "district": 3, "town": 4, "village": 2, "tavern": 1, "dock": 1}
 
 var terrain: Terrain
-var _walls: Array[Transform3D] = []
-var _wall_cols: Array[Color] = []
-var _roofs: Array[Transform3D] = []
-var _roof_cols: Array[Color] = []
-var _towers: Array[Transform3D] = []
-var _glows: Array[Transform3D] = []
-var _glow_cols: Array[Color] = []
+var material: ShaderMaterial
 
 
 func build(world: Dictionary) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 143
-	for poi in world.get("pois", []):
-		var x: float = poi["x"]
-		var z: float = poi["z"]
-		var region: String = poi["region"]
-		var kind: String = poi["kind"]
-		var y := terrain.height_at(x, z)
-		if kind == "capital":
-			var tower_h := 30.0 if region == "capital" else 16.0
-			var base_y := 0.6 if region == "capital" else y
-			_towers.append(Transform3D(Basis.from_scale(Vector3(3.0, tower_h, 3.0)), Vector3(x, base_y + tower_h / 2.0, z)))
-			_glows.append(Transform3D(Basis.from_scale(Vector3.ONE * 2.0), Vector3(x, base_y + tower_h + 1.5, z)))
-			_glow_cols.append(ROOF.get(region, Color.WHITE).lightened(0.3))
-		elif kind == "obelisk":
-			_towers.append(Transform3D(Basis.from_scale(Vector3(1.2, 10.0, 1.2)), Vector3(x, y + 5.0, z)))
-			_glows.append(Transform3D(Basis.from_scale(Vector3.ONE * 1.4), Vector3(x, y + 11.0, z)))
-			_glow_cols.append(Color("#8ef0c4"))
-		elif kind == "dungeon":
-			_glows.append(Transform3D(Basis.from_scale(Vector3(2.5, 3.0, 0.4)), Vector3(x, y + 1.5, z)))
-			_glow_cols.append(Color("#8ef0c4"))
-		var n: int = HOUSES_PER_KIND.get(kind, 0)
-		var radius := 8.0 if kind == "capital" else 3.5
-		for h in n:
-			var a: float = TAU * h / maxi(n, 1) + rng.randf() * 0.5
-			var r := 0.0 if n == 1 else radius * rng.randf_range(0.8, 1.2)
-			var hx := x + cos(a) * r
-			var hz := z + sin(a) * r
-			var hy := terrain.height_at(hx, hz)
-			var s := (1.5 if kind == "tavern" else 1.0) * rng.randf_range(0.9, 1.2)
-			var w := 2.6 * s
-			var hh := 2.2 * s
-			var rot := Basis(Vector3.UP, rng.randf() * PI)
-			_walls.append(Transform3D(rot.scaled(Vector3(w, hh, w * 0.85)), Vector3(hx, hy + hh / 2.0, hz)))
-			_wall_cols.append(WALL.get(region, Color.WHITE))
-			_roofs.append(Transform3D(rot.scaled(Vector3(w * 0.8, 1.8 * s, w * 0.8)), Vector3(hx, hy + hh + 0.9 * s, hz)))
-			_roof_cols.append(ROOF.get(region, Color.GRAY))
-			if kind == "tavern":
-				_glows.append(Transform3D(Basis.from_scale(Vector3.ONE * 0.6), Vector3(hx + w * 0.7, hy + 2.6, hz)))
-				_glow_cols.append(Color("#ffb84d"))
-	_add_multimesh(BoxMesh.new(), _walls, _wall_cols, false)
-	var roof := CylinderMesh.new()
-	roof.top_radius = 0.0
-	roof.bottom_radius = 0.75
-	roof.radial_segments = 4
-	roof.height = 1.0
-	_add_multimesh(roof, _roofs, _roof_cols, false)
-	var tower := CylinderMesh.new()
-	tower.top_radius = 0.5
-	tower.bottom_radius = 0.55
-	tower.radial_segments = 8
-	tower.height = 1.0
-	var tower_cols: Array[Color] = []
-	tower_cols.resize(_towers.size())
-	tower_cols.fill(Color("#e9e1ff"))
-	_add_multimesh(tower, _towers, tower_cols, false)
-	var glow := SphereMesh.new()
-	glow.radius = 0.5
-	glow.height = 1.0
-	glow.radial_segments = 8
-	glow.rings = 4
-	_add_multimesh(glow, _glows, _glow_cols, true)
-	_add_labels(world)
+	material = ShaderMaterial.new()
+	material.shader = preload("res://shaders/vcol.gdshader")
+	var hour: int = Time.get_datetime_dict_from_system(true)["hour"]
+	material.set_shader_parameter("night", 1.0 if (hour < 6 or hour >= 19) else 0.0)
+	_build_buildings(world.get("buildings", []))
+	_build_props(world.get("props", {}))
+	_build_roads(world.get("roads", []))
+	_build_labels(world)
+	_build_volcano(world.get("landmarks", {}))
 
 
-func _add_multimesh(mesh: Mesh, xforms: Array[Transform3D], cols: Array[Color], unshaded: bool) -> void:
-	if xforms.is_empty():
+func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> void:
+	if xforms.is_empty() or mesh.get_surface_count() == 0:
 		return
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = true
-	mat.roughness = 0.85
-	if unshaded:
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mesh.surface_set_material(0, mat)
+	mesh.surface_set_material(0, material)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_custom_data = true
+	# Compatibility renderer: with use_colors off, COLOR reaches the shader as zero for MultiMesh
+	# instances (everything rendered black). Keep instance colors on, set to white.
 	mm.use_colors = true
 	mm.mesh = mesh
 	mm.instance_count = xforms.size()
 	for i in xforms.size():
 		mm.set_instance_transform(i, xforms[i])
-		mm.set_instance_color(i, cols[i])
+		mm.set_instance_color(i, Color.WHITE)
+		mm.set_instance_custom_data(i, tints[i])
 	var mmi := MultiMeshInstance3D.new()
 	mmi.multimesh = mm
-	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if unshaded else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)
 
 
-func _add_labels(world: Dictionary) -> void:
+func _build_buildings(list: Array) -> void:
+	var by_type := {}
+	for b in list:
+		var t: String = b["type"]
+		if not by_type.has(t):
+			by_type[t] = {"x": [] as Array[Transform3D], "c": [] as Array[Color]}
+		var x: float = b["x"]
+		var z: float = b["z"]
+		var s: float = b["s"]
+		# Sit on the lowest nearby point so buildings never float on slopes; sink a little into the ground.
+		var y := minf(terrain.height_at(x, z), minf(terrain.height_at(x + 3.0 * s, z), terrain.height_at(x, z + 3.0 * s))) - 0.3
+		if t == "dock":
+			y = 0.0
+		if t == "spire":
+			y = maxf(y, 0.0)
+		var basis := Basis(Vector3.UP, float(b["rot"])).scaled(Vector3.ONE * s)
+		(by_type[t]["x"] as Array[Transform3D]).append(Transform3D(basis, Vector3(x, y, z)))
+		var roof: Color = ROOF.get(str(b["region"]), Color.WHITE)
+		(by_type[t]["c"] as Array[Color]).append(Color(roof.r, roof.g, roof.b, 1.0))
+	for t in by_type:
+		_instances(Catalog.building(t), by_type[t]["x"], by_type[t]["c"])
+
+
+func _build_props(props: Dictionary) -> void:
+	if props.is_empty():
+		return
+	var types: Array = props["types"]
+	var groups := {}
+	var tt: Array = props["t"]
+	for i in tt.size():
+		var ti := int(tt[i])
+		if not groups.has(ti):
+			groups[ti] = {"x": [] as Array[Transform3D], "c": [] as Array[Color]}
+		var x: float = props["x"][i]
+		var z: float = props["z"][i]
+		var s: float = props["s"][i]
+		var y := terrain.height_at(x, z)
+		var name: String = types[ti]
+		if name == "lily":
+			y = 0.06
+		(groups[ti]["x"] as Array[Transform3D]).append(Transform3D(Basis(Vector3.UP, float(props["r"][i])).scaled(Vector3.ONE * s), Vector3(x, y - 0.1, z)))
+		(groups[ti]["c"] as Array[Color]).append(Color(1, 1, 1, 0))
+	for ti in groups:
+		_instances(Catalog.prop(str(types[ti])), groups[ti]["x"], groups[ti]["c"])
+
+
+func _build_roads(roads: Array) -> void:
+	var a := Architect.new()
+	var dirt := Color("#b89a6a")
+	for r in roads:
+		var pts: Array = r["pts"]
+		var width := 1.6
+		for i in pts.size() - 1:
+			var p0 := Vector3(pts[i][0], 0, pts[i][1])
+			var p1 := Vector3(pts[i + 1][0], 0, pts[i + 1][1])
+			var dir := (p1 - p0).normalized()
+			var side := Vector3(-dir.z, 0, dir.x) * width
+			var q: Array[Vector3] = [p0 + side, p0 - side, p1 - side, p1 + side]
+			for k in 4:
+				var v: Vector3 = q[k]
+				v.y = maxf(terrain.height_at(v.x, v.z), 0.15) + 0.18
+				q[k] = v
+			var center: Vector3 = (q[0] + q[1] + q[2] + q[3]) / 4.0 - Vector3(0, 5, 0)  # makes the face point up
+			a._quad(q[0], q[1], q[2], q[3], dirt, center)
+	var mesh := a.commit()
+	if mesh.get_surface_count() == 0:
+		return
+	mesh.surface_set_material(0, material)
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
+
+
+func _build_labels(world: Dictionary) -> void:
 	for region in world.get("regions", []):
-		var l := _label(region["name"], 30, Color(region["accent"]))
-		l.position = Vector3(region["x"], maxf(terrain.height_at(region["x"], region["z"]), 2.0) + 32.0, region["z"])
+		var l := _label(str(region["name"]), 30, Color(region["accent"]), true)
+		l.position = Vector3(region["x"], maxf(terrain.height_at(region["x"], region["z"]), 2.0) + 40.0, region["z"])
+		l.visibility_range_begin = 160.0  # region names only from afar
 		add_child(l)
 	for poi in world.get("pois", []):
-		if poi["kind"] != "capital":
+		var kind: String = poi["kind"]
+		var x: float = poi["x"]
+		var z: float = poi["z"]
+		var y := terrain.height_at(x, z)
+		if kind == "capital":
+			var l := _label(str(poi["name"]), 22, Color.WHITE, true)
+			l.position = Vector3(x, y + 28.0, z)
+			add_child(l)
+		elif kind != "district":
+			var l2 := _label(str(poi["name"]), 26, Color("#ffe9b0") if kind != "dungeon" else Color("#8ef0c4"), false)
+			l2.position = Vector3(x, y + 11.0, z)
+			l2.visibility_range_end = 230.0  # small places only when you get closer
+			add_child(l2)
+	for b in world.get("buildings", []):
+		var nm: String = b["name"]
+		if nm == "":
 			continue
-		var l := _label(str(poi["name"]), 22, Color.WHITE)
-		l.position = Vector3(poi["x"], terrain.height_at(poi["x"], poi["z"]) + 24.0, poi["z"])
-		add_child(l)
+		var l3 := _label(nm, 22, Color("#fff3d6"), false)
+		l3.pixel_size = 0.04
+		var bx: float = b["x"]
+		var bz: float = b["z"]
+		l3.position = Vector3(bx, terrain.height_at(bx, bz) + 9.5 * float(b["s"]), bz)
+		l3.visibility_range_end = 110.0  # shop signs only up close
+		add_child(l3)
 
 
-func _label(text: String, size: int, color: Color) -> Label3D:
+func _label(text: String, size: int, color: Color, fixed: bool) -> Label3D:
 	var l := Label3D.new()
 	l.text = text
 	l.font_size = size
-	l.pixel_size = 0.0012
 	l.modulate = color
 	l.outline_size = 10
 	l.outline_modulate = Color(0, 0, 0, 0.85)
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	l.no_depth_test = true
-	l.fixed_size = true  # constant on-screen size, readable at any zoom
+	l.no_depth_test = fixed
+	l.fixed_size = fixed
+	l.pixel_size = 0.0012 if fixed else 0.05
 	return l
+
+
+func _build_volcano(landmarks: Dictionary) -> void:
+	if not landmarks.has("volcano"):
+		return
+	var v: Dictionary = landmarks["volcano"]
+	var top := Vector3(v["x"], float(v["h"]) - 6.0, v["z"])
+	var glow := OmniLight3D.new()
+	glow.light_color = Color("#ff7a2a")
+	glow.light_energy = 3.0
+	glow.omni_range = 70.0
+	glow.position = top + Vector3(0, 6, 0)
+	add_child(glow)
+	var smoke := CPUParticles3D.new()
+	smoke.amount = 40
+	smoke.lifetime = 9.0
+	smoke.preprocess = 9.0
+	smoke.position = top + Vector3(0, 4, 0)
+	smoke.direction = Vector3(0.2, 1, 0)
+	smoke.spread = 12.0
+	smoke.initial_velocity_min = 3.0
+	smoke.initial_velocity_max = 5.0
+	smoke.gravity = Vector3(0.6, 0.4, 0)
+	smoke.scale_amount_min = 3.0
+	smoke.scale_amount_max = 6.0
+	var curve := Curve.new()
+	curve.add_point(Vector2(0, 0.4))
+	curve.add_point(Vector2(1, 2.2))
+	smoke.scale_amount_curve = curve
+	var puff := SphereMesh.new()
+	puff.radius = 1.0
+	puff.height = 2.0
+	puff.radial_segments = 8
+	puff.rings = 4
+	var pm := StandardMaterial3D.new()
+	pm.albedo_color = Color(0.25, 0.22, 0.22, 0.55)
+	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	puff.material = pm
+	smoke.mesh = puff
+	add_child(smoke)
