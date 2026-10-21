@@ -22,6 +22,11 @@ const SMALL_PROPS := ["flowers", "reeds", "lily", "rock", "mushroom", "bonespike
 const PROP_NEAR := 150.0      # props within this distance of the camera use their detailed mesh
 const BUILDING_NEAR := 190.0  # ... buildings
 var _lod_sets: Array = []
+const LOD_CELL := 64.0
+const PROP_CELL := 128.0   # far trees are split into cells of this size for frustum culling
+const DISTANT := 380.0     # cells farther than this (camera to cell centre) draw their merged distant mesh
+var _lod_grid := {}     # Vector2i cell -> PackedInt32Array of (set << 16 | instance)
+var _lod_active := {}   # set index -> true while it has near instances
 var _lod_cam := Vector3(1e9, 0, 0)
 var _building_pos := PackedVector3Array()
 
@@ -91,7 +96,8 @@ func _build_buildings(list: Array) -> void:
 		_add_lod_set(Catalog.building(t), Catalog.building_simple(t), by_type[t]["x"], by_type[t]["c"], BUILDING_NEAR)
 
 
-## Every 0.25 s: when the camera has moved, re-pick which buildings and props get their detailed mesh.
+## Every 0.25 s: when the camera has moved, re-pick which buildings and props get their detailed mesh
+## (as a FrameJobs job, so it shares the per-frame work budget).
 func _process(delta: float) -> void:
 	_lod_tick -= delta
 	if _lod_tick > 0.0:
@@ -102,7 +108,7 @@ func _process(delta: float) -> void:
 		return
 	if cam.global_position.distance_to(_lod_cam) > 8.0:
 		_lod_cam = cam.global_position
-		_refresh_lod(_lod_cam)
+		FrameJobs.add(func() -> void: _refresh_lod(_lod_cam), FrameJobs.PRIO_HIGH, "settlements-lod")
 
 
 ## Index of the enterable building under the cursor (screen space), or -1. Only when zoomed in enough.
@@ -149,78 +155,194 @@ func _build_props(props: Dictionary) -> void:
 			y = 0.06
 		(groups[ti]["x"] as Array[Transform3D]).append(Transform3D(Basis(Vector3.UP, float(props["r"][i])).scaled(Vector3.ONE * s), Vector3(x, y - 0.1, z)))
 		(groups[ti]["c"] as Array[Color]).append(Color(1, 1, 1, 0))
+	var distant := {}  # cell -> merged ultra-low trees {v, n, c, u, u2}
 	for ti in groups:
 		var name: String = types[ti]
 		var far_mesh: ArrayMesh = null if SMALL_PROPS.has(name) else Catalog.prop_simple(name)
-		_add_lod_set(Catalog.prop(name), far_mesh, groups[ti]["x"], groups[ti]["c"], PROP_NEAR)
+		_add_lod_set(Catalog.prop(name), far_mesh, groups[ti]["x"], groups[ti]["c"], PROP_NEAR, far_mesh != null)
+		if far_mesh:
+			_merge_distant(distant, Catalog.prop_distant(name), groups[ti]["x"])
+	for cell in distant:
+		var d: Dictionary = distant[cell]
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = d["v"]
+		arrays[Mesh.ARRAY_NORMAL] = d["n"]
+		arrays[Mesh.ARRAY_COLOR] = d["c"]
+		arrays[Mesh.ARRAY_TEX_UV] = d["u"]
+		arrays[Mesh.ARRAY_TEX_UV2] = d["u2"]
+		var m := ArrayMesh.new()
+		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		m.surface_set_material(0, material)
+		var mi := MeshInstance3D.new()
+		mi.mesh = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.set_meta("group", "props")
+		mi.visibility_range_begin = DISTANT
+		mi.visibility_range_begin_margin = 20.0
+		add_child(mi)
+
+
+## Bakes `mesh` at every transform into the per-cell distant meshes (static batching: one draw per cell).
+func _merge_distant(distant: Dictionary, mesh: ArrayMesh, xf: Array[Transform3D]) -> void:
+	var src := mesh.surface_get_arrays(0)
+	var sv: PackedVector3Array = src[Mesh.ARRAY_VERTEX]
+	var sn: PackedVector3Array = src[Mesh.ARRAY_NORMAL]
+	var sc: PackedColorArray = src[Mesh.ARRAY_COLOR]
+	var su: PackedVector2Array = src[Mesh.ARRAY_TEX_UV]
+	var su2: PackedVector2Array = src[Mesh.ARRAY_TEX_UV2]
+	for t in xf:
+		var cell := Vector2i(floori(t.origin.x / PROP_CELL), floori(t.origin.z / PROP_CELL))
+		if not distant.has(cell):
+			distant[cell] = {"v": PackedVector3Array(), "n": PackedVector3Array(), "c": PackedColorArray(), "u": PackedVector2Array(), "u2": PackedVector2Array()}
+		var d: Dictionary = distant[cell]
+		var v: PackedVector3Array = d["v"]
+		var n: PackedVector3Array = d["n"]
+		for k in sv.size():
+			v.append(t * sv[k])
+			n.append((t.basis * sn[k]).normalized())
+		d["v"] = v
+		d["n"] = n
+		d["c"] = (d["c"] as PackedColorArray) + sc
+		d["u"] = (d["u"] as PackedVector2Array) + su
+		d["u2"] = (d["u2"] as PackedVector2Array) + su2
 
 
 ## A detailed MultiMesh for instances near the camera plus a cheap one (or nothing) for the rest.
-func _add_lod_set(near_mesh: ArrayMesh, far_mesh: ArrayMesh, xf: Array[Transform3D], tints: Array[Color], radius: float) -> void:
-	var far_mmi: MultiMeshInstance3D = _instances(far_mesh, xf, tints) if far_mesh else null
+## With `per_cell`, the far copies are split into one MultiMesh per map cell (so the renderer's frustum
+## culling skips cells out of view), each handing over to the merged distant mesh past DISTANT.
+func _add_lod_set(near_mesh: ArrayMesh, far_mesh: ArrayMesh, xf: Array[Transform3D], tints: Array[Color], radius: float, per_cell := false) -> void:
 	var near_mmi := _instances(near_mesh, xf, tints)
 	if near_mmi == null:
 		return
+	var group := "buildings" if radius == BUILDING_NEAR else "props"  # dev profiler: --hide=<group>
+	near_mmi.set_meta("group", group)
+	var far_mm: Array = []           # per instance: the MultiMesh holding its cheap copy (or null)
+	var far_i := PackedInt32Array()  # ... and its index there
+	far_mm.resize(xf.size())
+	far_i.resize(xf.size())
+	if far_mesh and not per_cell:
+		var mmi := _instances(far_mesh, xf, tints)
+		mmi.set_meta("group", group)
+		for i in xf.size():
+			far_mm[i] = mmi.multimesh
+			far_i[i] = i
+	elif far_mesh:
+		var cells := {}
+		for i in xf.size():
+			var cell := Vector2i(floori(xf[i].origin.x / PROP_CELL), floori(xf[i].origin.z / PROP_CELL))
+			if not cells.has(cell):
+				cells[cell] = PackedInt32Array()
+			var l: PackedInt32Array = cells[cell]
+			l.append(i)
+			cells[cell] = l
+		for cell in cells:
+			var members: PackedInt32Array = cells[cell]
+			var cx: Array[Transform3D] = []
+			var cc: Array[Color] = []
+			for i in members:
+				cx.append(xf[i])
+				cc.append(tints[i])
+			var mmi := _instances(far_mesh, cx, cc)
+			mmi.set_meta("group", group)
+			mmi.visibility_range_end = DISTANT
+			mmi.visibility_range_end_margin = 20.0
+			for k in members.size():
+				far_mm[members[k]] = mmi.multimesh
+				far_i[members[k]] = k
 	near_mmi.multimesh.visible_instance_count = 0
 	var pos := PackedVector3Array()
 	for t in xf:
 		pos.append(t.origin)
 	near_mmi.visible = false
-	_lod_sets.append({"near": near_mmi.multimesh, "far": far_mmi.multimesh if far_mmi else null, "r": radius,
-		"near_node": near_mmi, "far_node": far_mmi,
-		"base": _buffer(xf, tints) if far_mmi else PackedFloat32Array(), "pos": pos, "xf": xf, "c": tints})
+	var si := _lod_sets.size()
+	_lod_sets.append({"near": near_mmi.multimesh, "far_mm": far_mm, "far_i": far_i, "r": radius,
+		"near_node": near_mmi, "pos": pos, "xf": xf, "c": tints,
+		"near_idx": PackedInt32Array(), "flag": _zeros(xf.size())})
+	# spatial hash: cell -> packed (set index << 16 | instance index)
+	for i in pos.size():
+		var cell := Vector2i(floori(pos[i].x / LOD_CELL), floori(pos[i].z / LOD_CELL))
+		if not _lod_grid.has(cell):
+			_lod_grid[cell] = PackedInt32Array()
+		var list: PackedInt32Array = _lod_grid[cell]
+		list.append((si << 16) | i)
+		_lod_grid[cell] = list
 
 
-## MultiMesh buffer built on the CPU (reading `multimesh.buffer` back is empty on some renderers).
-## Per instance: 12 transform floats (row-major 3x4), 4 color (white), 4 custom (tint).
-func _buffer(xf: Array[Transform3D], tints: Array[Color]) -> PackedFloat32Array:
-	var buf := PackedFloat32Array()
-	buf.resize(xf.size() * 20)
-	for i in xf.size():
-		var t := xf[i]
-		var b := t.basis
-		var o := i * 20
-		buf[o] = b.x.x; buf[o + 1] = b.y.x; buf[o + 2] = b.z.x; buf[o + 3] = t.origin.x
-		buf[o + 4] = b.x.y; buf[o + 5] = b.y.y; buf[o + 6] = b.z.y; buf[o + 7] = t.origin.y
-		buf[o + 8] = b.x.z; buf[o + 9] = b.y.z; buf[o + 10] = b.z.z; buf[o + 11] = t.origin.z
-		for k in 4:
-			buf[o + 12 + k] = 1.0
-		var c := tints[i]
-		buf[o + 16] = c.r; buf[o + 17] = c.g; buf[o + 18] = c.b; buf[o + 19] = c.a
-	return buf
+func _zeros(n: int) -> PackedByteArray:
+	var b := PackedByteArray()
+	b.resize(n)
+	return b
 
 
 ## Detailed buildings/props near the camera, cheap ones (or nothing, for tiny props) everywhere else.
-## Each type keeps one near and one far MultiMesh; near instances are hidden in the far one by zeroing
-## their transform in the buffer, so the draw-call count never grows with the number of objects.
+## Only grid cells within reach of the camera are scanned, and only instances that enter or leave the
+## near set are touched in the far MultiMesh (hidden there by a zero-scale transform), so the cost
+## follows what changed, not the size of the world. Each type keeps one near and one far MultiMesh.
 func _refresh_lod(cam_pos: Vector3) -> void:
-	for ps in _lod_sets:
-		var r: float = ps["r"]
-		var r2 := r * r
-		var tints: Array[Color] = ps["c"]
-		var pos: PackedVector3Array = ps["pos"]
-		var xf: Array[Transform3D] = ps["xf"]
-		var near: MultiMesh = ps["near"]
-		var far: MultiMesh = ps["far"]
-		var buf := PackedFloat32Array()
-		if far:
-			buf = (ps["base"] as PackedFloat32Array).duplicate()
-		var n := 0
-		for i in pos.size():
-			if pos[i].distance_squared_to(cam_pos) > r2:
+	var reach := maxf(BUILDING_NEAR, PROP_NEAR)
+	var c0 := Vector2i(floori((cam_pos.x - reach) / LOD_CELL), floori((cam_pos.z - reach) / LOD_CELL))
+	var c1 := Vector2i(floori((cam_pos.x + reach) / LOD_CELL), floori((cam_pos.z + reach) / LOD_CELL))
+	var want := {}
+	for cx in range(c0.x, c1.x + 1):
+		for cz in range(c0.y, c1.y + 1):
+			var cell = _lod_grid.get(Vector2i(cx, cz))
+			if cell == null:
 				continue
-			near.set_instance_transform(n, xf[i])
-			near.set_instance_custom_data(n, tints[i])
-			n += 1
-			if far:
-				var o := i * 20  # 12 transform + 4 color + 4 custom floats per instance
-				for k in 12:
-					buf[o + k] = 0.0
-		near.visible_instance_count = n
-		(ps["near_node"] as Node3D).visible = n > 0  # skip empty draws
-		if far:
-			far.buffer = buf
-			(ps["far_node"] as Node3D).visible = n < pos.size()
+			for code in (cell as PackedInt32Array):
+				var si := code >> 16
+				var i := code & 0xFFFF
+				var ps: Dictionary = _lod_sets[si]
+				var r: float = ps["r"]
+				if (ps["pos"] as PackedVector3Array)[i].distance_squared_to(cam_pos) <= r * r:
+					if not want.has(si):
+						want[si] = PackedInt32Array()
+					var w: PackedInt32Array = want[si]
+					w.append(i)
+					want[si] = w
+	var touched := _lod_active.duplicate()
+	for si in want:
+		touched[si] = true
+	_lod_active.clear()
+	for si in touched:
+		var list: PackedInt32Array = want.get(si, PackedInt32Array())
+		_apply_lod_set(si, list)
+		if not list.is_empty():
+			_lod_active[si] = true
+
+
+func _apply_lod_set(si: int, list: PackedInt32Array) -> void:
+	var ps: Dictionary = _lod_sets[si]
+	var xf: Array[Transform3D] = ps["xf"]
+	var tints: Array[Color] = ps["c"]
+	var flag: PackedByteArray = ps["flag"]
+	var old: PackedInt32Array = ps["near_idx"]
+	var far_mm: Array = ps["far_mm"]
+	var far_i: PackedInt32Array = ps["far_i"]
+	var near: MultiMesh = ps["near"]
+	for i in old:
+		flag[i] = 2  # was near
+	for i in list:
+		if flag[i] == 2:
+			flag[i] = 3  # stays near
+		else:
+			flag[i] = 1  # enters: hide its cheap copy
+			if far_mm[i] != null:
+				(far_mm[i] as MultiMesh).set_instance_transform(far_i[i], Transform3D(Basis.from_scale(Vector3.ZERO), xf[i].origin))
+	for i in old:
+		if flag[i] == 2:
+			flag[i] = 0  # leaves: show its cheap copy again
+			if far_mm[i] != null:
+				(far_mm[i] as MultiMesh).set_instance_transform(far_i[i], xf[i])
+		else:
+			flag[i] = 1
+	for n in list.size():
+		near.set_instance_transform(n, xf[list[n]])
+		near.set_instance_custom_data(n, tints[list[n]])
+	near.visible_instance_count = list.size()
+	(ps["near_node"] as Node3D).visible = not list.is_empty()  # skip empty draws
+	ps["near_idx"] = list
+	ps["flag"] = flag
 
 
 func _build_roads(roads: Array) -> void:

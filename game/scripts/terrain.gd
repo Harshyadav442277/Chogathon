@@ -3,7 +3,9 @@ extends Node3D
 ## The Monadia continent with level of detail.
 ## Data: a 641 x 561 height/color grid (~1.4 units per cell) exported from the server's generator.
 ## The map is split into chunks of 64 x 64 cells. Every chunk always has a coarse mesh (step 4);
-## chunks near the camera get a mid (step 2) or full (step 1) mesh, built on demand a couple per frame.
+## chunks near the camera get a mid (step 2) or full (step 1) mesh. Meshes are indexed and built in
+## time slices through FrameJobs (never a whole chunk in one frame), and the next finer level is
+## pre-built in idle time while the camera approaches.
 ## Skirts hide cracks between neighbouring LODs. Shading is smooth (per-vertex normals and colors).
 ## Full-detail chunks also get ground cover (grass tufts, flower clumps, pebbles) drawn close to the camera. Public API: height_at(x, z), size_x/size_z.
 
@@ -12,7 +14,8 @@ const NOISE := preload("res://textures/noise.png")
 const LOD_STEPS := [1, 2, 4]
 const LOD_NEAR := 120.0   # camera distance (to chunk) for full detail
 const LOD_MID := 300.0    # ... for mid detail; beyond this the coarse mesh
-const BUILDS_PER_FRAME := 2
+const SLICE_US := 1500       # max time one build slice may take before yielding to the next frame
+const PREFETCH := 1.4        # pre-build the next finer LOD within this multiple of its radius (idle time)
 const SKIRT := 3.0
 const COVER_SAMPLES := 1200  # ground-cover attempts per full-detail chunk
 const COVER_DIST := 150.0    # chunks farther than this hide their cover (blades have shrunk away by then)
@@ -29,6 +32,8 @@ var _cover_material: ShaderMaterial
 var _grass_material: ShaderMaterial
 var _chunks: Array = []  # [{mi: MeshInstance3D, meshes: [m0, m1, m2], lod: int, center: Vector3, cover: Node}]
 var _tick := 0.0
+## 0.6..1 scale on LOD/cover distances; AdaptiveQuality lowers it on slow devices.
+var quality := 1.0
 
 
 func _ready() -> void:
@@ -60,8 +65,10 @@ func _ready() -> void:
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			add_child(mi)
 			var center := _vertex((i0 + i1) / 2, (j0 + j1) / 2)
-			var c := {"mi": mi, "meshes": [null, null, null], "lod": -1, "i0": i0, "j0": j0, "i1": i1, "j1": j1, "center": center, "cover": null}
-			c["meshes"][2] = _build_chunk(i0, j0, i1, j1, LOD_STEPS[2])
+			var c := {"mi": mi, "meshes": [null, null, null], "lod": -1, "want": 2, "i0": i0, "j0": j0, "i1": i1, "j1": j1, "center": center, "cover": null}
+			var b := ChunkBuild.new(self, i0, j0, i1, j1, LOD_STEPS[2])
+			b.build_rows(1 << 62)
+			c["meshes"][2] = b.mesh()
 			mi.mesh = c["meshes"][2]
 			c["lod"] = 2
 			_chunks.append(c)
@@ -76,25 +83,48 @@ func _process(delta: float) -> void:
 	if cam == null:
 		return
 	var cp := cam.global_position
-	var builds := 0
-	for c in _chunks:
+	for k in _chunks.size():
+		var c: Dictionary = _chunks[k]
 		var center: Vector3 = c["center"]
 		var d := cp.distance_to(center)
-		var want := 0 if d < LOD_NEAR else (1 if d < LOD_MID else 2)
+		var want := 0 if d < LOD_NEAR * quality else (1 if d < LOD_MID * quality else 2)
+		c["want"] = want
+		var meshes: Array = c["meshes"]
 		if want != c["lod"]:
-			var meshes: Array = c["meshes"]
-			if meshes[want] == null:
-				if builds >= BUILDS_PER_FRAME:
-					continue
-				meshes[want] = _build_chunk(c["i0"], c["j0"], c["i1"], c["j1"], LOD_STEPS[want])
-				builds += 1
-			(c["mi"] as MeshInstance3D).mesh = meshes[want]
-			c["lod"] = want
-		if want == 0 and c["cover"] == null and builds < BUILDS_PER_FRAME:
-			c["cover"] = _build_cover(c)
-			builds += 1
+			if meshes[want] != null:
+				_show_lod(c, want)
+			else:
+				_queue_build(k, want, FrameJobs.PRIO_HIGH)
+		elif want > 0 and meshes[want - 1] == null and d < (LOD_NEAR if want == 1 else LOD_MID) * quality * PREFETCH:
+			_queue_build(k, want - 1, FrameJobs.PRIO_IDLE)  # the camera is approaching: build ahead of time
+		if want == 0 and c["cover"] == null:
+			_queue_cover(k)
 		if c["cover"] != null:
-			(c["cover"] as Node3D).visible = d < COVER_DIST
+			(c["cover"] as Node3D).visible = d < COVER_DIST * quality
+
+
+func _show_lod(c: Dictionary, lod: int) -> void:
+	(c["mi"] as MeshInstance3D).mesh = c["meshes"][lod]
+	c["lod"] = lod
+
+
+## Build chunk `k` at `lod` in slices through FrameJobs; shown once ready if still wanted.
+func _queue_build(k: int, lod: int, prio: int) -> void:
+	var key := "terrain:%d:%d" % [k, lod]
+	if FrameJobs.pending(key):
+		return
+	var c: Dictionary = _chunks[k]
+	var st := {"b": null}  # lambdas capture locals by value; keep progress in a shared dictionary
+	FrameJobs.add(func() -> bool:
+		if st["b"] == null:
+			st["b"] = ChunkBuild.new(self, c["i0"], c["j0"], c["i1"], c["j1"], LOD_STEPS[lod])
+		var b: ChunkBuild = st["b"]
+		if not b.build_rows(Time.get_ticks_usec() + SLICE_US):
+			return true
+		c["meshes"][lod] = b.mesh()
+		if c["want"] == lod:
+			_show_lod(c, lod)
+		return false, prio, key)
 
 
 func _vertex(i: int, j: int) -> Vector3:
@@ -106,76 +136,120 @@ func _color(i: int, j: int) -> Color:
 	return Color8(colors[k], colors[k + 1], colors[k + 2], colors[k + 3])
 
 
-## Smooth-shaded chunk mesh at the given step (per-vertex normals and colors, so no blocky cells),
-## plus skirts on its four edges.
-func _build_chunk(i0: int, j0: int, i1: int, j1: int, step: int) -> ArrayMesh:
-	var nx := ceili(float(i1 - i0) / step)
-	var nz := ceili(float(j1 - j0) / step)
-	# grid points of this chunk at this step
-	var gp := PackedVector3Array()
-	var gn := PackedVector3Array()
-	var gc := PackedColorArray()
-	for zz in nz + 1:
-		var j := mini(j0 + zz * step, j1)
-		for xx in nx + 1:
-			var i := mini(i0 + xx * step, i1)
-			gp.append(_vertex(i, j))
-			gn.append(_normal(i, j, step))
-			gc.append(_color(i, j))
+## Incremental, indexed chunk mesh: grid points are computed a few rows per call (so one build never
+## blocks a frame), then assembled with an index pattern shared by every chunk of the same size.
+## Smooth shading (per-vertex normals and colors) plus skirts on the four edges hide LOD cracks.
+class ChunkBuild:
+	var t: Terrain
+	var i0: int
+	var j0: int
+	var i1: int
+	var j1: int
+	var step: int
+	var nx: int
+	var nz: int
+	var row := 0
 	var verts := PackedVector3Array()
 	var norms := PackedVector3Array()
 	var cols := PackedColorArray()
-	verts.resize(nx * nz * 6)
-	norms.resize(nx * nz * 6)
-	cols.resize(nx * nz * 6)
-	var p := 0
+
+	func _init(terrain: Terrain, a0: int, b0: int, a1: int, b1: int, s: int) -> void:
+		t = terrain
+		i0 = a0
+		j0 = b0
+		i1 = a1
+		j1 = b1
+		step = s
+		nx = ceili(float(i1 - i0) / step)
+		nz = ceili(float(j1 - j0) / step)
+		var n := (nx + 1) * (nz + 1) + 2 * (nx + nz)
+		verts.resize(n)
+		norms.resize(n)
+		cols.resize(n)
+
+	## Fills grid rows until `deadline_us`; true when every row is done.
+	func build_rows(deadline_us: int) -> bool:
+		while row <= nz:
+			var j := mini(j0 + row * step, j1)
+			var base := row * (nx + 1)
+			for xx in nx + 1:
+				var i := mini(i0 + xx * step, i1)
+				verts[base + xx] = t._vertex(i, j)
+				norms[base + xx] = t._normal(i, j, step)
+				cols[base + xx] = t._color(i, j)
+			row += 1
+			if Time.get_ticks_usec() > deadline_us:
+				break
+		return row > nz
+
+	func mesh() -> ArrayMesh:
+		var per := t._perimeter(nx, nz)
+		var g := (nx + 1) * (nz + 1)
+		for k in per.size():
+			verts[g + k] = verts[per[k]] - Vector3(0, Terrain.SKIRT, 0)
+			norms[g + k] = norms[per[k]]
+			cols[g + k] = cols[per[k]]
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = verts
+		arrays[Mesh.ARRAY_NORMAL] = norms
+		arrays[Mesh.ARRAY_COLOR] = cols
+		arrays[Mesh.ARRAY_INDEX] = t._indices(nx, nz)
+		var m := ArrayMesh.new()
+		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		return m
+
+
+var _index_cache := {}
+var _perimeter_cache := {}
+
+
+## Grid indices walked once around the border (top, right, bottom, left), for the skirts.
+func _perimeter(nx: int, nz: int) -> PackedInt32Array:
+	var key := Vector2i(nx, nz)
+	if _perimeter_cache.has(key):
+		return _perimeter_cache[key]
 	var row := nx + 1
+	var per := PackedInt32Array()
+	for xx in nx:
+		per.append(xx)
+	for zz in nz:
+		per.append(zz * row + nx)
+	for xx in range(nx, 0, -1):
+		per.append(nz * row + xx)
+	for zz in range(nz, 0, -1):
+		per.append(zz * row)
+	_perimeter_cache[key] = per
+	return per
+
+
+## Triangle indices for an (nx x nz)-cell grid plus its skirt strip; identical for every chunk of that size.
+func _indices(nx: int, nz: int) -> PackedInt32Array:
+	var key := Vector2i(nx, nz)
+	if _index_cache.has(key):
+		return _index_cache[key]
+	var row := nx + 1
+	var idx := PackedInt32Array()
+	idx.resize(nx * nz * 6 + 2 * (nx + nz) * 6)
+	var p := 0
 	for zz in nz:
 		for xx in nx:
 			var ka := zz * row + xx
-			var kb := ka + 1
 			var kc := ka + row
-			var kd := kc + 1
 			# Godot treats clockwise triangles (seen from the front) as front faces.
-			for k in [ka, kb, kc, kb, kd, kc]:
-				verts[p] = gp[k]
-				norms[p] = gn[k]
-				cols[p] = gc[k]
-				p += 1
-	# Skirts: hang a strip below every border edge so LOD seams never show sky.
-	var edges := [[i0, j0, i1, j0], [i1, j0, i1, j1], [i1, j1, i0, j1], [i0, j1, i0, j0]]
-	for e in edges:
-		var ia: int = e[0]
-		var ja: int = e[1]
-		var ib: int = e[2]
-		var jb: int = e[3]
-		var count := maxi(1, maxi(absi(ib - ia), absi(jb - ja)) / step)
-		for s in count:
-			var t0 := float(s) / count
-			var t1 := float(s + 1) / count
-			var ii0 := int(round(lerpf(ia, ib, t0)))
-			var jj0 := int(round(lerpf(ja, jb, t0)))
-			var ii1 := int(round(lerpf(ia, ib, t1)))
-			var jj1 := int(round(lerpf(ja, jb, t1)))
-			var u0 := _vertex(ii0, jj0)
-			var u1 := _vertex(ii1, jj1)
-			var l0 := u0 - Vector3(0, SKIRT, 0)
-			var l1 := u1 - Vector3(0, SKIRT, 0)
-			var c0 := _color(ii0, jj0)
-			var c1 := _color(ii1, jj1)
-			var n0 := _normal(ii0, jj0, step)
-			var n1 := _normal(ii1, jj1, step)
-			verts.append_array(PackedVector3Array([u0, u1, l1, u0, l1, l0]))
-			norms.append_array(PackedVector3Array([n0, n1, n1, n0, n1, n0]))
-			cols.append_array(PackedColorArray([c0, c1, c1, c0, c1, c0]))
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = verts
-	arrays[Mesh.ARRAY_NORMAL] = norms
-	arrays[Mesh.ARRAY_COLOR] = cols
-	var m := ArrayMesh.new()
-	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	return m
+			idx[p] = ka; idx[p + 1] = ka + 1; idx[p + 2] = kc
+			idx[p + 3] = ka + 1; idx[p + 4] = kc + 1; idx[p + 5] = kc
+			p += 6
+	var per := _perimeter(nx, nz)
+	var g := (nx + 1) * (nz + 1)
+	var n := per.size()
+	for k in n:
+		var k1 := (k + 1) % n
+		idx[p] = per[k]; idx[p + 1] = per[k1]; idx[p + 2] = g + k1
+		idx[p + 3] = per[k]; idx[p + 4] = g + k1; idx[p + 5] = g + k
+		p += 6
+	_index_cache[key] = idx
+	return idx
 
 
 ## Ground normal at grid point (i, j) from central differences `s` cells apart.
@@ -193,20 +267,42 @@ func _normal(i: int, j: int, s: int) -> Vector3:
 
 ## Ground cover for full-detail chunks: dense grass tufts on green ground (with the odd flower clump),
 ## pebbles on sand, dirt and rock. Grass uses shaders/grass.gdshader (wind, smooth distance fade).
-func _build_cover(c: Dictionary) -> Node3D:
+func _queue_cover(k: int) -> void:
+	var key := "cover:%d" % k
+	if FrameJobs.pending(key):
+		return
+	var c: Dictionary = _chunks[k]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(c["i0"]) * 7919 + int(c["j0"]) * 104729
-	var tufts: Array[Transform3D] = []
-	var tuft_cols: Array[Color] = []
-	var blooms: Array[Transform3D] = []
-	var bloom_cols: Array[Color] = []
-	var stones: Array[Transform3D] = []
-	var stone_cols: Array[Color] = []
+	var st := {"done": 0, "rng": rng, "tufts": [] as Array[Transform3D], "tuft_cols": [] as Array[Color], "blooms": [] as Array[Transform3D],
+		"bloom_cols": [] as Array[Color], "stones": [] as Array[Transform3D], "stone_cols": [] as Array[Color]}
+	FrameJobs.add(func() -> bool:
+		if c["cover"] != null:
+			return false
+		var deadline := Time.get_ticks_usec() + SLICE_US
+		while st["done"] < COVER_SAMPLES:
+			_cover_samples(c, st, 100)
+			st["done"] += 100
+			if Time.get_ticks_usec() > deadline:
+				return true
+		c["cover"] = _cover_nodes(st)
+		return false, FrameJobs.PRIO_NORMAL, key)
+
+
+## `count` cover placement attempts for chunk `c`, appended to the lists in `st`.
+func _cover_samples(c: Dictionary, st: Dictionary, count: int) -> void:
+	var rng: RandomNumberGenerator = st["rng"]
+	var tufts: Array[Transform3D] = st["tufts"]
+	var tuft_cols: Array[Color] = st["tuft_cols"]
+	var blooms: Array[Transform3D] = st["blooms"]
+	var bloom_cols: Array[Color] = st["bloom_cols"]
+	var stones: Array[Transform3D] = st["stones"]
+	var stone_cols: Array[Color] = st["stone_cols"]
 	var i0: int = c["i0"]
 	var j0: int = c["j0"]
 	var i1: int = c["i1"]
 	var j1: int = c["j1"]
-	for k in COVER_SAMPLES:
+	for k in count:
 		var fi := rng.randf_range(i0, i1)
 		var fj := rng.randf_range(j0, j1)
 		var col := _color(int(fi), int(fj))
@@ -229,6 +325,15 @@ func _build_cover(c: Dictionary) -> Node3D:
 		elif rng.randf() < 0.3:
 			stones.append(Transform3D(basis, Vector3(x, h - 0.1, z)))
 			stone_cols.append(col.darkened(rng.randf_range(0.05, 0.3)))
+
+
+func _cover_nodes(st: Dictionary) -> Node3D:
+	var tufts: Array[Transform3D] = st["tufts"]
+	var tuft_cols: Array[Color] = st["tuft_cols"]
+	var blooms: Array[Transform3D] = st["blooms"]
+	var bloom_cols: Array[Color] = st["bloom_cols"]
+	var stones: Array[Transform3D] = st["stones"]
+	var stone_cols: Array[Color] = st["stone_cols"]
 	var root := Node3D.new()
 	add_child(root)
 	if not tufts.is_empty():

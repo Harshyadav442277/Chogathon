@@ -26,7 +26,7 @@ func _ready() -> void:
 
 
 func refresh() -> void:
-	var data = await Api.get_json("/api/world/positions")
+	var data = await Api.get_json_if_changed("/api/world/positions")  # unchanged between sim ticks -> skipped
 	if data is Dictionary and data.has("ids"):
 		positions = data
 		ids = PackedInt32Array(data["ids"])
