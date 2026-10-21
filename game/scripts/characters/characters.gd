@@ -22,13 +22,16 @@ var _speed := PackedFloat32Array()
 var _walking := PackedByteArray()
 var _active := PackedInt32Array()  # indices currently walking; only these are touched per frame
 var _frame := 0
-var _perf := OS.get_cmdline_user_args().has("--perf")
+var _perf := false
 var _perf_us := 0
 var _perf_max := 0
 var _perf_frames := 0
 
 
 func _ready() -> void:
+	_perf = _dev_flag("perf")
+	if _perf:
+		print("chars: renderer %s, %s" % [RenderingServer.get_video_adapter_name(), RenderingServer.get_video_adapter_vendor()])
 	var mesh := ChibiMesh.build()
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://shaders/character.gdshader")
@@ -46,7 +49,7 @@ func _ready() -> void:
 	_mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Characters are spread across the whole continent.
 	_mmi.custom_aabb = AABB(Vector3(-500, -50, -400), Vector3(1000, 200, 800))
-	_mmi.visible = not OS.get_cmdline_user_args().has("--hide-chars")
+	_mmi.visible = not _dev_flag("hide-chars")
 	add_child(_mmi)
 	GameState.positions_updated.connect(_on_positions)
 	GameState.selection_changed.connect(func(_id): _refresh_custom())
@@ -85,7 +88,7 @@ func _on_positions() -> void:
 		_code[i] = state + 4 * role + 32 * work
 		mm.set_instance_color(i, GameState.HOUSE_COLORS[int(p["house"][i])])
 	mm.visible_instance_count = n
-	if first and OS.get_cmdline_user_args().has("--walk-test"):
+	if first and _dev_flag("walk-test"):
 		_scatter()
 	_refresh_custom()
 	if first:
@@ -199,6 +202,16 @@ func _scatter() -> void:
 		var z := _tgt[i].z + cos(a) * r
 		_cur[i] = Vector3(x, maxf(terrain.height_at(x, z), 0.3) if terrain else 0.0, z)
 		_walk_to_target(i)
+
+
+## Dev flags: `-- --perf` on the command line, or `?perf` in the page URL of a web build.
+func _dev_flag(flag: String) -> bool:
+	if OS.get_cmdline_user_args().has("--" + flag):
+		return true
+	if OS.has_feature("web"):
+		var query = JavaScriptBridge.eval("window.location.search", true)
+		return typeof(query) == TYPE_STRING and flag in query
+	return false
 
 
 ## Dev helper: `-- --perf` prints the character update cost and the frame's draw calls once a second.
