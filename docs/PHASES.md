@@ -6,12 +6,12 @@ This is our team workflow. Event requirements and dates are in [RULES.md](../RUL
 | :--- | :--- | :--- | :--- |
 | Preparation | Rules, collaboration guide and blank folder structure prepared | Repository maintainer | Done |
 | Registration check | Existing team registration and members confirmed | To assign | Open |
-| Project agreement | Team fills PRD.md and agrees scope | To assign | Not started |
-| Implementation | Agreed scope works and setup is documented | To assign | Not started |
+| Project agreement | Team fills PRD.md and agrees scope | To assign | In progress (PRD drafted 2026-10-21) |
+| Implementation | Agreed scope works and setup is documented | To assign | In progress (works locally, not deployed) |
 | Demo checks | Exact demo flow passes and video is ready | To assign | Not started |
 | Event submission | Entry submitted and receipt or confirmation saved | To assign | Not started |
 
-Implementation has not started. Assign concrete tasks only when the team is ready to proceed.
+Implementation started on 2026-10-21 in [chog-hivemind/](../chog-hivemind/). See [DEMO.md](DEMO.md) for what has been verified.
 
 ## Team practices for later
 

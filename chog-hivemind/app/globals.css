@@ -114,3 +114,45 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent2); b
 .paper h2 { font-size: 20px; margin: 18px 0 6px; border-top: 1px solid var(--line); padding-top: 14px; }
 .masthead { font-family: var(--font-display), monospace; text-align: center; letter-spacing: 0.1em; font-size: 20px; padding-bottom: 10px; border-bottom: 3px double var(--line); }
 .footer { color: var(--muted); font-size: 12.5px; padding: 30px 0; text-align: center; }
+
+/* ---------- Monadia 3D world ---------- */
+.w-root { position: fixed; inset: 60px 0 0 0; background: #120f24; overflow: hidden; z-index: 5; }
+.w-root canvas { touch-action: none; }
+.w-loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-display), monospace; color: var(--accent); letter-spacing: 0.1em; }
+.w-hud-top { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; gap: 12px; align-items: flex-start; pointer-events: none; flex-wrap: wrap; }
+.w-hud-top > * { pointer-events: auto; }
+.w-title { background: rgba(18, 15, 36, 0.78); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; backdrop-filter: blur(8px); }
+.w-brand { font-family: var(--font-display), monospace; font-size: 14px; letter-spacing: 0.18em; color: #e9dcff; text-shadow: 0 0 12px rgba(169, 123, 255, 0.8); }
+.w-search { position: relative; width: min(380px, 100%); }
+.w-search input { background: rgba(18, 15, 36, 0.85); backdrop-filter: blur(8px); }
+.w-results { position: absolute; top: 46px; left: 0; right: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.w-results button { display: block; width: 100%; text-align: left; padding: 8px 12px; background: none; border: 0; color: var(--text); }
+.w-results button:hover { background: var(--card2); }
+.w-legend { position: absolute; left: 12px; bottom: 12px; background: rgba(18, 15, 36, 0.8); border: 1px solid var(--line); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 2px; backdrop-filter: blur(8px); max-width: 260px; }
+.w-legend button { display: flex; align-items: center; gap: 8px; background: none; border: 0; color: var(--text); font-size: 12.5px; padding: 3px 6px; border-radius: 6px; text-align: left; }
+.w-legend button:hover { background: var(--card2); }
+.w-legend button span { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.w-legend button em { margin-left: auto; font-style: normal; color: var(--muted); }
+.w-panel { position: absolute; top: 12px; right: 12px; bottom: 12px; width: min(380px, calc(100% - 24px)); overflow-y: auto; background: linear-gradient(180deg, rgba(20, 40, 90, 0.92), rgba(16, 14, 40, 0.94)); border: 1px solid #4dabf7; box-shadow: 0 0 24px rgba(77, 171, 247, 0.35), inset 0 0 30px rgba(77, 171, 247, 0.08); border-radius: 14px; padding: 14px; backdrop-filter: blur(10px); z-index: 30; }
+.w-panel .card { background: rgba(0, 0, 0, 0.25); }
+.w-status-head { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display), monospace; font-size: 12px; color: #9fd8ff; letter-spacing: 0.12em; margin-bottom: 10px; }
+.w-status-head button { background: none; border: 0; color: var(--muted); font-size: 16px; }
+.w-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
+.w-stats div { background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(77, 171, 247, 0.3); border-radius: 8px; padding: 6px; text-align: center; }
+.w-stats b { display: block; font-size: 16px; }
+.w-stats span { font-size: 10.5px; color: var(--muted); }
+.w-kv { display: grid; grid-template-columns: 96px 1fr; gap: 4px 8px; font-size: 13px; }
+.w-kv span { color: #9fd8ff; }
+.w-faces { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.w-faces img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid; cursor: pointer; }
+.w-region { font-family: var(--font-display), monospace; font-size: 15px; letter-spacing: 0.12em; white-space: nowrap; text-shadow: 0 2px 0 #000, 0 0 14px rgba(0, 0, 0, 0.9); }
+.w-poi { white-space: nowrap; font-size: 11.5px; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(18, 15, 36, 0.78); color: #fff; cursor: pointer; }
+.w-poi.capital { font-size: 13.5px; font-weight: 700; border-color: var(--accent); background: rgba(60, 30, 120, 0.85); }
+.w-poi.tavern { border-color: #ffb84d; }
+.w-poi.dungeon { border-color: #8ef0c4; }
+.w-poi:hover { background: var(--accent2); }
+.w-bubble { width: max-content; max-width: 230px; white-space: normal; font-size: 11.5px; line-height: 1.3; padding: 6px 9px; border-radius: 12px; background: rgba(255, 255, 255, 0.95); color: #1b1530; border: 2px solid; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); }
+.w-bubble b { color: #4b2bb3; }
+.w-tip { white-space: nowrap; font-size: 12px; padding: 4px 9px; border-radius: 8px; background: rgba(18, 15, 36, 0.92); border: 1px solid; color: #fff; }
+.w-tip span { color: var(--muted); }
+@media (max-width: 780px) { .w-legend { display: none; } .w-panel { top: auto; height: 55%; } }

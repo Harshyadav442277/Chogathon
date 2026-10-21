@@ -1,6 +1,6 @@
 # Working in this repository
 
-1. The current authorized scope is hackathon documentation and a folder scaffold. Leave the project idea, stack and implementation undecided until the user asks to proceed.
+1. Implementation of Chog Hivemind in `chog-hivemind/` was authorized on 2026-10-21 (see docs/MEMORY.md). Design source of truth: `chog-hivemind/WORLD_BIBLE.md`.
 2. Start with README.md, RULES.md and docs/PHASES.md. Keep files short and easy for both authors to edit.
 3. Verify event facts against official sources. Include the check date and link. Keep organizer requirements separate from team practices and unresolved questions.
 4. When implementation is authorized, map each major feature to the actual criteria in RULES.md. Keep scope in docs/PRD.md and setup in docs/ARCHITECTURE.md.

@@ -157,6 +157,13 @@ const ADDED_COLUMNS = [
 ];
 
 export async function migrate() {
+  // Local file DB: WAL lets the web server read while the sim loop writes.
+  if (!process.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL.startsWith("file:")) {
+    try {
+      await run("PRAGMA journal_mode = WAL");
+      await run("PRAGMA busy_timeout = 5000");
+    } catch {}
+  }
   for (const s of SCHEMA) await run(s);
   for (const s of ADDED_COLUMNS) {
     try {
