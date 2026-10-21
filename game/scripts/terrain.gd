@@ -18,13 +18,8 @@ func _ready() -> void:
 	heights = FileAccess.get_file_as_bytes("res://data/terrain_height.bin").to_float32_array()
 	var colors := FileAccess.get_file_as_bytes("res://data/terrain_color.bin")
 	mesh = _build_mesh(colors)
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = true
-	mat.roughness = 1.0
-	mat.metallic_specular = 0.0
-	if OS.get_cmdline_user_args().has("--unshaded"):
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://shaders/terrain.gdshader")  # vertex color + lava glow (alpha)
 	material_override = mat
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
@@ -50,8 +45,8 @@ func _build_mesh(colors: PackedByteArray) -> ArrayMesh:
 			var b := _vertex(i + 1, j)
 			var c := _vertex(i, j + 1)
 			var d := _vertex(i + 1, j + 1)
-			var k := (j * grid_x + i) * 3
-			var col := Color8(colors[k], colors[k + 1], colors[k + 2])
+			var k := (j * grid_x + i) * 4
+			var col := Color8(colors[k], colors[k + 1], colors[k + 2], colors[k + 3])
 			var n1 := (c - a).cross(b - a).normalized()
 			var n2 := (c - b).cross(d - b).normalized()
 			# Godot treats clockwise triangles (seen from the front) as front faces: a,b,c and b,d,c face up.
