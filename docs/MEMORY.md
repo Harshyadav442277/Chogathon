@@ -16,6 +16,8 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Installed 32 skills from gamedev-skills/awesome-gamedev-agent-skills (Apache-2.0) into `.claude/skills/` | Requested by the user; LICENSE and NOTICE kept alongside |
 | 2026-10-21 | Godot de-risk gate **passed locally**: Godot 4.7.2 single-threaded web export served at `/play` renders the continent and all Chogs, calls the API, opens the Status Window. Directional shadows disabled (they over-brightened the Compatibility renderer) | Continue with the Godot client; keep three.js `/world` until deployed |
 | 2026-10-21 | Two-developer split: A = landscape + buildings (`feat/world`), B = characters (`feat/characters`); file ownership and contract in [WORKSPLIT.md](WORKSPLIT.md) | Parallel work without merge conflicts |
+| 2026-10-21 | Buildings and props are generated procedurally in Godot (`game/scripts/catalog.gd`) instead of downloading Kenney kits | No downloads or licensing, about +0.45 MB to the web build, shapes fit each job |
+| 2026-10-21 | Positions feed: Chogs at work stand outside their job's building (new additive `building` field) and never in water | Makes jobs visible on the map |
 | 2026-10-21 | Characters: one procedural chibi mesh (`game/scripts/characters/chibi_mesh.gd`). UV2.x tags body parts; role props will be added to the same mesh and hidden per instance. The head is the NFT portrait, billboarded in `character.gdshader`. Per-instance data: slot, state + 4 × role, phase, highlight | Keeps every Chog in one draw call (a MultiMesh holds one mesh). The portrait stays readable from the top-down camera |
 
 When a decision changes, add a new dated row explaining what replaced it.

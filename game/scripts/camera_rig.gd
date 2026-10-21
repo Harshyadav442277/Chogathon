@@ -5,13 +5,13 @@ extends Node3D
 signal clicked(screen_pos: Vector2)
 
 @export var min_dist := 25.0
-@export var max_dist := 560.0
+@export var max_dist := 640.0
 @export var min_pitch := deg_to_rad(25.0)
 @export var max_pitch := deg_to_rad(70.0)
-@export var bounds := Vector2(420, 330)
+@export var bounds := Vector2(460, 400)
 
 var camera: Camera3D
-var dist := 420.0
+var dist := 520.0
 var yaw := 0.0
 var pitch := deg_to_rad(52.0)
 var _goal: Variant = null  # Vector3 target while flying

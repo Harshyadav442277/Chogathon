@@ -16,7 +16,7 @@ func _ready() -> void:
 ## GET a JSON endpoint. Returns the parsed Variant, or null on any failure.
 func get_json(path: String) -> Variant:
 	var req := HTTPRequest.new()
-	req.timeout = 20.0
+	req.timeout = 30.0
 	add_child(req)
 	var err := req.request(base_url + path, ["Accept: application/json"])
 	if err != OK:
