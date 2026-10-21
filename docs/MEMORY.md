@@ -20,5 +20,6 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Positions feed: Chogs at work stand outside their job's building (new additive `building` field) and never in water | Makes jobs visible on the map |
 | 2026-10-21 | Enterable interiors for 25 mid/large building types, with a story panel per building | Requested by the user: interiors that go along with the story |
 | 2026-10-21 | Terrain level of detail: grid doubled to 641 x 561, chunked terrain with three detail levels, close-up ground cover and shader detail, building stand-ins when far away, flattened ground under the capitals | Requested by the user: less detail when zoomed out, more when zoomed in |
+| 2026-10-21 | Close-up detail through procedural shaders on a single baked noise texture (no downloaded texture packs), per-surface material tags, detailed near meshes with per-instance distance LOD; Godot 4.7.2 kept (no engine upgrade) | Requested by the user: less bland and blocky up close. The web build needs the Compatibility renderer either way, and procedural detail adds 0.25 MB instead of tens of MB of textures |
 
 When a decision changes, add a new dated row explaining what replaced it.

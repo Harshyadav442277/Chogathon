@@ -1,10 +1,11 @@
 class_name CameraRig
 extends Node3D
 ## God's-eye camera: left-drag pan, right-drag orbit, wheel/pinch zoom, WASD pan, smooth fly-to.
+## The look-at point follows the ground height (smoothly), and the camera never dips below the terrain.
 
 signal clicked(screen_pos: Vector2)
 
-@export var min_dist := 25.0
+@export var min_dist := 14.0
 @export var max_dist := 640.0
 @export var min_pitch := deg_to_rad(25.0)
 @export var max_pitch := deg_to_rad(70.0)
@@ -18,6 +19,8 @@ var _goal: Variant = null  # Vector3 target while flying
 var _goal_dist := 0.0
 var _drag_button := 0
 var _press_pos := Vector2.ZERO
+var terrain: Terrain  # set by main; optional
+var _ground := 0.0    # smoothed ground height under the look-at point
 
 
 func _ready() -> void:
@@ -88,6 +91,11 @@ func _process(delta: float) -> void:
 	if move != Vector2.ZERO:
 		_goal = null
 		_pan(-move * delta * 600.0)
+	if terrain:
+		var g := maxf(terrain.height_at(position.x, position.z), 0.0)
+		if absf(g - _ground) > 0.01:
+			_ground = lerpf(_ground, g, 1.0 - exp(-delta * 5.0))
+			_apply()
 	if _goal != null:
 		var k := 1.0 - exp(-delta * 3.0)
 		position = position.lerp(_goal, k)
@@ -100,6 +108,17 @@ func _process(delta: float) -> void:
 func _apply() -> void:
 	if camera == null:
 		return
+	var target := Vector3(global_position.x, _ground, global_position.z)
 	var offset := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * dist
-	camera.global_position = global_position + offset
-	camera.look_at(global_position, Vector3.UP)
+	var cam_pos := target + offset
+	if terrain:
+		cam_pos.y = maxf(cam_pos.y, terrain.height_at(cam_pos.x, cam_pos.z) + 3.0)
+	camera.global_position = cam_pos
+	camera.look_at(target, Vector3.UP)
+
+
+## Jump the look-at height to the ground right away (no smoothing), e.g. after a teleport.
+func snap_ground() -> void:
+	if terrain:
+		_ground = maxf(terrain.height_at(position.x, position.z), 0.0)
+	_apply()

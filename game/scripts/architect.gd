@@ -6,11 +6,26 @@ extends RefCounted
 ##   COLOR  = sRGB vertex color
 ##   UV.x   = glow: 0 none, 0.5 glows at night (windows, lanterns), 1.0 always glows (lava, crystals, magic)
 ##   UV.y   = 1 to take the instance's region tint (roofs, banners), 0 to keep the vertex color
+##   UV2.x  = surface material (M_* below) that the shader turns into a procedural texture
 
 var verts := PackedVector3Array()
 var norms := PackedVector3Array()
 var cols := PackedColorArray()
 var uvs := PackedVector2Array()
+var uv2s := PackedVector2Array()
+## Material for the next parts; -1 = guess from colour (stone -> brick, light walls -> plaster, wood, tinted roofs).
+var mat := -1
+
+const M_PLAIN := 0
+const M_BRICK := 1
+const M_PLASTER := 2
+const M_WOOD := 3
+const M_ROOF := 4
+const M_LEAF := 5
+const M_BARK := 6
+const M_ROCK := 7
+const M_GRASS := 8
+const M_CLOTH := 9
 
 const WINDOW := Color("#ffd27a")
 const DARK := Color("#3a2a24")
@@ -32,11 +47,50 @@ func _tri(a: Vector3, b: Vector3, c: Vector3, col: Color, center: Vector3, glow:
 		c = t
 		g = -g
 	var n := (-g).normalized()
+	var m := Vector2(float(mat if mat >= 0 else _guess(col, glow, tint)), 0.0)
 	for v in [a, b, c]:
 		verts.append(v)
 		norms.append(n)
 		cols.append(col)
 		uvs.append(Vector2(glow, tint))
+		uv2s.append(m)
+
+
+func _guess(col: Color, glow: float, tint: float) -> int:
+	if glow > 0.0:
+		return M_PLAIN
+	if tint > 0.5:
+		return M_CLOTH
+	if col.is_equal_approx(STONE) or col.is_equal_approx(FOUND):
+		return M_BRICK
+	if col.is_equal_approx(WOOD) or col.is_equal_approx(BEAM) or col.is_equal_approx(Color("#b98a5a")) or col.is_equal_approx(Color("#a77a4a")):
+		return M_WOOD
+	if col.v > 0.78 and col.s < 0.22:
+		return M_PLASTER
+	return M_PLAIN
+
+
+## Run `f` with a fixed material, then restore the previous one.
+func with_mat(m: int, f: Callable) -> void:
+	var prev := mat
+	mat = m
+	f.call()
+	mat = prev
+
+
+## Seeded random wobble of every vertex added since `from` (organic shapes: canopies, rocks).
+func jitter(from: int, amount: float, seed_v: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	for k in range(from, verts.size()):
+		var v := verts[k]
+		rng.seed = seed_v + int(round(v.x * 97.0)) * 73856093 + int(round(v.y * 97.0)) * 19349663 + int(round(v.z * 97.0)) * 83492791
+		verts[k] = v + Vector3(rng.randf() - 0.5, rng.randf() - 0.5, rng.randf() - 0.5) * amount
+	# recompute flat normals after moving
+	for k in range(from, verts.size(), 3):
+		var n := (verts[k + 2] - verts[k]).cross(verts[k + 1] - verts[k]).normalized()
+		norms[k] = n
+		norms[k + 1] = n
+		norms[k + 2] = n
 
 
 func _quad(a: Vector3, b: Vector3, c: Vector3, d: Vector3, col: Color, center: Vector3, glow := 0.0, tint := 0.0) -> void:
@@ -62,6 +116,9 @@ func box(base: Vector3, size: Vector3, col: Color, glow := 0.0, tint := 0.0) -> 
 
 ## Gable roof whose ridge runs along X, sitting on top of a w x d footprint at height `y`.
 func gable(base: Vector3, w: float, d: float, h: float, col: Color, tint := 1.0) -> void:
+	var prev := mat
+	if mat < 0 and tint > 0.5:
+		mat = M_ROOF
 	var c := base + Vector3(0, h * 0.35, 0)
 	var x := w / 2.0 + 0.3
 	var z := d / 2.0 + 0.4
@@ -76,10 +133,14 @@ func gable(base: Vector3, w: float, d: float, h: float, col: Color, tint := 1.0)
 	_tri(a, f, r1, col, c, 0.0, tint)
 	_tri(b, e, r2, col, c, 0.0, tint)
 	_quad(a, b, e, f, col, c, 0.0, tint)
+	mat = prev
 
 
 ## Four-sided pyramid roof.
 func pyramid(base: Vector3, w: float, d: float, h: float, col: Color, tint := 1.0, glow := 0.0) -> void:
+	var prev := mat
+	if mat < 0 and tint > 0.5:
+		mat = M_ROOF
 	var c := base + Vector3(0, h * 0.25, 0)
 	var x := w / 2.0
 	var z := d / 2.0
@@ -88,6 +149,7 @@ func pyramid(base: Vector3, w: float, d: float, h: float, col: Color, tint := 1.
 	for i in 4:
 		_tri(p[i], p[(i + 1) % 4], top, col, c, glow, tint)
 	_quad(p[0], p[1], p[2], p[3], col, c, glow, tint)
+	mat = prev
 
 
 ## Cylinder (or cone/frustum when r_top differs) standing on `base`.
@@ -112,7 +174,11 @@ func cyl(base: Vector3, r: float, h: float, col: Color, segs := 8, r_top := -1.0
 
 
 func cone(base: Vector3, r: float, h: float, col: Color, segs := 8, glow := 0.0, tint := 0.0) -> void:
+	var prev := mat
+	if mat < 0 and tint > 0.5:
+		mat = M_ROOF
 	cyl(base, r, h, col, segs, 0.0, glow, tint)
+	mat = prev
 
 
 ## Low-poly ball (latitude/longitude), centred at `center`.
@@ -169,8 +235,24 @@ func framed_window(x: float, y: float, z: float, s := 0.7, shutters := true) -> 
 	box(Vector3(x, y, z + 0.09), Vector3(0.07, s, 0.04), BEAM)
 	box(Vector3(x, y - 0.14, z + 0.12), Vector3(s + 0.3, 0.1, 0.25), SILL)
 	if shutters:
+		var prev := mat
+		mat = M_WOOD
 		box(Vector3(x - s * 0.72, y - 0.04, z + 0.05), Vector3(s * 0.36, s + 0.05, 0.06), TINT, 0.0, 1.0)
 		box(Vector3(x + s * 0.72, y - 0.04, z + 0.05), Vector3(s * 0.36, s + 0.05, 0.06), TINT, 0.0, 1.0)
+		mat = prev
+
+
+## Planter under a front window with a few blossoms.
+func flower_box(x: float, y: float, z: float, s: float, seed_v: int) -> void:
+	box(Vector3(x, y, z + 0.22), Vector3(s + 0.25, 0.22, 0.28), WOOD)
+	var fc := [Color("#ff7aa8"), Color("#ffd43b"), Color("#b197fc"), Color("#ff6b6b"), Color("#ffffff")]
+	var prev := mat
+	mat = M_LEAF
+	box(Vector3(x, y + 0.22, z + 0.22), Vector3(s + 0.15, 0.12, 0.2), Color("#4f8f4a"))
+	mat = M_PLAIN
+	for k in 3:
+		ball(Vector3(x - s * 0.35 + k * s * 0.35, y + 0.4, z + 0.24), 0.11, fc[(seed_v + k) % fc.size()], 0.0, 0.0, 0.8, 2, 4)
+	mat = prev
 
 
 ## A window on a side face (normal along X); `side` is -1 or +1.
@@ -185,7 +267,18 @@ func side_window(side: float, w: float, y: float, z: float, s := 0.6) -> void:
 ## with trim and ridge beam. Front (door) faces +Z. Returns the roof top height.
 func house(w: float, d: float, h: float, wall: Color, roof_h := 2.2, floors := 1) -> float:
 	box(Vector3(0, -0.4, 0), Vector3(w + 0.4, 0.75, d + 0.4), FOUND)
+	var prev := mat
+	mat = M_BRICK if wall.is_equal_approx(STONE) else M_PLASTER
 	box(Vector3.ZERO, Vector3(w, h, d), wall)
+	mat = prev
+	# diagonal timber braces on both side walls (around the side window), per floor
+	for f in floors:
+		var y0 := h * f / floors + 0.1
+		var y1 := h * (f + 1) / floors - 0.3
+		for side in [-1.0, 1.0]:
+			var sx: float = side * (w / 2.0 + 0.05)
+			beam(Vector3(sx, y0, -d / 2.0 + 0.15), Vector3(sx, y1, -0.55), 0.16, BEAM)
+			beam(Vector3(sx, y0, d / 2.0 - 0.15), Vector3(sx, y1, 0.55), 0.16, BEAM)
 	for cx in [-w / 2.0, w / 2.0]:
 		for cz in [-d / 2.0, d / 2.0]:
 			box(Vector3(cx, 0, cz), Vector3(0.28, h, 0.28), BEAM)
@@ -195,7 +288,7 @@ func house(w: float, d: float, h: float, wall: Color, roof_h := 2.2, floors := 1
 		box(Vector3(0, fy, -d / 2.0 - 0.02), Vector3(w + 0.1, 0.26, 0.14), BEAM)
 	# door: frame, door, step, lamp
 	box(Vector3(0, 0, d / 2.0 + 0.03), Vector3(1.4, 2.15, 0.12), BEAM)
-	box(Vector3(0, 0, d / 2.0 + 0.08), Vector3(1.0, 1.9, 0.1), DARK)
+	with_mat(M_WOOD, func() -> void: box(Vector3(0, 0, d / 2.0 + 0.08), Vector3(1.0, 1.9, 0.1), Color("#6b4630")))
 	box(Vector3(0.32, 0.9, d / 2.0 + 0.15), Vector3(0.08, 0.08, 0.06), Color("#e8b84a"))
 	box(Vector3(0, -0.3, d / 2.0 + 0.55), Vector3(1.7, 0.35, 0.8), FOUND)
 	box(Vector3(0.95, 2.0, d / 2.0 + 0.25), Vector3(0.25, 0.32, 0.25), Color("#ffb84d"), 0.5)
@@ -208,6 +301,8 @@ func house(w: float, d: float, h: float, wall: Color, roof_h := 2.2, floors := 1
 			if f == 0 and absf(x) < 1.0:
 				continue
 			framed_window(x, wy, d / 2.0, 0.62)
+			if (i + f) % 2 == 0:
+				flower_box(x, wy - 0.62, d / 2.0, 0.62, i + f * 3)
 		for side in [-1.0, 1.0]:
 			side_window(side, w, wy, 0.0)
 	# roof with trim and ridge
@@ -215,7 +310,27 @@ func house(w: float, d: float, h: float, wall: Color, roof_h := 2.2, floors := 1
 	box(Vector3(0, h + roof_h - 0.05, 0), Vector3(w + 0.8, 0.18, 0.22), BEAM)
 	box(Vector3(0, h - 0.05, d / 2.0 + 0.42), Vector3(w + 0.7, 0.14, 0.14), BEAM)
 	box(Vector3(0, h - 0.05, -d / 2.0 - 0.42), Vector3(w + 0.7, 0.14, 0.14), BEAM)
+	# barge boards along the four sloped roof edges
+	var bx := w / 2.0 + 0.36
+	var bz := d / 2.0 + 0.4
+	for sx in [-bx, bx]:
+		for sz in [-bz, bz]:
+			beam(Vector3(sx, h + 0.02, sz), Vector3(sx, h + roof_h + 0.02, 0), 0.16, BEAM)
 	return h + roof_h
+
+
+## Square beam of thickness `t` from `a` to `b`, in any direction (braces, barge boards, branches).
+func beam(a: Vector3, b: Vector3, t: float, col: Color, tint := 0.0) -> void:
+	var dir := (b - a).normalized()
+	var up := Vector3.UP if absf(dir.y) < 0.9 else Vector3.RIGHT
+	var u := dir.cross(up).normalized() * t / 2.0
+	var v := dir.cross(u).normalized() * t / 2.0
+	var c := (a + b) / 2.0
+	var p := [a - u - v, a + u - v, a + u + v, a - u + v, b - u - v, b + u - v, b + u + v, b - u + v]
+	_quad(p[0], p[1], p[2], p[3], col, c, 0.0, tint)
+	_quad(p[4], p[5], p[6], p[7], col, c, 0.0, tint)
+	for i in 4:
+		_quad(p[i], p[(i + 1) % 4], p[4 + (i + 1) % 4], p[4 + i], col, c, 0.0, tint)
 
 
 ## Small set dressing beside a front door.
@@ -240,6 +355,7 @@ func commit() -> ArrayMesh:
 	arrays[Mesh.ARRAY_NORMAL] = norms
 	arrays[Mesh.ARRAY_COLOR] = cols
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_TEX_UV2] = uv2s
 	var m := ArrayMesh.new()
 	if not verts.is_empty():
 		m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
