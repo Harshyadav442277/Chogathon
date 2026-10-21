@@ -3,7 +3,8 @@ extends Node3D
 ## Contract with main.gd (docs/WORKSPLIT.md): terrain, pick(), id_at(), position_of().
 
 const SUPPLY := 1969
-const WALK_RATE := 1.2
+const WALK_SPEED := 4.0  # units/s
+const MAX_TRIP := 30.0   # s; long trips speed up so a cross-continent move still lands before the next sim tick (~45 s)
 const MIN_SCREEN := 0.0065  # character.gdshader min_screen
 const STATES := {"walk": 0, "work": 1, "fight": 2}
 const ROLES := {"main_dps": 1, "sub_dps": 2, "tank": 3, "healer": 4, "support": 5, "buffer": 6}
@@ -15,7 +16,10 @@ var _tgt := PackedVector3Array()
 var _yaw := PackedFloat32Array()
 var _ids := PackedInt32Array()
 var _code := PackedFloat32Array()  # state + 4 * role, from the server
-var _moving := false
+var _speed := PackedFloat32Array()
+var _walking := PackedByteArray()
+var _active := PackedInt32Array()  # indices currently walking; only these are touched per frame
+var _frame := 0
 var _perf := OS.get_cmdline_user_args().has("--perf")
 var _perf_us := 0
 var _perf_max := 0
@@ -57,6 +61,9 @@ func _on_positions() -> void:
 	if first:
 		_cur.resize(n)
 		_yaw.resize(n)
+		_speed.resize(n)
+		_walking.resize(n)
+		_walking.fill(0)
 	var mm := _mmi.multimesh
 	for i in n:
 		var x: float = p["x"][i]
@@ -68,23 +75,45 @@ func _on_positions() -> void:
 			_cur[i] = _tgt[i]
 			_yaw[i] = fmod(_ids[i] * 2.39996, TAU)  # golden-angle spread so idle crowds don't all face one way
 			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), _cur[i]))
+		else:
+			_walk_to_target(i)
 		var state: int = STATES.get(str(p["state"][i]), 1) if p.has("state") else 1
 		var role: int = ROLES.get(str(p["role"][i]), 0) if p.has("role") else 0
 		_code[i] = state + 4 * role
 		mm.set_instance_color(i, GameState.HOUSE_COLORS[int(p["house"][i])])
 	mm.visible_instance_count = n
-	_moving = true
+	if first and OS.get_cmdline_user_args().has("--walk-test"):
+		_scatter()
 	_refresh_custom()
 	if first:
 		_maybe_select()
 
 
+## Starts a walk when the server moved this Chog: constant speed, facing the direction of travel.
+func _walk_to_target(i: int) -> void:
+	var d := _tgt[i] - _cur[i]
+	var dist := Vector2(d.x, d.z).length()
+	if dist < 0.05:
+		return
+	_speed[i] = maxf(WALK_SPEED, dist / MAX_TRIP)
+	_yaw[i] = atan2(d.x, d.z)
+	if _walking[i] == 0:
+		_walking[i] = 1
+		_active.append(i)
+		_set_custom(i)
+
+
 func _refresh_custom() -> void:
-	var mm := _mmi.multimesh
 	for i in _ids.size():
-		var sel := 1.0 if _ids[i] == GameState.selected else 0.0
-		var phase := fmod(_ids[i] * 0.618034, 1.0)
-		mm.set_instance_custom_data(i, Color(float(_ids[i] - 1), _code[i], phase, sel))
+		_set_custom(i)
+
+
+func _set_custom(i: int) -> void:
+	var sel := 1.0 if _ids[i] == GameState.selected else 0.0
+	var phase := fmod(_ids[i] * 0.618034, 1.0)
+	# While walking the state is 0 (walk); the role stays so props keep showing.
+	var code := floorf(_code[i] / 4.0) * 4.0 if _walking[i] == 1 else _code[i]
+	_mmi.multimesh.set_instance_custom_data(i, Color(float(_ids[i] - 1), code, phase, sel))
 
 
 func _process(delta: float) -> void:
@@ -95,25 +124,32 @@ func _process(delta: float) -> void:
 
 
 func _walk(delta: float) -> void:
-	var n := _cur.size()
-	if n == 0 or not _moving:
+	if _active.is_empty():
 		return
 	var mm := _mmi.multimesh
-	var k := 1.0 - exp(-delta * WALK_RATE)
-	var still_moving := false
-	for i in n:
+	var still := PackedInt32Array()
+	_frame += 1
+	for i in _active:
+		var c := _cur[i]
 		var to := _tgt[i]
-		var d := to - _cur[i]
-		if d.x * d.x + d.z * d.z > 0.0004:
-			_cur[i] = _cur[i].lerp(to, k)
-			_yaw[i] = atan2(d.x, d.z)
-			still_moving = true
-		elif _cur[i] != to:
-			_cur[i] = to
+		var dx := to.x - c.x
+		var dz := to.z - c.z
+		var dist := sqrt(dx * dx + dz * dz)
+		var step := _speed[i] * delta
+		if dist <= step:
+			c = to
+			_walking[i] = 0
+			_set_custom(i)
 		else:
-			continue
-		mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), _cur[i]))
-	_moving = still_moving
+			c.x += dx / dist * step
+			c.z += dz / dist * step
+			# Terrain lookups are most of the cost: each walker samples the ground every 4th frame, staggered.
+			if terrain and (i + _frame) & 3 == 0:
+				c.y = maxf(terrain.height_at(c.x, c.z), 0.3)
+			still.append(i)
+		_cur[i] = c
+		mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), c))
+	_active = still
 
 
 ## Index of the character whose head is nearest to a screen point (within radius px), or -1.
@@ -149,13 +185,26 @@ func _maybe_select() -> void:
 			GameState.select(int(arg.trim_prefix("--select=")))
 
 
+## Dev helper: `-- --walk-test` moves every Chog 20-60 units off its spot so the whole crowd walks back (worst case for --perf).
+func _scatter() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	for i in _cur.size():
+		var a := rng.randf() * TAU
+		var r := rng.randf_range(20.0, 60.0)
+		var x := _tgt[i].x + sin(a) * r
+		var z := _tgt[i].z + cos(a) * r
+		_cur[i] = Vector3(x, maxf(terrain.height_at(x, z), 0.3) if terrain else 0.0, z)
+		_walk_to_target(i)
+
+
 ## Dev helper: `-- --perf` prints the character update cost and the frame's draw calls once a second.
 func _log_perf(us: int) -> void:
 	_perf_us += us
 	_perf_max = maxi(_perf_max, us)
 	_perf_frames += 1
 	if _perf_frames >= 60:
-		print("chars: avg %d us, max %d us, draw calls %d, objects %d" % [_perf_us / _perf_frames, _perf_max, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)])
+		print("chars: fps %d, avg %d us, max %d us, walking %d, draw calls %d, objects %d" % [Engine.get_frames_per_second(), _perf_us / _perf_frames, _perf_max, _active.size(), Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)])
 		_perf_us = 0
 		_perf_max = 0
 		_perf_frames = 0

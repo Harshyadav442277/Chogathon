@@ -13,6 +13,7 @@ uniform float rows = 44.0;
 uniform float head_y = 1.2;      // ChibiMesh.HEAD_Y
 uniform float head_size = 1.0;   // ChibiMesh.HEAD_SIZE
 uniform float min_screen = 0.0065;  // grow with distance so Chogs stay visible zoomed out
+uniform float walk_speed = 9.0;     // stride rate, rad/s
 
 varying flat float v_part;
 varying flat float v_slot;
@@ -29,12 +30,36 @@ void vertex() {
 	float dist = length(INV_VIEW_MATRIX[3].xyz - origin);
 	float s = max(1.0, dist * min_screen) * (1.0 + INSTANCE_CUSTOM.a * 0.5);
 	vec3 local = VERTEX - origin;
+	float state = mod(floor(INSTANCE_CUSTOM.g + 0.5), 4.0);
+	float bob = 0.0;
+	if (state < 0.5) {
+		// Walk: legs and arms swing in opposite phase around hip and shoulder, the body bobs twice per stride.
+		vec3 side = MODEL_MATRIX[0].xyz;
+		vec3 fwd = MODEL_MATRIX[2].xyz;
+		vec3 m = vec3(dot(local, side), local.y, dot(local, fwd));  // model-space position (instances only yaw)
+		float t = TIME * walk_speed + INSTANCE_CUSTOM.b * 6.2832;
+		float swing = sin(t) * 0.7;
+		float angle = 0.0;
+		float pivot = 0.0;
+		if (part > 0.5 && part < 1.5) {
+			angle = m.x < 0.0 ? swing : -swing;
+			pivot = 0.34;
+		} else if (part > 1.5 && part < 3.5) {
+			angle = part < 2.5 ? -swing : swing;
+			pivot = 0.78;
+		}
+		float y = m.y - pivot;
+		m = vec3(m.x, pivot + y * cos(angle) - m.z * sin(angle), y * sin(angle) + m.z * cos(angle));
+		bob = abs(sin(t)) * 0.08;
+		m.y += bob;
+		local = side * m.x + vec3(0.0, m.y, 0.0) + fwd * m.z;
+	}
 	if (part > 3.5) {
 		// Billboard the portrait around the head center, nudged toward the camera so the body never covers it.
 		vec3 right = INV_VIEW_MATRIX[0].xyz;
 		vec3 up = INV_VIEW_MATRIX[1].xyz;
 		vec3 back = INV_VIEW_MATRIX[2].xyz;
-		local = vec3(0.0, head_y, 0.0) + (right * (UV.x - 0.5) + up * (0.5 - UV.y)) * head_size + back * 0.25;
+		local = vec3(0.0, head_y + bob, 0.0) + (right * (UV.x - 0.5) + up * (0.5 - UV.y)) * head_size + back * 0.25;
 		NORMAL = back;
 	}
 	VERTEX = origin + local * s;
