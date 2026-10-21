@@ -2,7 +2,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type Me = { address: string; judge?: boolean; chogs: { id: number; name: string; house: string; bond: number }[] } | null;
+type Me = {
+  address: string; judge?: boolean; chogs: { id: number; name: string; house: string; bond: number }[];
+  energy: { left: number; max: number };
+} | null;
 
 declare global {
   interface Window { ethereum?: any }

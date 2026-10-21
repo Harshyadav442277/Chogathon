@@ -24,15 +24,18 @@
 - Pages: feed, profile, meme cascade, times, leaderboard, about.
 - Wallet sign-in, whispers gated by onchain ownership, rumors, chat.
 
-**Half-finished (resume first):**
-- The schema now has `injections.target_chog` and `posts.cheers`.
-- `types.ts` has the `nudge | introduce | gift` kinds.
-- The engine loads them, picks one holder action per Chog per tick, and puts the introduced Chog's latest post into the feed.
-- **Still to do:**
-  - `apply()` handling for nudge, introduce and gift (around `src/sim/engine.ts:343`).
-  - Offline and Claude brain rules for those kinds.
-  - The `/api/care` route.
-  - The cheer button.
+**Holder actions + cheers: done, verified locally on 21 Oct 2026 (uncommitted in branch `claude/repo-status-check-394210` until pushed):**
+- `apply()` handles nudge (journey), introduce (obeyed = guaranteed follow) and gift, with bond changes per kind. Only whispers and rumors start memes.
+- Offline brain rules for all three, plus a Claude prompt section ("HOLDER REQUESTS"). The Claude path has **not** been run, because there's no key.
+- `/api/care` replaces `/api/whisper`. It covers whisper, nudge, introduce and gift, each limited to once per Chog per day, under a **Mon Energy** budget of 6 per holder per day (`src/lib/holder.ts`). Judges get a budget per browser. Gifts come from a fixed list (`GIFTS` in `world.ts`), so no free text reaches the model through them.
+- `/api/cheer` lets anyone cheer, once per post: up to 10 a day without a wallet, 30 with one. Crier news can't be cheered. `/api/me` returns energy.
+- UI: the Care & Command panel (tabs + energy pill) replaces the whisper box, the Holder log covers all four kinds, and posts have a 📣 cheer button.
+- Evidence, from a local build outside OneDrive with the offline brain and a local SQLite DB:
+  - `tsc` clean and `next build` passes.
+  - Engine test: 40 queued commands, 10 per kind, all resolved with the expected effects.
+  - HTTP test: 25 checks on the care, cheer and me routes passed, covering auth, validation, daily caps and energy running out.
+  - Browser: introduced a Chog and cheered a post through the UI.
+- **Not verified:** wallet holders (only the judge path was tested), the Claude brain, Turso and deployment.
 
 **Background:** thumbnails are being generated into `public/chogs/`.
 
