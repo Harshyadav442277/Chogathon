@@ -116,9 +116,7 @@ func cone(base: Vector3, r: float, h: float, col: Color, segs := 8, glow := 0.0,
 
 
 ## Low-poly ball (latitude/longitude), centred at `center`.
-func ball(center: Vector3, r: float, col: Color, glow := 0.0, tint := 0.0, squash := 1.0) -> void:
-	var rings := 4
-	var segs := 7
+func ball(center: Vector3, r: float, col: Color, glow := 0.0, tint := 0.0, squash := 1.0, rings := 4, segs := 7) -> void:
 	for j in rings:
 		var v0 := PI * j / rings
 		var v1 := PI * (j + 1) / rings

@@ -52,6 +52,9 @@ func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> 
 	mmi.multimesh = mm
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)
+	if OS.get_cmdline_user_args().has("--perf"):
+		var tris: int = (mesh.surface_get_array_len(0) / 3) if mesh.get_surface_count() > 0 else 0
+		print("TRIS %s x%d = %d" % [mesh.resource_name if mesh.resource_name != "" else str(tris) + "/inst", xforms.size(), tris * xforms.size()])
 
 
 func _build_buildings(list: Array) -> void:
