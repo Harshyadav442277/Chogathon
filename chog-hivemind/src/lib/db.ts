@@ -4,6 +4,9 @@ let client: Client | null = null;
 
 export function db(): Client {
   if (!client) {
+    // Deployed code and the cron must never fall back to a throwaway local file.
+    if (!process.env.TURSO_DATABASE_URL && (process.env.VERCEL || process.env.GITHUB_ACTIONS))
+      throw new Error("TURSO_DATABASE_URL is not set");
     client = createClient({
       url: process.env.TURSO_DATABASE_URL || "file:hivemind.db",
       authToken: process.env.TURSO_AUTH_TOKEN,

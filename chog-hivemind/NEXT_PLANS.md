@@ -24,7 +24,7 @@
 - Pages: feed, profile, meme cascade, times, leaderboard, about.
 - Wallet sign-in, whispers gated by onchain ownership, rumors, chat.
 
-**Holder actions + cheers: done, verified locally on 21 Oct 2026 (uncommitted in branch `claude/repo-status-check-394210` until pushed):**
+**Holder actions + cheers: done, verified locally on 21 Oct 2026 ([PR #1](https://github.com/Harshyadav442277/Chogathon/pull/1)). Deployment runbook: [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md#deployment).**
 - `apply()` handles nudge (journey), introduce (obeyed = guaranteed follow) and gift, with bond changes per kind. Only whispers and rumors start memes.
 - Offline brain rules for all three, plus a Claude prompt section ("HOLDER REQUESTS"). The Claude path has **not** been run, because there's no key.
 - `/api/care` replaces `/api/whisper`. It covers whisper, nudge, introduce and gift, each limited to once per Chog per day, under a **Mon Energy** budget of 6 per holder per day (`src/lib/holder.ts`). Judges get a budget per browser. Gifts come from a fixed list (`GIFTS` in `world.ts`), so no free text reaches the model through them.

@@ -1,12 +1,19 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
-const SECRET = process.env.SESSION_SECRET || "dev-only-secret-change-me";
 const COOKIE = "hive_session";
 
 export type Session = { address: string; judge?: boolean; exp: number };
 
-const sign = (payload: string) => createHmac("sha256", SECRET).update(payload).digest("base64url");
+// A deployment without SESSION_SECRET would sign sessions with a public string, so refuse.
+function secret(): string {
+  const s = process.env.SESSION_SECRET;
+  if (s) return s;
+  if (process.env.VERCEL) throw new Error("SESSION_SECRET is not set");
+  return "dev-only-secret-change-me";
+}
+
+const sign = (payload: string) => createHmac("sha256", secret()).update(payload).digest("base64url");
 
 export function encodeSession(s: Session): string {
   const payload = Buffer.from(JSON.stringify(s)).toString("base64url");
