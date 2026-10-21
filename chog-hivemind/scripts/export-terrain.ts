@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { colorAt, height, WORLD_D, WORLD_W } from "../src/world/terrain";
 
-export const GRID_X = 321, GRID_Z = 281;
+export const GRID_X = 641, GRID_Z = 561; // ~1.4 units per cell; the client builds LOD chunks from this
 export const SIZE_X = WORLD_W * 1.2, SIZE_Z = WORLD_D * 1.25;
 
 const out = fileURLToPath(new URL("../../game/data/", import.meta.url));

@@ -17,6 +17,12 @@ const FOOTPRINT := {
 var terrain: Terrain
 var material: ShaderMaterial
 var _buildings: Array = []
+var _detail_nodes: Array[Node3D] = []   # detailed buildings + small props (near view)
+var _simple_nodes: Array[Node3D] = []   # stand-ins (far view)
+var _far := false
+var _lod_tick := 0.0
+const SMALL_PROPS := ["flowers", "reeds", "lily", "rock", "mushroom", "bonespike", "lavarock"]
+const FAR_HEIGHT := 250.0  # camera height above which the far LOD is used
 var _building_pos := PackedVector3Array()
 
 
@@ -32,9 +38,9 @@ func build(world: Dictionary) -> void:
 	_build_volcano(world.get("landmarks", {}))
 
 
-func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> void:
+func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> MultiMeshInstance3D:
 	if xforms.is_empty() or mesh.get_surface_count() == 0:
-		return
+		return null
 	mesh.surface_set_material(0, material)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -55,6 +61,7 @@ func _instances(mesh: Mesh, xforms: Array[Transform3D], tints: Array[Color]) -> 
 	if OS.get_cmdline_user_args().has("--perf"):
 		var tris: int = (mesh.surface_get_array_len(0) / 3) if mesh.get_surface_count() > 0 else 0
 		print("TRIS %s x%d = %d" % [mesh.resource_name if mesh.resource_name != "" else str(tris) + "/inst", xforms.size(), tris * xforms.size()])
+	return mmi
 
 
 func _build_buildings(list: Array) -> void:
@@ -80,7 +87,33 @@ func _build_buildings(list: Array) -> void:
 		var roof: Color = ROOF.get(str(b["region"]), Color.WHITE)
 		(by_type[t]["c"] as Array[Color]).append(Color(roof.r, roof.g, roof.b, 1.0))
 	for t in by_type:
-		_instances(Catalog.building(t), by_type[t]["x"], by_type[t]["c"])
+		var near_mmi := _instances(Catalog.building(t), by_type[t]["x"], by_type[t]["c"])
+		var far_mmi := _instances(Catalog.building_simple(t), by_type[t]["x"], by_type[t]["c"])
+		if near_mmi:
+			_detail_nodes.append(near_mmi)
+		if far_mmi:
+			far_mmi.visible = false
+			_simple_nodes.append(far_mmi)
+
+
+## Swap detailed buildings/small props for stand-ins when the camera is high above the map.
+func _process(delta: float) -> void:
+	_lod_tick -= delta
+	if _lod_tick > 0.0:
+		return
+	_lod_tick = 0.25
+	var cam := get_viewport().get_camera_3d()
+	if cam == null or cam.global_position.y < -500.0:  # inside an interior
+		return
+	var h := cam.global_position.y
+	var far := h > FAR_HEIGHT + (15.0 if not _far else -15.0)  # hysteresis
+	if far == _far:
+		return
+	_far = far
+	for n in _detail_nodes:
+		n.visible = not far
+	for n in _simple_nodes:
+		n.visible = far
 
 
 ## Index of the enterable building under the cursor (screen space), or -1. Only when zoomed in enough.
@@ -128,7 +161,9 @@ func _build_props(props: Dictionary) -> void:
 		(groups[ti]["x"] as Array[Transform3D]).append(Transform3D(Basis(Vector3.UP, float(props["r"][i])).scaled(Vector3.ONE * s), Vector3(x, y - 0.1, z)))
 		(groups[ti]["c"] as Array[Color]).append(Color(1, 1, 1, 0))
 	for ti in groups:
-		_instances(Catalog.prop(str(types[ti])), groups[ti]["x"], groups[ti]["c"])
+		var mmi := _instances(Catalog.prop(str(types[ti])), groups[ti]["x"], groups[ti]["c"])
+		if mmi and SMALL_PROPS.has(str(types[ti])):
+			_detail_nodes.append(mmi)  # tiny props only when zoomed in
 
 
 func _build_roads(roads: Array) -> void:

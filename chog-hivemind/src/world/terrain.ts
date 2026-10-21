@@ -151,8 +151,41 @@ function landValue(x: number, z: number): number {
   return v + fbm(x * 0.02 + 7, z * 0.02 - 3, 3) * 0.12; // ragged coastline
 }
 
+/** Fixed city sites (chosen once by the generator's flat-site search). The terrain is flattened into a
+ *  plateau under each so walls and shops never sit on cliffs. gen-world.ts places the capitals here. */
+export const CITY_SITES: { region: RegionId; name: string; x: number; z: number; r: number }[] = [
+  { region: "emberforge", name: "Zapstone Citadel", x: -132.9, z: -76.4, r: 56 },
+  { region: "tidecry", name: "Rainhaven", x: -235.4, z: 100.8, r: 56 },
+  { region: "prism", name: "Glasshold", x: 190.4, z: -76.8, r: 56 },
+  { region: "dreamveil", name: "Lullaby Hollow", x: 223.3, z: 94.1, r: 56 },
+];
+const plateauCache = new Map<string, number>();
+function plateau(c: (typeof CITY_SITES)[number]): number {
+  let h = plateauCache.get(c.name);
+  if (h === undefined) {
+    // average of the raw terrain around the centre, kept above sea level
+    let sum = 0;
+    for (let i = 0; i < 12; i++) sum += rawHeight(c.x + Math.cos(i * 0.52) * c.r * 0.5, c.z + Math.sin(i * 0.52) * c.r * 0.5);
+    h = Math.max(3.5, Math.min(14, sum / 12));
+    plateauCache.set(c.name, h);
+  }
+  return h;
+}
+
 /** Terrain height in world units. Sea level = 0. */
 export function height(x: number, z: number): number {
+  let h = rawHeight(x, z);
+  for (const c of CITY_SITES) {
+    const d = Math.hypot(x - c.x, z - c.z);
+    if (d < c.r * 1.45) {
+      const t = smooth(c.r * 1.45, c.r, d); // 0 outside -> 1 inside the city
+      h = h * (1 - t) + plateau(c) * t;
+    }
+  }
+  return h;
+}
+
+function rawHeight(x: number, z: number): number {
   const land = landValue(x, z);
   if (land < -0.25) return -9;
   const shore = smooth(-0.05, 0.22, land); // 0 at the coast -> 1 inland
