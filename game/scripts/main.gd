@@ -27,6 +27,7 @@ func _ready() -> void:
 	swarm.set("terrain", terrain)
 	add_child(swarm)
 	rig = CameraRig.new()
+	rig.terrain = terrain
 	add_child(rig)
 	rig.clicked.connect(_on_click)
 	interiors = Interiors.new()
@@ -50,7 +51,7 @@ func _maybe_screenshot() -> void:
 				rig.pitch = deg_to_rad(float(v[3]))
 			if v.size() > 4:
 				rig.yaw = deg_to_rad(float(v[4]))
-			rig._apply()
+			rig.snap_ground()
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--click="):  # dev: simulate a click at screen x,y (tests the real picking path)
 			await get_tree().create_timer(3.0).timeout
@@ -60,7 +61,7 @@ func _maybe_screenshot() -> void:
 			await get_tree().create_timer(2.0).timeout
 			interiors.enter(int(arg.trim_prefix("--enter=")))
 	if OS.get_cmdline_user_args().has("--perf"):  # dev: print frame stats after warm-up
-		await get_tree().create_timer(6.0).timeout
+		await get_tree().create_timer(12.0).timeout
 		var rs := RenderingServer
 		print("CAM pos=%s rig=%s dist=%.0f selected=%d" % [rig.camera.global_position, rig.global_position, rig.dist, GameState.selected])
 		print("PERF fps=%d draw_calls=%d primitives=%d objects=%d" % [Engine.get_frames_per_second(),

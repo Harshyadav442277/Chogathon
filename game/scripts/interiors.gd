@@ -32,6 +32,7 @@ func _ready() -> void:
 	_atlas = preload("res://assets/chogs_atlas.webp")
 	_material = ShaderMaterial.new()
 	_material.shader = preload("res://shaders/vcol.gdshader")
+	_material.set_shader_parameter("noise_tex", preload("res://textures/noise.png"))
 	_material.set_shader_parameter("night", 1.0)  # interiors are lamp-lit
 	_camera = Camera3D.new()
 	_camera.fov = 50.0

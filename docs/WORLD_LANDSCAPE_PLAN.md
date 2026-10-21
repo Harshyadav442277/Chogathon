@@ -70,7 +70,24 @@ Roads run from the capital to the nation capitals, the towns and the frontier, d
 - **Flat cities:** the four capitals sit on fixed sites (`CITY_SITES` in `chog-hivemind/src/world/terrain.ts`). The ground is flattened under each one, so buildings and roads no longer float or sink on slopes.
 - **Measured natively (Intel integrated GPU):** wide view about 36–45 fps; mid zoom 60 fps with 103 draw calls; Zapstone close-up 56 fps with 117 draw calls. The web pck grew from 4.96 MB to 6.8 MB.
 
-## 9. Checks
+## 9. Close-up detail pass (added 2026-10-21)
+- **No more blocky ground:** terrain chunks use smooth per-vertex normals and blended per-vertex colors instead of flat-shaded cells.
+- **Procedural surface textures, no downloaded art:**
+  - All noise comes from one baked 256 x 256 tileable texture, `game/textures/noise.png` (made by `game/tools/make_noise.py`). Each noise lookup is a single mipmapped texture read, which keeps it fast and stops distant shimmer.
+  - **Ground** (`terrain.gdshader`): grass blades with lush and dry patches and tiny wildflowers; dirt with pebbles; sand ripples; rock strata on steep slopes. Bump lighting on all of them, fading out with distance.
+  - **Buildings and props** (`vcol.gdshader`): every surface carries a material tag (`Architect.M_*` in UV2) for brick with mortar, plaster with grime and exposed-brick patches, wood planks with grain and knots, overlapping roof shingles with moss, leaves, bark, cracked mossy rock, cloth. Also contact shading near the ground and wind sway on leaves.
+- **Geometry:**
+  - Houses get diagonal timber braces, barge boards on the roof edges, flower boxes, a plank door and wooden shutters.
+  - New near meshes: jagged layered pines; clustered, wobbly oak and gold-tree canopies with branches and root flares; curved palms with drooping fronds; irregular rocks and boulders with moss caps; flower patches on stems.
+  - Ground cover is now bent grass-blade tufts that sway in the wind, flower clumps and irregular pebbles. It uses its own double-sided shader, `grass.gdshader`, and shrinks away smoothly 55–95 units from the camera.
+- **Level of detail per instance:** buildings within 190 units and props within 150 units of the camera use detailed meshes; everything else uses the cheap versions. Swapping happens inside one near and one far MultiMesh per type, so draw calls don't grow. Tiny props are not drawn when far.
+- **Camera:** the look-at point now follows the ground height and the camera never goes below the terrain. Minimum zoom distance is 14 (was 25), so close-ups are reachable.
+- **Measured natively (Intel integrated GPU, 1440 x 900, after 12 s warm-up):**
+  - Committed build before this pass: Zapstone view 37 fps.
+  - After this pass: 32–37 fps there (runs vary about ±5 fps). Street close-up 35, forest 33–36, meadow 30–31, wide view 32–34.
+  - Wide view uses 157 draw calls, over the 150 budget (90 of them are terrain chunks).
+
+## 10. Checks
 - Native and web screenshots: wide view, mid zoom over a capital, close-up of the volcano.
 - Draw calls under 150.
 - Headless import and run show no errors.
