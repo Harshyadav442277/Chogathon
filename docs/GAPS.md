@@ -14,6 +14,7 @@ Checked: 18 October 2026. Remove or resolve rows as evidence becomes available.
 | 7 tokens missing metadata | IPFS fetch failed for 7 of 1,969 during snapshot | Re-run `npm run snapshot`, then `seed`, `thumbs`, `atlas` | To assign |
 | Whisper tested with a real holder? | Only the non-holder rejection was tested | Test with a wallet that holds a Chog Genesis | To assign |
 | Are some Chogs hidden inside POI markers? | Unverified guess, 2026-10-21. `-- --select=111` flew to Hollow of Skulls, but #111 (x −5.2, z −105.3) wasn't visible and the Status Window didn't open. A mint octagon sat at screen center | Re-run with the server and check whether the dungeon marker covers Chogs standing at the POI center. If so, the server's spawn radius or the marker size needs to change (world side) | Developer A / B |
+| Selected Chog hidden behind its workplace | Seen 2026-10-21 in native recordings: `--select=6` and `--select=2` flew the camera so that a building roof covered the Chog standing at the door | Camera (`camera_rig.gd`, shared) could look from the door side or pull back; or the server could stand workers on the far side. Needs an agreement between A and B | Developer A / B |
 | WORLD_BIBLE jobs, cheats and skills | Designed, not implemented | Decide what fits before the deadline | To assign |
 
 ## Resolved answers

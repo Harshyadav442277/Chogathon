@@ -3,8 +3,9 @@ shader_type spatial;
 // UV2.x = body part (0 torso, 1 legs, 2 left arm, 3 right arm, 4 face).
 // The face is the Chog's NFT portrait from the atlas, turned toward the camera and ringed in its house color.
 // Instance COLOR = house color (sRGB). INSTANCE_CUSTOM: r = atlas slot (tokenId - 1),
-// g = state + 4 * role (state 0 walk, 1 work, 2 fight; role 0 civilian, 1..6 adventurer roles),
-// b = phase offset 0..1, a = highlight 0..1.
+// g = state + 4 * role + 32 * work (state 0 walk, 1 work, 2 fight; role 0 civilian, 1..6 adventurer roles;
+// work 0 hammer, 1 bow, 2 dig, 3 salute, 4 sword drill), b = phase offset 0..1, a = highlight 0..1.
+// All animation is rigid rotation of parts around hip and shoulder pivots: no skeletons.
 render_mode world_vertex_coords, cull_back, depth_draw_opaque;
 
 uniform sampler2D atlas : source_color, filter_linear_mipmap;
@@ -15,13 +16,23 @@ uniform float head_size = 1.0;   // ChibiMesh.HEAD_SIZE
 uniform float min_screen = 0.0065;  // grow with distance so Chogs stay visible zoomed out
 uniform float walk_speed = 9.0;     // stride rate, rad/s
 
+const float HIP = 0.34;
+const float SHOULDER = 0.78;
+
 varying flat float v_part;
 varying flat float v_slot;
 varying vec3 v_color;
 varying float v_sel;
+varying float v_flash;
 
 vec3 srgb_to_linear(vec3 c) {
 	return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
+}
+
+// Rotates a model-space point about the X axis through height `pivot`. Negative angles swing forward (+Z).
+vec3 rot_x(vec3 p, float pivot, float a) {
+	float y = p.y - pivot;
+	return vec3(p.x, pivot + y * cos(a) - p.z * sin(a), y * sin(a) + p.z * cos(a));
 }
 
 void vertex() {
@@ -29,37 +40,90 @@ void vertex() {
 	vec3 origin = MODEL_MATRIX[3].xyz;
 	float dist = length(INV_VIEW_MATRIX[3].xyz - origin);
 	float s = max(1.0, dist * min_screen) * (1.0 + INSTANCE_CUSTOM.a * 0.5);
-	vec3 local = VERTEX - origin;
-	float state = mod(floor(INSTANCE_CUSTOM.g + 0.5), 4.0);
-	float bob = 0.0;
+	float code = floor(INSTANCE_CUSTOM.g + 0.5);
+	float state = mod(code, 4.0);
+	float work = floor(code / 32.0);
+	float phase = INSTANCE_CUSTOM.b * TAU;
+
+	// Pose for this frame: limb angles, forward bend of the upper body, and a whole-body offset.
+	float leg_l = 0.0, leg_r = 0.0, arm_l = 0.0, arm_r = 0.0, bow = 0.0;
+	vec3 shift = vec3(0.0);
+	float flash = 0.0;
 	if (state < 0.5) {
-		// Walk: legs and arms swing in opposite phase around hip and shoulder, the body bobs twice per stride.
-		vec3 side = MODEL_MATRIX[0].xyz;
-		vec3 fwd = MODEL_MATRIX[2].xyz;
-		vec3 m = vec3(dot(local, side), local.y, dot(local, fwd));  // model-space position (instances only yaw)
-		float t = TIME * walk_speed + INSTANCE_CUSTOM.b * 6.2832;
+		// Walk: legs and arms swing in opposite phase, the body bobs twice per stride.
+		float t = TIME * walk_speed + phase;
 		float swing = sin(t) * 0.7;
-		float angle = 0.0;
-		float pivot = 0.0;
-		if (part > 0.5 && part < 1.5) {
-			angle = m.x < 0.0 ? swing : -swing;
-			pivot = 0.34;
-		} else if (part > 1.5 && part < 3.5) {
-			angle = part < 2.5 ? -swing : swing;
-			pivot = 0.78;
+		leg_l = swing; leg_r = -swing; arm_l = -swing; arm_r = swing;
+		shift.y = abs(sin(t)) * 0.08;
+	} else if (state < 1.5) {
+		float f = fract(TIME * 0.8 + INSTANCE_CUSTOM.b);  // one work cycle every 1.25 s
+		if (work < 0.5) {
+			// Hammer (craft): slow lift of the right arm, fast strike, a small dip on impact.
+			float lift = f < 0.75 ? smoothstep(0.0, 0.75, f) : 1.0 - (f - 0.75) / 0.25;
+			arm_r = -(0.3 + 2.3 * lift);
+			bow = 0.3 * (1.0 - lift);  // the head nods with each strike: arms are mostly hidden behind the portrait
+		} else if (work < 1.5) {
+			// Bow (service): a polite bow every other cycle, arms at the sides.
+			float g = fract(TIME * 0.4 + INSTANCE_CUSTOM.b);
+			bow = 0.55 * (smoothstep(0.1, 0.3, g) - smoothstep(0.55, 0.8, g));
+		} else if (work < 2.5) {
+			// Dig (land): both arms drive down and forward while the body leans in.
+			float d = 0.5 + 0.5 * sin(f * TAU);
+			arm_l = -(0.4 + 1.0 * d);
+			arm_r = arm_l;
+			bow = 0.1 + 0.35 * d;
+		} else if (work < 3.5) {
+			// Salute (civic): right hand up to the brow, held, then down.
+			float g = fract(TIME * 0.3 + INSTANCE_CUSTOM.b);
+			float up = smoothstep(0.05, 0.15, g) - smoothstep(0.6, 0.7, g);
+			arm_r = -2.7 * up;
+			bow = -0.2 * up;  // stand tall and lean back while saluting
+		} else {
+			// Sword drill (adventurers in town): quick forward strikes.
+			float k = abs(sin(f * TAU));
+			arm_r = -(0.4 + 1.6 * k);
+			bow = 0.25 * k;
+			shift.z = 0.15 * k;
 		}
-		float y = m.y - pivot;
-		m = vec3(m.x, pivot + y * cos(angle) - m.z * sin(angle), y * sin(angle) + m.z * cos(angle));
-		bob = abs(sin(t)) * 0.08;
-		m.y += bob;
-		local = side * m.x + vec3(0.0, m.y, 0.0) + fwd * m.z;
+	} else {
+		// Fight: lunge forward and strike, recoil with a shake and a red/white flash as the hit lands.
+		float f = fract(TIME * 0.9 + INSTANCE_CUSTOM.b);
+		float lunge = smoothstep(0.0, 0.25, f) * (1.0 - smoothstep(0.35, 0.6, f));
+		float hit = smoothstep(0.55, 0.6, f) * (1.0 - smoothstep(0.6, 0.85, f));
+		shift.z = 0.45 * lunge - 0.15 * hit;
+		shift.x = sin(TIME * 60.0) * 0.05 * hit;
+		arm_r = -(0.6 + 1.8 * lunge);
+		arm_l = -0.5 * lunge;
+		leg_l = -0.4 * lunge;
+		leg_r = 0.3 * lunge;
+		bow = 0.25 * lunge - 0.15 * hit;
+		flash = hit;
 	}
+
+	vec3 side = MODEL_MATRIX[0].xyz;
+	vec3 fwd = MODEL_MATRIX[2].xyz;
+	vec3 local = VERTEX - origin;
+	vec3 m;
+	if (part > 3.5) {
+		m = rot_x(vec3(0.0, head_y, 0.0), HIP, bow);  // head center follows the upper body
+	} else {
+		m = vec3(dot(local, side), local.y, dot(local, fwd));  // model space (instances only yaw)
+		if (part < 0.5) {
+			m = rot_x(m, HIP, bow);
+		} else if (part < 1.5) {
+			m = rot_x(m, HIP, m.x < 0.0 ? leg_l : leg_r);
+		} else {
+			m = rot_x(rot_x(m, SHOULDER, part < 2.5 ? arm_l : arm_r), HIP, bow);
+		}
+	}
+	m += shift;
+	local = side * m.x + vec3(0.0, m.y, 0.0) + fwd * m.z;
 	if (part > 3.5) {
 		// Billboard the portrait around the head center, nudged toward the camera so the body never covers it.
 		vec3 right = INV_VIEW_MATRIX[0].xyz;
 		vec3 up = INV_VIEW_MATRIX[1].xyz;
 		vec3 back = INV_VIEW_MATRIX[2].xyz;
-		local = vec3(0.0, head_y + bob, 0.0) + (right * (UV.x - 0.5) + up * (0.5 - UV.y)) * head_size + back * 0.25;
+		local += (right * (UV.x - 0.5) + up * (0.5 - UV.y)) * head_size + back * 0.25;
 		NORMAL = back;
 	}
 	VERTEX = origin + local * s;
@@ -67,11 +131,13 @@ void vertex() {
 	v_slot = INSTANCE_CUSTOM.r;
 	v_sel = INSTANCE_CUSTOM.a;
 	v_color = srgb_to_linear(COLOR.rgb);
+	v_flash = flash;
 }
 
 void fragment() {
 	ROUGHNESS = 1.0;
 	SPECULAR = 0.0;
+	vec3 flash_col = mix(vec3(1.0, 0.15, 0.1), vec3(1.0), step(0.5, fract(TIME * 12.0)));
 	if (v_part > 3.5) {
 		vec2 p = UV - 0.5;
 		float r = length(p);
@@ -80,7 +146,7 @@ void fragment() {
 		}
 		vec3 col;
 		if (r > 0.42) {
-			col = mix(v_color, vec3(1.0, 0.72, 0.1), v_sel);
+			col = mix(mix(v_color, vec3(1.0, 0.72, 0.1), v_sel), flash_col, v_flash);
 		} else {
 			float c = mod(v_slot, cols);
 			float row = floor(v_slot / cols);
@@ -90,11 +156,14 @@ void fragment() {
 		// The portrait is shown unlit, like the old tokens, so the NFT reads the same everywhere.
 		ALBEDO = vec3(0.0);
 		EMISSION = col;
-	} else if (v_part > 1.5) {
-		ALBEDO = mix(v_color, vec3(1.0), 0.3);
-	} else if (v_part > 0.5) {
-		ALBEDO = v_color * 0.3;
 	} else {
-		ALBEDO = v_color;
+		if (v_part > 1.5) {
+			ALBEDO = mix(v_color, vec3(1.0), 0.3);
+		} else if (v_part > 0.5) {
+			ALBEDO = v_color * 0.3;
+		} else {
+			ALBEDO = v_color;
+		}
+		EMISSION = flash_col * v_flash * 0.8;
 	}
 }

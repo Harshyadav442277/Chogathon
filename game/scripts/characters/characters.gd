@@ -8,6 +8,8 @@ const MAX_TRIP := 30.0   # s; long trips speed up so a cross-continent move stil
 const MIN_SCREEN := 0.0065  # character.gdshader min_screen
 const STATES := {"walk": 0, "work": 1, "fight": 2}
 const ROLES := {"main_dps": 1, "sub_dps": 2, "tank": 3, "healer": 4, "support": 5, "buffer": 6}
+## Work animation per job track (character.gdshader): hammer, bow, dig, salute, sword drill.
+const TRACKS := {"craft": 0, "service": 1, "land": 2, "civic": 3, "adventurer": 4}
 
 var terrain: Terrain
 var _mmi := MultiMeshInstance3D.new()
@@ -15,7 +17,7 @@ var _cur := PackedVector3Array()
 var _tgt := PackedVector3Array()
 var _yaw := PackedFloat32Array()
 var _ids := PackedInt32Array()
-var _code := PackedFloat32Array()  # state + 4 * role, from the server
+var _code := PackedFloat32Array()  # state + 4 * role + 32 * work animation, from the server
 var _speed := PackedFloat32Array()
 var _walking := PackedByteArray()
 var _active := PackedInt32Array()  # indices currently walking; only these are touched per frame
@@ -79,7 +81,8 @@ func _on_positions() -> void:
 			_walk_to_target(i)
 		var state: int = STATES.get(str(p["state"][i]), 1) if p.has("state") else 1
 		var role: int = ROLES.get(str(p["role"][i]), 0) if p.has("role") else 0
-		_code[i] = state + 4 * role
+		var work: int = TRACKS.get(str(p["track"][i]), 1) if p.has("track") else 1
+		_code[i] = state + 4 * role + 32 * work
 		mm.set_instance_color(i, GameState.HOUSE_COLORS[int(p["house"][i])])
 	mm.visible_instance_count = n
 	if first and OS.get_cmdline_user_args().has("--walk-test"):
@@ -111,7 +114,7 @@ func _refresh_custom() -> void:
 func _set_custom(i: int) -> void:
 	var sel := 1.0 if _ids[i] == GameState.selected else 0.0
 	var phase := fmod(_ids[i] * 0.618034, 1.0)
-	# While walking the state is 0 (walk); the role stays so props keep showing.
+	# While walking the state is 0 (walk); role and work bits stay so props keep showing.
 	var code := floorf(_code[i] / 4.0) * 4.0 if _walking[i] == 1 else _code[i]
 	_mmi.multimesh.set_instance_custom_data(i, Color(float(_ids[i] - 1), code, phase, sel))
 

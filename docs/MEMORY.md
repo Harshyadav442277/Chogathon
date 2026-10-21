@@ -19,5 +19,6 @@ Keep a short shared record of agreed decisions. This file contains project histo
 | 2026-10-21 | Buildings and props are generated procedurally in Godot (`game/scripts/catalog.gd`) instead of downloading Kenney kits | No downloads or licensing, about +0.45 MB to the web build, shapes fit each job |
 | 2026-10-21 | Positions feed: Chogs at work stand outside their job's building (new additive `building` field) and never in water | Makes jobs visible on the map |
 | 2026-10-21 | Characters: one procedural chibi mesh (`game/scripts/characters/chibi_mesh.gd`). UV2.x tags body parts; role props will be added to the same mesh and hidden per instance. The head is the NFT portrait, billboarded in `character.gdshader`. Per-instance data: slot, state + 4 × role, phase, highlight | Keeps every Chog in one draw call (a MultiMesh holds one mesh). The portrait stays readable from the top-down camera |
+| 2026-10-21 | Positions feed gets an additive `track` field (job track) for per-track work animations; PR #2 into `main` | Client needed the track; the server already knew it. Additive, so existing clients are unaffected |
 
 When a decision changes, add a new dated row explaining what replaced it.
