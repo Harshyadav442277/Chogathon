@@ -1,6 +1,6 @@
 # Work split: two developers, one repo
 
-Agreed 2026-10-21. Goal: both developers work in parallel without touching the same files. Plan context: [GODOT_GAME_PLAN.md](GODOT_GAME_PLAN.md).
+Agreed 2026-10-21. Goal: both developers work in parallel without touching the same files. Plan context: [GODOT_GAME_PLAN.md](GODOT_GAME_PLAN.md). Developer B's full brief: [HANDOFF_CHARACTERS.md](HANDOFF_CHARACTERS.md). Claude Code context: [../CLAUDE.md](../CLAUDE.md).
 
 | | Developer A (world) | Developer B (characters) |
 |---|---|---|
