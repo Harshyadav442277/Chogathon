@@ -23,7 +23,7 @@ Checked: 18 October 2026. Remove or resolve rows as evidence becomes available.
 No answers recorded yet. For each answer, add the date, source link, exact practical implication and who confirmed it.
 
 ## Open as of 2026-10-21 (season simulation and story)
-- **Deployment:** nothing is deployed. Needs the team's Vercel and Turso accounts; set `SEASON_HOURS=168` there.
-- **Daily Pull with a wallet:** `/api/v2/gacha` (draw and bestow) was not tested with a real holder wallet or a judge code; the hand logic (deterministic, rarity-weighted) and the apply path (gifts queued in the database) were.
+- **Deployment:** deployed 2026-10-22 to https://chogsekai.vercel.app (Vercel + Turso). **Open:** the GitHub Actions secrets (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`) and variables (`SEASON_HOURS=24`, `SIM_TICK_SECONDS=600`) must be set by a repo admin, or the world will not tick; `/play` not yet checked in a browser.
+- **Daily Pull with a wallet:** tested on the deployed site with the judge code (2026-10-22); not tested with a real holder wallet; the hand logic (deterministic, rarity-weighted) and the apply path (gifts queued in the database) were.
 - **Local dev server latency:** occasional multi-second responses on the Next.js dev server around simulation ticks; not measured on a production build.
 - **Story volume:** about 24,000 history rows per 160-tick season locally; a 7-day season at 45-second ticks writes far more quest rows. Pruning old seasons is not implemented yet.
