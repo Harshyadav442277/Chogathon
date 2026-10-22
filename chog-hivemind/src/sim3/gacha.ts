@@ -1,51 +1,46 @@
-// Daily gacha for Constellations (NFT holders): each UTC day a player pulls a hand of skills and quests, then
-// bestows a few of them. Defaults: pull 5 + 5, bestow 2 skills + 2 quests to Chogs you own. Env overrides:
-// GACHA_PULL_SKILLS, GACHA_PULL_QUESTS, GACHA_GIVE_SKILLS, GACHA_GIVE_QUESTS, GACHA_OWN_ONLY=0 (any Chog).
-// The pull is seeded by wallet + day + season: asking again returns the same hand (no re-rolls).
+// Star Pulls (gacha) for Constellations, the NFT holders. Each season a player gets GACHA_PULLS pulls (default 5);
+// every pull reveals one card, a skill or a quest, weighted by rarity. Every card pulled can be bestowed once,
+// on a Chog the player holds (GACHA_OWN_ONLY=0: any Chog). Seasons last a day, so this refreshes daily.
+// A card is seeded by wallet + season + pull number: the same pull always reveals the same card.
 import { allOwners } from "../lib/chain";
 import { mulberry32 } from "../world/terrain";
 import { hash } from "../sim/world";
 import { QUESTS, SKILLS, type Quest, type Skill } from "./sim";
 
-const envInt = (k: string, d: number) => (process.env[k] ? Number(process.env[k]) : d);
 export const GACHA = {
-  pullSkills: envInt("GACHA_PULL_SKILLS", 5),
-  pullQuests: envInt("GACHA_PULL_QUESTS", 5),
-  giveSkills: envInt("GACHA_GIVE_SKILLS", 2),
-  giveQuests: envInt("GACHA_GIVE_QUESTS", 2),
+  pulls: process.env.GACHA_PULLS ? Number(process.env.GACHA_PULLS) : 5,
   ownOnly: process.env.GACHA_OWN_ONLY !== "0",
 };
 
 export const GACHA_SCHEMA = [
-  `CREATE TABLE IF NOT EXISTS pulls (
-    author TEXT NOT NULL, day TEXT NOT NULL, season INTEGER NOT NULL, skills TEXT NOT NULL, quests TEXT NOT NULL,
-    used TEXT NOT NULL DEFAULT '[]', created_at INTEGER NOT NULL, PRIMARY KEY (author, day)
+  `CREATE TABLE IF NOT EXISTS season_pulls (
+    author TEXT NOT NULL, season INTEGER NOT NULL, cards TEXT NOT NULL DEFAULT '[]', used TEXT NOT NULL DEFAULT '[]',
+    created_at INTEGER NOT NULL, PRIMARY KEY (author, season)
   )`,
 ];
 
-/** Rarity by tier 1..5 (F/E-rank common, S-rank rare). Index = tier - 1. */
+export type Card = { kind: "skill" | "quest"; id: string };
+
+/** Rarity by tier 1..5 (common .. legendary). Index = tier - 1. */
 const RARITY = [40, 28, 18, 10, 4];
 const QUEST_POOL = QUESTS.filter((q) => !q.boss || q.boss === "seal");
 
-function draw<T>(items: T[], weight: (t: T) => number, n: number, r: () => number): T[] {
-  const pool = [...items];
-  const out: T[] = [];
-  while (out.length < n && pool.length) {
-    let t = r() * pool.reduce((s, x) => s + weight(x), 0);
-    let k = 0;
-    for (; k < pool.length - 1; k++) if ((t -= weight(pool[k])) <= 0) break;
-    out.push(pool.splice(k, 1)[0]);
-  }
-  return out;
+function weighted<T>(items: T[], weight: (t: T) => number, r: () => number): T {
+  let t = r() * items.reduce((s, x) => s + weight(x), 0);
+  for (const x of items) if ((t -= weight(x)) <= 0) return x;
+  return items[items.length - 1];
 }
 
-/** Today's hand for a player: deterministic, weighted by rarity, no duplicates. */
-export function rollPull(author: string, day: string, season: number): { skills: string[]; quests: string[] } {
-  const r = mulberry32(hash(`pull:${author}:${day}:${season}`));
-  return {
-    skills: draw(SKILLS, (s: Skill) => RARITY[s.tier - 1] ?? 1, GACHA.pullSkills, r).map((s) => s.id),
-    quests: draw(QUEST_POOL, (q: Quest) => RARITY[Math.min(5, q.tier) - 1] ?? 1, GACHA.pullQuests, r).map((q) => q.id),
-  };
+/** The card revealed by pull number `n` (0-based) for this player and season. Avoids repeating earlier cards. */
+export function drawCard(author: string, season: number, n: number, already: Card[]): Card {
+  const r = mulberry32(hash(`card:${author}:${season}:${n}`));
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const card: Card = r() < 0.55
+      ? { kind: "skill", id: weighted(SKILLS, (s: Skill) => RARITY[s.tier - 1] ?? 1, r).id }
+      : { kind: "quest", id: weighted(QUEST_POOL, (q: Quest) => RARITY[Math.min(5, q.tier) - 1] ?? 1, r).id };
+    if (!already.some((c) => c.kind === card.kind && c.id === card.id)) return card;
+  }
+  return { kind: "skill", id: SKILLS[n % SKILLS.length].id };
 }
 
 let ownersCache: { at: number; map: Map<number, string> } | null = null;

@@ -11,6 +11,9 @@ func _ready() -> void:
 		var origin = JavaScriptBridge.eval("window.location.origin", true)
 		if typeof(origin) == TYPE_STRING and origin != "":
 			base_url = origin
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--api="):  # dev: point a native run at another server, e.g. the deployed site
+			base_url = arg.trim_prefix("--api=")
 
 
 ## GET a JSON endpoint. Returns the parsed Variant, or null on any failure.
@@ -66,6 +69,21 @@ func get_json_if_changed(path: String) -> Variant:
 				return NOT_MODIFIED  # the browser revalidated from its own cache: same data
 			_etags[path] = tag
 	return JSON.parse_string((res[3] as PackedByteArray).get_string_from_utf8())
+
+
+## GET raw bytes (images). Returns an empty array on failure.
+func get_bytes(path: String) -> PackedByteArray:
+	var req := HTTPRequest.new()
+	req.timeout = 30.0
+	add_child(req)
+	if req.request(base_url + path) != OK:
+		req.queue_free()
+		return PackedByteArray()
+	var res: Array = await req.request_completed
+	req.queue_free()
+	if res[0] != HTTPRequest.RESULT_SUCCESS or int(res[1]) != 200:
+		return PackedByteArray()
+	return res[3]
 
 
 ## POST JSON. Returns {status, data}.

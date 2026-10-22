@@ -46,5 +46,5 @@ GitHub Actions secrets (repo **Settings > Secrets and variables > Actions**, nee
 - `/api/v2/season` shows season 1, phase 1, and `startedAt` close to the deploy time.
 - `/api/world/positions` returns 1,962 ids with states.
 - `/play/index.html` shows the title screen, then the world; the Status Window opens on a Chog.
-- Judge sign-in in Daily Pull works with `JUDGE_CODE`; drawing a hand and bestowing a card applies on the next tick.
+- Judge sign-in in Star Pulls works with `JUDGE_CODE`; pulling a card and bestowing it applies on the next tick.
 - The `hive-tick` workflow runs every ~10 minutes (some runs may be late).

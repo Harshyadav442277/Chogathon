@@ -2,7 +2,7 @@ class_name Hud
 extends CanvasLayer
 ## Adventure-style HUD (dark forest green, gold trim, heart containers), kept to the edges so the world stays
 ## visible: a small season banner (top left), three buttons (top right), a short Star Stream (bottom left) and
-## a narrow Status panel (right, only when a Chog is selected). The Daily Pull and the Chronicle open as
+## a narrow Status panel (right, only when a Chog is selected). The Star Pulls and the Chronicle open as
 ## centred windows only when asked for. H hides everything.
 
 const GOLD := Color("#d8b24a")
@@ -37,11 +37,21 @@ var _gacha_btn: Button
 var _gacha_draw: Button
 var _gacha_state := {}
 var _picked := {}  # {"kind": "skill"|"quest", "ref": id}
+var _sfx := {}
+var _pic: TextureRect
+var _pics := {}  # chog id -> ImageTexture (NFT pictures, cached)
 var _signin: HBoxContainer
 var _judge_code: LineEdit
 
 
 func _ready() -> void:
+	# UI sounds (original, tools/make_sfx.py): click, select, pull, bestow, error, open.
+	for n in ["click", "select", "pull", "bestow", "error", "open"]:
+		var pl := AudioStreamPlayer.new()
+		pl.stream = load("res://assets/sfx/%s.wav" % n)
+		pl.volume_db = -6.0
+		add_child(pl)
+		_sfx[n] = pl
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -71,6 +81,12 @@ func _ready() -> void:
 				_toggle_gacha()
 			else:
 				_toggle_novel()
+
+
+func sfx(name: String) -> void:
+	var pl := _sfx.get(name) as AudioStreamPlayer
+	if pl:
+		pl.play()
 
 
 func _unhandled_key_input(e: InputEvent) -> void:
@@ -129,6 +145,7 @@ func _button(text: String) -> Button:
 	b.add_theme_stylebox_override("hover", _box(Color(0.1, 0.24, 0.14, 0.95), GOLD, 2))
 	b.add_theme_stylebox_override("pressed", _box(Color(0.14, 0.3, 0.18, 0.95), GOLD, 2))
 	b.focus_mode = Control.FOCUS_NONE
+	b.pressed.connect(func(): sfx("click"))
 	return b
 
 
@@ -245,7 +262,7 @@ func _build_buttons() -> void:
 	var chron := _button("Chronicle")
 	chron.pressed.connect(_toggle_novel)
 	h.add_child(chron)
-	var pull := _button("Daily Pull")
+	var pull := _button("Star Pulls")
 	pull.pressed.connect(_toggle_gacha)
 	h.add_child(pull)
 	var song := _button("Music")
@@ -324,11 +341,27 @@ func _build_status() -> void:
 	var v := VBoxContainer.new()
 	_panel.add_child(v)
 	v.add_child(_header("STATUS", func(): GameState.select(-1)))
-	_title = _label("", 17, CREAM)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 8)
+	v.add_child(head)
+	var frame := PanelContainer.new()
+	var fb := _box(Color(0.02, 0.05, 0.03, 1.0), GOLD, 2)
+	fb.set_content_margin_all(2)
+	frame.add_theme_stylebox_override("panel", fb)
+	head.add_child(frame)
+	_pic = TextureRect.new()
+	_pic.custom_minimum_size = Vector2(84, 84)
+	_pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	frame.add_child(_pic)
+	var hv := VBoxContainer.new()
+	hv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(hv)
+	_title = _label("", 16, CREAM)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	v.add_child(_title)
-	_sub = _rich(12)
-	v.add_child(_sub)
+	hv.add_child(_title)
+	_sub = _rich(11)
+	hv.add_child(_sub)
 	_hp = Hearts.new()
 	_hp.count = 8
 	_hp.size_px = 13.0
@@ -364,6 +397,8 @@ func _on_selected(chog_id: int) -> void:
 		_panel.visible = false
 		return
 	_panel.visible = true
+	sfx("select")
+	_show_pic(chog_id)
 	var i := GameState.index_of(chog_id)
 	_title.text = str(GameState.positions["names"][i]) if i >= 0 else "Chog #%d" % chog_id
 	_sub.text = "[color=#a89f7e]Reading the Status Window...[/color]"
@@ -394,6 +429,23 @@ func _on_selected(chog_id: int) -> void:
 		_agent.text = _agent_text(a)
 	if data.get("life") is Dictionary:
 		_life.text = _life_text(data["life"])
+
+
+## The Chog's NFT picture (160 px webp served by the site at /chogs/<id>.webp), cached per id.
+func _show_pic(chog_id: int) -> void:
+	if _pics.has(chog_id):
+		_pic.texture = _pics[chog_id]
+		return
+	_pic.texture = null
+	var bytes := await Api.get_bytes("/chogs/%d.webp" % chog_id)
+	if bytes.is_empty() or GameState.selected != chog_id:
+		return
+	var img := Image.new()
+	if img.load_webp_from_buffer(bytes) != OK:
+		return
+	var tex := ImageTexture.create_from_image(img)
+	_pics[chog_id] = tex
+	_pic.texture = tex
 
 
 func _agent_text(a: Dictionary) -> String:
@@ -456,14 +508,15 @@ func _toggle_novel() -> void:
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Daily Pull (centred window): draw today's hand of skills and quests, then bestow a few on your Chogs.
+# Star Pulls (centred window): each season a holder gets 5 pulls; every pull reveals one card (a skill or a
+# quest) that can be bestowed once on a Chog they hold.
 
 func _build_gacha() -> void:
 	_gacha = _modal(Vector2(660, 520))
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 6)
 	_gacha.add_child(v)
-	v.add_child(_header("DAILY PULL", func(): _gacha.visible = false))
+	v.add_child(_header("STAR PULLS", func(): _gacha.visible = false))
 	_gacha_info = _label("", 12, DIM)
 	_gacha_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	v.add_child(_gacha_info)
@@ -482,9 +535,9 @@ func _build_gacha() -> void:
 	var judge := _button("Judge sign-in")
 	judge.pressed.connect(_judge_signin)
 	_signin.add_child(judge)
-	_gacha_draw = _button("Draw today's hand")
+	_gacha_draw = _button("Pull a card")
 	_gacha_draw.pressed.connect(_pull)
-	_gacha_draw.visible = false  # shown once the server says you're a holder without today's hand
+	_gacha_draw.visible = false  # shown once the server says you're a holder with pulls left
 	v.add_child(_gacha_draw)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -513,12 +566,14 @@ func _toggle_gacha() -> void:
 	_gacha.visible = not _gacha.visible
 	_novel.visible = false
 	if _gacha.visible:
+		sfx("open")
 		_gacha_info.text = "Asking the stars..."
 		_render_gacha(await Api.get_json("/api/v2/gacha"))
 
 
 func _pull() -> void:
 	var r := await Api.post_json("/api/v2/gacha", {"action": "pull"})
+	sfx("pull" if int(r.get("status", 0)) == 200 else "error")
 	_render_gacha(r.get("data"), r.get("status", 0))
 
 
@@ -526,8 +581,9 @@ func _give() -> void:
 	if _picked.is_empty() or _gacha_target.selected < 0:
 		_gacha_info.text = "Pick a card, then a Chog to bestow it on."
 		return
-	var r := await Api.post_json("/api/v2/gacha", {"action": "give", "kind": _picked["kind"], "ref": _picked["ref"], "chogId": int(_gacha_target.get_item_metadata(_gacha_target.selected))})
+	var r := await Api.post_json("/api/v2/gacha", {"action": "give", "index": int(_picked["index"]), "chogId": int(_gacha_target.get_item_metadata(_gacha_target.selected))})
 	_picked = {}
+	sfx("bestow" if int(r.get("status", 0)) == 200 else "error")
 	_render_gacha(r.get("data"), r.get("status", 0))
 
 
@@ -543,27 +599,33 @@ func _render_gacha(d, status := 200) -> void:
 	var info := ""
 	_signin.visible = not d.get("signedIn", false)
 	if not d.get("signedIn", false):
-		info = "Connect a wallet that holds a Chog to draw (judges: use your judge code). Stargazers can watch everything."
+		info = "Connect a wallet that holds a Chog to pull (judges: use your judge code). Stargazers can watch everything."
 	elif not d.get("holder", false):
 		info = "This wallet holds no Chog: you're a Stargazer (watch only)."
 	else:
-		var given: Dictionary = d.get("given", {"skills": 0, "quests": 0})
-		info = "Each day: draw %d skills + %d quests, bestow %d skills + %d quests%s.   Today: skills %d/%d · quests %d/%d" % [
-			int(cfg.get("pullSkills", 5)), int(cfg.get("pullQuests", 5)), int(cfg.get("giveSkills", 2)), int(cfg.get("giveQuests", 2)),
-			" on Chogs you hold" if cfg.get("ownOnly", true) else " on any Chog",
-			int(given.get("skills", 0)), int(cfg.get("giveSkills", 2)), int(given.get("quests", 0)), int(cfg.get("giveQuests", 2))]
+		var cards: Array = d.get("cards", [])
+		var bestowed := cards.filter(func(c): return c.get("used", false)).size()
+		info = "Season %d - %d of %d pulls left - each card can be bestowed once on a Chog you hold (%d bestowed)." % [
+			int(d.get("season", 0)), int(d.get("pullsLeft", 0)), int(cfg.get("pulls", 5)), bestowed]
 	if d.has("message"):
 		info = str(d["message"]) + "\n" + info
 	_gacha_info.text = info
-	var pull = d.get("pull")
-	_gacha_draw.visible = d.get("holder", false) and not (pull is Dictionary)
+	_gacha_draw.visible = d.get("holder", false) and int(d.get("pullsLeft", 0)) > 0
+	_gacha_draw.text = "Pull a card (%d left)" % int(d.get("pullsLeft", 0))
 	for ch in _gacha_cards.get_children():
 		ch.queue_free()
-	if pull is Dictionary:
-		for k in pull.get("skills", []):
-			_gacha_cards.add_child(_card("skill", k))
-		for q in pull.get("quests", []):
-			_gacha_cards.add_child(_card("quest", q))
+	var drawn := int(d.get("drawn", -1))
+	for c in d.get("cards", []):
+		var card := _card(c)
+		_gacha_cards.add_child(card)
+		if int(c.get("index", -1)) == drawn:
+			# the card just pulled flips in
+			card.pivot_offset = Vector2(59, 56)
+			card.scale = Vector2(0.15, 0.15)
+			card.modulate = Color(2.0, 2.0, 1.4)
+			var tw := card.create_tween().set_parallel()
+			tw.tween_property(card, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tw.tween_property(card, "modulate", Color.WHITE, 0.8)
 	_gacha_target.clear()
 	var owned: Array = d.get("owned", [])
 	for o in owned:
@@ -579,7 +641,7 @@ func _render_gacha(d, status := 200) -> void:
 
 
 ## Wallet sign-in from inside the web build: the browser wallet signs the same free message as the website
-## (no transaction), /api/auth/verify sets the session cookie, then the Daily Pull reloads.
+## (no transaction), /api/auth/verify sets the session cookie, then Star Pulls reloads.
 const SIGN_IN_JS := """
 (async () => {
   window.__csAuth = 'pending';
@@ -608,6 +670,7 @@ func _connect_wallet() -> void:
 		var st = JavaScriptBridge.eval("window.__csAuth", true)
 		if typeof(st) == TYPE_STRING and st != "pending":
 			if st == "ok":
+				sfx("bestow")
 				_render_gacha(await Api.get_json("/api/v2/gacha"))
 			else:
 				_gacha_info.text = "Sign-in failed: " + str(st).trim_prefix("error:")
@@ -625,7 +688,8 @@ func _judge_signin() -> void:
 		_gacha_info.text = str(d.get("error", "Judge sign-in failed.")) if d is Dictionary else "Judge sign-in failed."
 
 
-func _card(kind: String, c: Dictionary) -> Button:
+func _card(c: Dictionary) -> Button:
+	var kind := str(c.get("kind", "skill"))
 	var rank: String = str(c.get("rank", TIER_RANK[clampi(int(c.get("tier", 1)), 0, 6)]))
 	var col := Color(RANK_COL.get(rank, "#ffffff"))
 	var b := Button.new()
@@ -647,7 +711,8 @@ func _card(kind: String, c: Dictionary) -> Button:
 	if used:
 		b.text += "\n(bestowed)"
 	b.pressed.connect(func():
-		_picked = {"kind": kind, "ref": str(c.get("id", ""))}
+		sfx("select")
+		_picked = {"index": int(c.get("index", -1))}
 		_gacha_info.text = "Chosen: %s \"%s\". Now pick a Chog and press Bestow." % [kind, str(c.get("name", ""))])
 	return b
 
