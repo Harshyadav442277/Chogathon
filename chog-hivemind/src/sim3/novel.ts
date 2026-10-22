@@ -5,6 +5,7 @@ import { all, batch, run } from "../lib/db";
 import { JOB_BY_ID } from "../sim2/season";
 import { WORLD } from "../world/data";
 import { hash } from "../sim/world";
+import { QUEST_BY_ID } from "./sim";
 import novelJson from "../../data/novel.json";
 import type { SeasonState } from "./sim";
 
@@ -28,10 +29,21 @@ export type NovelCtx = {
 const REGION_NAME = new Map(WORLD.regions.map((r) => [r.id, r.name]));
 const article = (w: string) => (/^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`);
 
+// "<kind>_first" triggers: the first chog_history row of that kind this season (or a thread that opened).
+const FIRST: Record<string, string> = {
+  ko_first: `SELECT 1 FROM chog_history WHERE season = ? AND kind = 'quest_fail' LIMIT 1`,
+  party_first: `SELECT 1 FROM chog_history WHERE season = ? AND kind = 'party' LIMIT 1`,
+  level_5: `SELECT 1 FROM agents WHERE season = ? AND level >= 5 AND chog_id IN (SELECT chog_id FROM chog_season WHERE season = agents.season AND track != 'demon') LIMIT 1`,
+  nemesis_first: `SELECT 1 FROM threads WHERE season = ? AND kind = 'nemesis' AND stage >= 1 LIMIT 1`,
+  siege_first: `SELECT 1 FROM threads WHERE season = ? AND kind = 'siege' AND stage >= 1 LIMIT 1`,
+  underdog_first: `SELECT 1 FROM threads t JOIN chog_season cs ON cs.chog_id = t.a AND cs.season = t.season
+                   WHERE t.season = ? AND t.kind = 'underdog' AND t.stage >= 1 AND cs.track NOT IN ('adventurer', 'demon') LIMIT 1`,
+};
+
 function triggered(c: Chapter, ctx: NovelCtx, questsDone: () => Promise<number>): Promise<boolean> | boolean {
   const { st } = ctx;
   const t = c.trigger;
-  if (t === "season_start") return ctx.seasonStart;
+  if (t === "season_start") return ctx.seasonStart || ctx.progress < 0.05;  // also catches chapters added mid-season
   if (t === "season_end") return ctx.seasonEnd;
   if (t === "first_raid") return !!ctx.raid;
   if (t === "phase_2") return st.phase >= 2;
@@ -41,6 +53,8 @@ function triggered(c: Chapter, ctx: NovelCtx, questsDone: () => Promise<number>)
   if (t.startsWith("seals_")) return st.seals >= Number(t.slice(6));
   if (t.startsWith("progress_")) return ctx.progress >= Number(t.slice(9)) / 100;
   if (t.startsWith("quests_")) return questsDone().then((n) => n >= Number(t.slice(7)));
+  if (t === "underdog_first" && ctx.progress < 0.35) return false;  // the bards need time to notice
+  if (FIRST[t]) return all<any>(FIRST[t], [ctx.season]).then((r) => r.length > 0).catch(() => false);
   return false;
 }
 
@@ -57,11 +71,13 @@ export async function writeChapters(ctx: NovelCtx): Promise<string[]> {
   }
   if (!due.length) return [];
   const p = await pointers(ctx);
-  await batch(due.map(([c, i]) => ({
+  const vars = (c: Chapter) => ({ ...p, ...(c.trigger.startsWith("seals_") ? p.seal[Number(c.trigger.slice(6)) - 1] ?? {} : {}) });
+  const titles = due.map(([c]) => render(c.title, vars(c)));
+  await batch(due.map(([c, i], k) => ({
     sql: `INSERT OR IGNORE INTO novel(season, chapter, ord, title, text, tick, at) VALUES(?,?,?,?,?,?,?)`,
-    args: [ctx.season, c.id, i, c.title, render(c.text, { ...p, ...(c.trigger.startsWith("seals_") ? p.seal[Number(c.trigger.slice(6)) - 1] ?? {} : {}) }), ctx.tick, ctx.now],
+    args: [ctx.season, c.id, i, titles[k], render(c.text, vars(c)), ctx.tick, ctx.now],
   })));
-  return due.map(([c]) => c.title);
+  return titles;
 }
 
 export function render(text: string, v: Record<string, unknown>): string {
@@ -113,6 +129,27 @@ async function pointers(ctx: NovelCtx): Promise<Record<string, any>> {
       ? `${nm(ctx.raid.defender) || "A farmer with a pitchfork"} was the first onto the wall, and the others followed. By midnight the demons broke and fled back into the dark, leaving pitchforks and pride behind.`
       : `The defenders were too few and too new. ${v.raidTown} burned until morning, and the demons went home laughing, their sacks full.`;
   }
+  // The first knocked out, the first party, the first to level 5, the first nemesis.
+  const ko = (await all<any>(`SELECT chog_id, ref FROM chog_history WHERE season = ? AND kind = 'quest_fail' ORDER BY id LIMIT 1`, [season]))[0];
+  if (ko) { v.firstFallen = nm(ko.chog_id); v.firstFallenQuest = QUEST_BY_ID.get(String(ko.ref))?.name ?? "a quest"; }
+  const party = (await all<any>(`SELECT chog_id, other, ref FROM chog_history WHERE season = ? AND kind = 'party' ORDER BY id LIMIT 1`, [season]))[0];
+  if (party) { v.partyA = nm(party.chog_id); v.partyB = nm(party.other); v.partyQuest = QUEST_BY_ID.get(String(party.ref))?.name ?? "a quest"; }
+  const lv = heroes.filter((a) => Number(a.level) >= 5).sort((a, b) => Number(b.level) - Number(a.level) || Number(a.id) - Number(b.id))[0];
+  if (lv) { v.levelFive = lv.name; v.levelFiveJob = jobName(Number(lv.id)); }
+  const nem = (await all<any>(`SELECT a, data FROM threads WHERE season = ? AND kind = 'nemesis' AND stage >= 1 ORDER BY id LIMIT 1`, [season]))[0];
+  if (nem) {
+    v.nemesisA = nm(nem.a);
+    const g = st.generals.find((x) => x.region === JSON.parse(nem.data || "{}").region);
+    v.nemesisBoss = nm(g?.chog) || "a Demon General";
+  }
+  const under = (await all<any>(`SELECT t.a FROM threads t JOIN chog_season cs ON cs.chog_id = t.a AND cs.season = t.season
+    WHERE t.season = ? AND t.kind = 'underdog' AND t.stage >= 1 AND cs.track NOT IN ('adventurer', 'demon') ORDER BY t.id LIMIT 1`, [season]))[0];
+  if (under) { v.underdog = nm(under.a); v.underdogJob = jobName(Number(under.a)); }
+  // The one who takes the cultist's moonberries (and comes back): a seeded pick, never a witness.
+  const wit = new Set(w.map((a) => Number(a.id)));
+  const tr = [...heroes].filter((a) => !wit.has(Number(a.id))).sort((a, b) => hash(`t:${season}:${a.id}`) - hash(`t:${season}:${b.id}`))[0];
+  if (tr) { v.traitor = tr.name; v.traitorJobA = article(jobName(Number(tr.id))); }
+
   const cands = [...heroes].sort((a, b) => Number(b.story) - Number(a.story) || Number(b.level) - Number(a.level)).slice(0, 3);
   cands.forEach((a, i) => { v[`cand${i + 1}`] = a.name; v[`cand${i + 1}job`] = jobName(Number(a.id)); });
   const rival = (await all<any>(`SELECT a, b, count FROM threads WHERE season = ? AND kind = 'rivals' AND stage >= 1 ORDER BY count DESC LIMIT 1`, [season]))[0];

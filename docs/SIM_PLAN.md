@@ -52,10 +52,10 @@ the King can't fall before 85% of the season, and a "Last Stand" boost stops it 
 
 ## 6. Players
 - **Stargazers** (no wallet) watch everything live: every agent's state, quest and log, the Star Stream, the season bar.
-- **Constellations** (wallet holding ≥ 1 Chog, or judge mode) play a **daily gacha** (changed 2026-10-22, replaces Star Points):
-  each UTC day they **draw a hand of 5 skills + 5 quests** (rarity-weighted, seeded by wallet + day, so no re-rolls)
-  and **bestow 2 skills + 2 quests on Chogs they hold**. Max 6 skills per Chog; quests start on the next tick and
-  the Chog's skills decide how long they take. Env `GACHA_*` switches to "draw 10 + 10, bestow 5 + 5 on any Chog".
+- **Constellations** (wallet holding ≥ 1 Chog, or judge mode) get **Star Pulls** (changed 2026-10-22, replaces the daily hand):
+  **5 pulls per season**; each pull reveals one card (55% skill / 45% quest, rarity-weighted, seeded by player + season
+  + pull number, no repeats) that can be **bestowed once on a Chog they hold**. Max 6 skills per Chog; quests start on
+  the next tick and the Chog's skills decide how long they take. Env `GACHA_PULLS` changes the count.
 - Every gift is narrated in the Star Stream.
 
 ## 7. Narration

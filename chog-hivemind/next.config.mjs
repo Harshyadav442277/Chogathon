@@ -8,7 +8,12 @@ const nextConfig = {
   // The Godot web build is exported into public/play/ (single-threaded: no COOP/COEP headers needed).
   // Redirect (not rewrite) so the export's relative asset URLs (index.js, index.wasm, index.pck) resolve under /play/.
   async redirects() {
-    return [{ source: "/play", destination: "/play/index.html", permanent: false }];
+    // The game is the whole site: every page route opens the game (its title screen says "Enter Monadia").
+    // APIs, /play/* files and static assets are untouched.
+    const game = "/play/index.html";
+    return ["/", "/play", "/world", "/times", "/leaderboard", "/about", "/chog/:path*", "/meme/:path*"].map((source) => ({
+      source, destination: game, permanent: false,
+    }));
   },
 };
 
