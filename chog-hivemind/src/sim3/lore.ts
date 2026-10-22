@@ -478,10 +478,14 @@ export function lookLines(a: string, t: Traits): string[] {
   return out.filter(Boolean);
 }
 
-export function buildProfile(id: number, a: string, t: Traits, home: string, job: string): Profile {
+const BG_NAME: Record<string, string> = { mon: "violet", radioactive: "radioactive green", "red sky": "red", "afternoon orange": "orange", gold: "golden" };
+
+export function buildProfile(id: number, fullName: string, t: Traits, home: string, job: string): Profile {
+  const a = fullName.replace(/\s+#\d+$/, "").replace(/\s+the\s+\w+$/i, "");
   const [tName, tLine] = pickBy(TEMPERAMENT, "temper", id);
   const vars = { a, home, job };
-  const bgv = t.Background && t.Background !== "undefined" ? t.Background.toLowerCase() : "";
+  const bgRaw = t.Background && t.Background !== "undefined" ? t.Background.toLowerCase() : "";
+  const bgv = BG_NAME[bgRaw] ?? bgRaw;
   const look = lookLines(a, t);
   if (bgv) look.push(fill(`{a} ${pickBy(BACKGROUND, "bg", id)}.`, { a, v: bgv }));
   const traits = ["Background", "Skin", "Eyes", "Mouth", "Head", "Accessory", "Tier"]

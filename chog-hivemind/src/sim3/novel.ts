@@ -105,6 +105,27 @@ function extraFor(n: StoryNode, base: Env): Env {
   return { ...((base.seal as Env[])?.[k - 1] ?? {}), sealNo: k, sealOrd: ORD[k - 1], sealOrdCap: ORD[k - 1][0].toUpperCase() + ORD[k - 1].slice(1), sealsLeft: 4 - k };
 }
 
+/** Where a beat sits in a season's timeline (0..100), so beats told in the same tick still read in story order. */
+function beatRank(n: StoryNode): number {
+  const t = n.trigger ?? "";
+  const num = Number(t.replace(/\D+/g, "")) || 0;
+  if (t === "season_start") return 0;
+  if (t.startsWith("progress_")) return num;
+  if (t.startsWith("quests_")) return { 25: 4, 100: 12, 300: 35, 600: 60 }[num] ?? num / 10;
+  if (t.startsWith("seals_")) return 20 * num + 5;
+  if (t.startsWith("level_")) return 6 + num;
+  if (t.startsWith("king_hp_")) return 100 - num / 2;
+  return ({ party_first: 3, ko_first: 5, first_raid: 8, gift_first: 9, phase_2: 10, gift_5: 15, rival_first: 20, nemesis_first: 25, underdog_first: 28,
+    siege_first: 30, phase_3: 85, last_stand: 95, hero: 98, season_end: 100 } as Record<string, number>)[t] ?? 50;
+}
+const depthOf = (n: StoryNode, memo = new Map<string, number>()): number => {
+  if (memo.has(n.id)) return memo.get(n.id)!;
+  const parents = [...(n.after ?? []), ...(n.afterAny ?? [])].map((id) => NODE_BY_ID.get(id)?.node).filter((x): x is StoryNode => !!x);
+  const d = parents.length ? 1 + Math.max(...parents.map((q) => depthOf(q, memo))) : 0;
+  memo.set(n.id, d);
+  return d;
+};
+
 /** Writes every beat whose moment has come this tick; returns their titles (for the Star Stream). */
 export async function writeChapters(ctx: NovelCtx): Promise<string[]> {
   const { arc, data } = await storyOf(ctx.season);
@@ -173,10 +194,11 @@ export async function writeChapters(ctx: NovelCtx): Promise<string[]> {
   if (!written.length) return [];
 
   data.flags = [...flags];
+  written.sort((a, b) => beatRank(a.node) - beatRank(b.node) || depthOf(a.node) - depthOf(b.node) || NODE_BY_ID.get(a.node.id)!.index - NODE_BY_ID.get(b.node.id)!.index);
   await batch([
-    ...written.map(({ node, title, text }) => ({
+    ...written.map(({ node, title, text }, i) => ({
       sql: `INSERT OR IGNORE INTO novel(season, chapter, ord, title, text, tick, at) VALUES(?,?,?,?,?,?,?)`,
-      args: [ctx.season, node.id, NODE_BY_ID.get(node.id)!.index, title, text, ctx.tick, ctx.now],
+      args: [ctx.season, node.id, i, title, text, ctx.tick, ctx.now],  // ord = place in this tick's batch (story order)
     })),
     { sql: `UPDATE story SET data = ? WHERE season = ?`, args: [JSON.stringify(data), ctx.season] },
   ]);
