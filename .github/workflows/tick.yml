@@ -25,6 +25,14 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: chog-hivemind/package-lock.json
+      - name: Check the database secrets
+        # Without them the tick would "succeed" against a throwaway local database and the live world would not move.
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          case "$TURSO_DATABASE_URL" in libsql://*) ;; *) echo "::error::Secret TURSO_DATABASE_URL is missing or not a libsql:// URL"; exit 1;; esac
+          [ -n "$TURSO_AUTH_TOKEN" ] || { echo "::error::Secret TURSO_AUTH_TOKEN is missing"; exit 1; }
       - run: npm ci
       - name: Run ticks
         env:
