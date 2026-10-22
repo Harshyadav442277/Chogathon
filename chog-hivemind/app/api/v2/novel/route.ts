@@ -17,7 +17,8 @@ export async function GET(req: Request) {
       title: NOVEL.title, season, total: NOVEL.chapters.length, seasons: seasons.map((s) => Number(s.season)),
       chapters: (() => {
         let n = 0;  // story chapters are numbered in the order they happened; interludes and the epilogue are not
-        return chapters.map((c) => {
+        const known = new Set(NOVEL.chapters.map((c) => c.id));  // chapters retired from data/novel.json are hidden
+        return chapters.filter((c) => known.has(String(c.chapter))).map((c) => {
           const raw = String(c.title).replace(/^Chapter \d+ · /, "");  // chapters stored before titles lost their numbers
           const plain = /^(Interlude|Epilogue)/.test(raw);
           return { id: c.chapter, number: plain ? null : ++n, title: plain ? raw : `Chapter ${n} · ${raw}`, text: c.text, tick: Number(c.tick), at: Number(c.at) };

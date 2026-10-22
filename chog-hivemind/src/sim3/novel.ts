@@ -43,7 +43,7 @@ const FIRST: Record<string, string> = {
 function triggered(c: Chapter, ctx: NovelCtx, questsDone: () => Promise<number>): Promise<boolean> | boolean {
   const { st } = ctx;
   const t = c.trigger;
-  if (t === "season_start") return ctx.seasonStart;
+  if (t === "season_start") return ctx.seasonStart || ctx.progress < 0.05;  // also catches chapters added mid-season
   if (t === "season_end") return ctx.seasonEnd;
   if (t === "first_raid") return !!ctx.raid;
   if (t === "phase_2") return st.phase >= 2;
