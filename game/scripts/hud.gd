@@ -25,8 +25,12 @@ var _title: Label
 var _sub: RichTextLabel
 var _hp: Hearts
 var _agent: RichTextLabel
-var _life: RichTextLabel
 var _life_btn: Button
+var _life_win: PanelContainer
+var _life_text_label: RichTextLabel
+var _life_data := {}
+var _life_name := ""
+var _italic := RegEx.new()
 var _novel: PanelContainer
 var _novel_text: RichTextLabel
 var _gacha: PanelContainer
@@ -66,8 +70,11 @@ func _ready() -> void:
 	_build_buttons()
 	_build_stream()
 	_build_status()
-	_novel = _modal(Vector2(620, 560))
+	_italic.compile("\\*([^*\\n]+)\\*")
+	_novel = _modal(Vector2(660, 580))
 	_novel_text = _modal_body(_novel, "THE MONADIA CYCLE")
+	_life_win = _modal(Vector2(720, 620))
+	_life_text_label = _modal_body(_life_win, "LIFE STORY")
 	_build_gacha()
 	var t := Timer.new()
 	t.wait_time = 10.0
@@ -85,6 +92,9 @@ func _ready() -> void:
 			await get_tree().create_timer(3.0).timeout
 			if arg.ends_with("pull"):
 				_toggle_gacha()
+			elif arg.ends_with("life"):
+				await get_tree().create_timer(4.0).timeout
+				_toggle_life()
 			else:
 				_toggle_novel()
 
@@ -413,15 +423,10 @@ func _build_status() -> void:
 	_agent = _rich(12)
 	_agent.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inner.add_child(_agent)
-	_life_btn = _button("Life +")
+	_life_btn = _button("Read Life Story")
+	_life_btn.disabled = true
 	inner.add_child(_life_btn)
-	_life = _rich(12)
-	_life.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_life.visible = false
-	inner.add_child(_life)
-	_life_btn.pressed.connect(func():
-		_life.visible = not _life.visible
-		_life_btn.text = "Life -" if _life.visible else "Life +")
+	_life_btn.pressed.connect(_toggle_life)
 
 
 func _bar(frac: float, width := 14, col := "#7fc96b") -> String:
@@ -440,7 +445,9 @@ func _on_selected(chog_id: int) -> void:
 	_title.text = str(GameState.positions["names"][i]) if i >= 0 else "Chog #%d" % chog_id
 	_sub.text = "[color=#a89f7e]Reading the Status Window...[/color]"
 	_agent.text = ""
-	_life.text = ""
+	_life_data = {}
+	_life_btn.disabled = true
+	_life_win.visible = false
 	var data = await Api.get_json("/api/chog/%d" % chog_id)
 	if GameState.selected != chog_id:
 		return
@@ -465,7 +472,12 @@ func _on_selected(chog_id: int) -> void:
 		_hp.queue_redraw()
 		_agent.text = _agent_text(a)
 	if data.get("life") is Dictionary:
-		_life.text = _life_text(data["life"])
+		_life_data = data["life"]
+		_life_name = str(c.get("name", "Chog #%d" % chog_id))
+		_life_btn.disabled = false
+		var ep: Array = _life_data.get("epithets", [])
+		if not ep.is_empty():
+			_sub.text += "\n[color=#ffd84a]%s[/color]" % "  ·  ".join(PackedStringArray(ep))
 
 
 ## The Chog's NFT picture (160 px webp served by the site at /chogs/<id>.webp), cached per id.
@@ -508,16 +520,80 @@ func _agent_text(a: Dictionary) -> String:
 	return "\n".join(lines)
 
 
-func _life_text(l: Dictionary) -> String:
-	var lines := PackedStringArray()
-	if str(l.get("bio", "")) != "":
-		lines.append("[i]%s[/i]" % str(l["bio"]))
+## Story text may use *italics*; escape brackets so BBCode can't be injected.
+func _md(t: String) -> String:
+	return _italic.sub(t.replace("[", "[lb]"), "[i]$1[/i]", true)
+
+
+const KIND_TAG := {
+	"quest_done": ["Quest", "#7fc96b"], "quest_fail": ["Fell", "#ff8a8a"], "level": ["Level", "#5aa9e6"], "title": ["Title", "#ffd84a"],
+	"party": ["Party", "#c9a7ff"], "raid_held": ["Raid", "#ffb84d"], "raid_hurt": ["Raid", "#ff8a8a"], "raid_won": ["Raid", "#ffb84d"], "raid_lost": ["Raid", "#ff8a8a"],
+	"gift_skill": ["Star", "#c9a7ff"], "gift_quest": ["Star", "#c9a7ff"], "slay_general": ["Seal", "#ffd84a"], "hero": ["Hero", "#ffd84a"], "summoned": ["Born", "#9fd8ff"],
+	"thread": ["Tale", "#d8b24a"], "train": ["Spar", "#9fd8ff"], "trade": ["Trade", "#cfe8b0"], "gossip": ["Talk", "#a89f7e"], "heal": ["Heal", "#7fc96b"],
+	"work": ["Work", "#a89f7e"], "fell": ["Fell", "#ff8a8a"],
+}
+
+
+func _heading(t: String) -> String:
+	return "\n[font_size=17][color=#d8b24a]%s[/color][/font_size]" % t
+
+
+## The whole life story as BBCode: profile card, the told sections, bonds, past lives and the season-by-season timeline.
+func _life_bbcode(l: Dictionary, nm: String) -> String:
+	var out := PackedStringArray()
+	var p: Dictionary = l.get("profile", {})
+	out.append("[font_size=20][color=#f3e9c6]%s[/color][/font_size]" % nm.replace("[", "[lb]"))
+	var ep: Array = l.get("epithets", [])
+	if not ep.is_empty():
+		out.append("[color=#ffd84a]%s[/color]" % "  ·  ".join(PackedStringArray(ep)))
+	if not p.is_empty():
+		out.append(_heading("Who they are"))
+		out.append("[color=#d8b24a]%s.[/color] %s" % [str(p.get("temperament", "")), _md(str(p.get("temperamentLine", "")))])
+		for look in p.get("look", []):
+			out.append("[color=#a89f7e]%s[/color]" % _md(str(look)))
+		out.append("")
+		var facts := [["Quirk", "quirk"], ["Dream", "dream"], ["Fear", "fear"], ["Motto", "motto"], ["Favourite food", "food"], ["Pastime", "hobby"], ["Talent", "talent"]]
+		for f in facts:
+			out.append("[color=#d8b24a]%s:[/color] %s" % [f[0], _md(str(p.get(f[1], "")))])
+		var tr: Array = p.get("traits", [])
+		if not tr.is_empty():
+			var bits := PackedStringArray()
+			for t in tr:
+				bits.append("%s %s" % [str(t["name"]), str(t["value"])])
+			out.append("[color=#7a8a6a]NFT: %s[/color]" % ", ".join(bits).replace("[", "[lb]"))
+	for sec in l.get("sections", []):
+		out.append(_heading(str(sec["title"])))
+		for para in sec["paragraphs"]:
+			out.append(_md(str(para)) + "\n")
 	var past: Array = l.get("pastLives", [])
 	if not past.is_empty():
-		lines.append("[color=#c9a7ff]Past lives:[/color] " + " ".join(PackedStringArray(past)))
-	for e in (l.get("timeline", []) as Array).slice(0, 8):
-		lines.append("[color=#7a8a6a]S%d t%d[/color] %s" % [int(e["season"]), int(e["tick"]), str(e["text"])])
-	return "\n".join(lines)
+		out.append(_heading("Past Lives"))
+		for pl in past:
+			out.append("[color=#c9a7ff]%s[/color]" % _md(str(pl["text"])))
+	var tl: Array = l.get("timeline", [])
+	if not tl.is_empty():
+		out.append(_heading("Timeline"))
+		var last := -1
+		for e in tl:
+			var sn := int(e["season"])
+			if sn != last:
+				out.append("\n[color=#d8b24a]Season %d[/color]" % sn)
+				last = sn
+			var tag: Array = KIND_TAG.get(str(e["kind"]), [str(e["kind"]).capitalize(), "#a89f7e"])
+			out.append("[color=#7a8a6a]t%d[/color] [color=%s]%s[/color]  %s" % [int(e["tick"]), tag[1], tag[0], _md(str(e["text"]))])
+	return "\n".join(out)
+
+
+func _toggle_life() -> void:
+	if _life_data.is_empty():
+		return
+	_life_win.visible = not _life_win.visible
+	_novel.visible = false
+	_gacha.visible = false
+	if _life_win.visible:
+		sfx("open")
+		_life_text_label.text = _life_bbcode(_life_data, _life_name)
+		_life_text_label.scroll_to_line(0)
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -526,6 +602,7 @@ func _life_text(l: Dictionary) -> String:
 func _toggle_novel() -> void:
 	_novel.visible = not _novel.visible
 	_gacha.visible = false
+	_life_win.visible = false
 	if not _novel.visible:
 		return
 	_novel_text.text = "Opening the book..."
@@ -534,10 +611,14 @@ func _toggle_novel() -> void:
 		_novel_text.text = "The chronicle could not be read."
 		return
 	var out := PackedStringArray()
-	out.append("[center][color=#a89f7e]Season %d · %d of %d chapters written so far[/color][/center]\n" % [int(d.get("season", 0)), (d.get("chapters", []) as Array).size(), int(d.get("total", 0))])
+	var arc: Dictionary = d.get("arc", {}) if d.get("arc") is Dictionary else {}
+	if not arc.is_empty():
+		out.append("[center][font_size=20][color=#f3e9c6]%s[/color][/font_size][/center]" % _md(str(arc.get("title", ""))))
+		out.append("[center][color=#a89f7e]%s[/color][/center]" % _md(str(arc.get("blurb", ""))))
+	out.append("[center][color=#7a8a6a]Season %d · %d beats told so far (about %d in all)[/color][/center]\n" % [int(d.get("season", 0)), (d.get("chapters", []) as Array).size(), int(d.get("total", 0))])
 	for c in d.get("chapters", []):
-		out.append("[font_size=17][color=#d8b24a]%s[/color][/font_size]" % str(c["title"]))
-		out.append(str(c["text"]).replace("[", "[lb]") + "\n")
+		out.append("[font_size=17][color=#d8b24a]%s[/color][/font_size]" % _md(str(c["title"])))
+		out.append(_md(str(c["text"])) + "\n")
 	if (d.get("chapters", []) as Array).is_empty():
 		out.append("[i]Nothing has been written yet. The story begins when the season does.[/i]")
 	_novel_text.text = "\n".join(out)
@@ -615,6 +696,7 @@ func _build_gacha() -> void:
 func _toggle_gacha() -> void:
 	_gacha.visible = not _gacha.visible
 	_novel.visible = false
+	_life_win.visible = false
 	if _gacha.visible:
 		sfx("open")
 		_gacha_info.text = "Asking the stars..."

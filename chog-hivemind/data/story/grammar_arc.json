@@ -1,0 +1,100 @@
+{
+  "grammar": {
+    "curse": ["the Shadow"],
+    "curse@lantern": ["the Grey Hush", "the Long Winter", "the Hush"],
+    "curse@returner": ["the Loop", "the Returning", "the Same Morning"],
+    "curse@overlord": ["the Quiet", "the Black Order", "the Great Tidying"],
+    "curse@slime": ["the Lean Years", "the Hunger", "the Thin Season"],
+    "curse@shield": ["the Rumour", "the Whisper", "the Long Slander"],
+    "curse@gate": ["the Locked Gate", "the Rule", "the Seal on the Sky"],
+    "curse@misfits": ["the Chaos", "the Mess", "the Situation"],
+    "curse@hidden": ["the Dungeon Season", "the Gathering Dark", "the Ledger"],
+
+    "king_epithet": ["the Demon King", "the lord of the black glass", "the one on the dark throne"],
+    "king_epithet@lantern": ["the King of the Long Winter", "the one who made the snow", "the lord of the black glass"],
+    "king_epithet@returner": ["the thing at the end of every road", "the one who always won", "the Demon King, again"],
+    "king_epithet@overlord": ["His Quiet Majesty", "the Throne", "the Administrator Below"],
+    "king_epithet@slime": ["the old crown in the south", "the Demon King, who did not like competition", "the king who counted every coin"],
+    "king_epithet@shield": ["the Demon King, whom everyone feared and nobody questioned", "the real enemy, still", "the one the rumours served"],
+    "king_epithet@gate": ["the Gatekeeper", "the final boss", "the one holding the key"],
+    "king_epithet@misfits": ["the Demon King, who deserved better opponents", "His Darkness, rather put out", "the villain, in the circumstances"],
+    "king_epithet@hidden": ["the last entry on the list", "the name at the bottom of the quest", "the Demon King, as the Quest foretold"],
+
+    "thaw_line": ["Something in the world gave way, just a little.", "The air in the region changed, and everyone felt it.", "It was a small change, but it was the right sort of change."],
+    "thaw_line@lantern": [
+      "All across the region it began to drip, a single drop from the end of one icicle.",
+      "The snow turned to slush, and the slush to rain, and the rain was warm.",
+      "Where the seal had broken, the ice cracked from end to end with a sound like a river stretching.",
+      "Small green things pushed up through the slush as though they had been waiting behind a door."
+    ],
+    "thaw_line@returner": [
+      "For the first time, the morning came differently, and {w1} noticed at once.",
+      "Something unfamiliar happened: a bird sang a note {w1} had not heard before.",
+      "The day went off the old script, and {w1} nearly wept with relief."
+    ],
+    "thaw_line@overlord": [
+      "A cold draught ran through the black glass halls, and the clerks looked up from their ledgers.",
+      "In the demon realm a lantern went out, one of the ones that had never gone out.",
+      "Somewhere a bell rang in the castle that nobody had been told to ring."
+    ],
+    "thaw_line@slime": [
+      "The harvest came in a little fuller that week, and the market stalls remembered colours.",
+      "Prices fell, tempers softened, and somebody put out a second chair.",
+      "The road to town was a little busier the next morning, with fewer worried faces."
+    ],
+    "thaw_line@shield": [
+      "A few shutters opened in the street, and a few faces looked out for the first time in weeks.",
+      "People stopped crossing the road. Not all of them, but some.",
+      "The whispering, for an afternoon, went quiet, as if it had lost its place."
+    ],
+    "thaw_line@gate": [
+      "In every Status Window, a grey line of text became a little less grey.",
+      "The Rule loosened by one notch, and every Chog felt it in their bones.",
+      "A floor of the sky unlocked, and light came through the crack."
+    ],
+    "thaw_line@misfits": [
+      "Against every reasonable expectation, things went to plan, which alarmed everyone.",
+      "Nothing caught fire. A new record was declared.",
+      "The wall held. Nobody could say exactly why, and nobody was inclined to ask."
+    ],
+    "thaw_line@hidden": [
+      "The Quest log chimed, and a line of text turned gold.",
+      "A new door opened in the sky, a polite one, with a number on it.",
+      "The stars rearranged themselves a little, like people shuffling along a bench."
+    ],
+
+    "omen": ["a crow circling the same tree for hours", "a bell ringing once with nobody near it", "milk turning in the pail", "the dogs all facing south",
+      "a shadow cast in the wrong direction", "candles that would not stay lit", "a smell of smoke with no fire", "the well rising and falling in a pattern",
+      "a flock of birds flying north too early", "a hush that went on a beat too long"],
+    "omen@lantern": ["snow falling upward for a count of three", "a lantern burning with no wick", "paw prints in the snow that ended in the middle of a field",
+      "a frozen bell that hummed one low note", "a green shoot under the ice", "silver light at the edge of the wood"],
+    "omen@returner": ["a stranger who greeted {w1} by name, then looked puzzled", "the same cart passing for the third time that morning",
+      "a song everyone knew, though nobody had learned it", "déjà vu so strong it made the teeth hurt", "a clock that struck thirteen"],
+    "omen@overlord": ["a clerk's ledger that did not balance, by one single cinder", "a throne room carpet that would not stay straight",
+      "a general who sneezed at the wrong moment", "an imp who had, inexplicably, learned to read", "a tea service that arrived on time, which was suspicious"],
+    "omen@slime": ["a new road on a map no one had drawn", "wild things lingering at the edge of the clearing, looking curious", "a patch of ground that grew whatever you planted in it",
+      "a stranger asking to join, with no weapon and a great deal of hope"],
+    "omen@shield": ["a handbill nailed up overnight, in a neat hand", "a stranger repeating a story in three different inns", "a door closing quietly as {w1} approached",
+      "the same rumour told, word for word, by people who had never met"],
+    "omen@gate": ["a line of grey text hanging in the air for a moment", "every Status Window flickering at once", "a sound like a vast lock turning",
+      "a number on the horizon, counting down", "a door in the sky, painted on"],
+    "omen@misfits": ["a goose that followed {w2} everywhere", "a prophecy that was, on inspection, a shopping list", "an unlucky coin that would not leave the party alone",
+      "a map that insisted all roads led to somebody's mother-in-law's house"],
+    "omen@hidden": ["a ping at the edge of hearing, like a bell underwater", "gold text that appeared when nobody was looking", "a feeling of being watched kindly",
+      "a star that had not been there last night, twinkling a little nervously"],
+
+    "closing": ["It was not the end of anything. It was the middle of everything.", "And so it began, and so it went on.", "They did not know it yet, but the story had already turned.",
+      "Nobody said so aloud, but everyone felt it.", "The night went on, as nights do."],
+    "closing@lantern": ["Outside, the snow kept falling, softer than before.", "Somewhere beyond the hill, something silver paused, and listened, and went on.",
+      "The lantern burned all night, though nobody had lit it."],
+    "closing@returner": ["{w1} would remember this, whatever came next. That, at least, was a comfort.", "The day ended, and for once {w1} did not know what the next one held.",
+      "It was the first time in a long while that the evening had not been a rehearsal."],
+    "closing@overlord": ["In the castle, someone made a note in a ledger and underlined it twice.", "The Demon King sipped cold tea and said nothing for a long while.",
+      "A very small imp wrote it all down, in case it mattered."],
+    "closing@slime": ["It was not much, but it was theirs.", "Somebody lit a second lamp, for no reason except that it was nice.", "The town went to sleep a little larger than it had woken."],
+    "closing@shield": ["{w1} did not defend themselves. They went on, doing the next honest thing.", "The whispers went on, but so did {w1}.", "Truth is slow, but it has long legs."],
+    "closing@gate": ["In the sky, the grey numbers ticked down by one.", "The Rule did not blink. Neither did they.", "A little more of the map turned from black to gold."],
+    "closing@misfits": ["Nobody could have planned it, and nobody tried.", "The goose, at least, was proud.", "They agreed never to speak of it. They told everyone."],
+    "closing@hidden": ["Quietly, in the dark, a line of gold text added itself to the log.", "A star, very high up, winked once.", "The Quest did not say well done. It never did. It just offered the next one."]
+  }
+}

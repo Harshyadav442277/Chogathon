@@ -1,0 +1,75 @@
+{
+  "nodes": [
+    {
+      "id": "last_stand", "trigger": "last_stand", "title": "Last Stand",
+      "variants": [
+        { "text": "Time ran short. The season was ending and {king} was still on the throne.\n\nThat night every star over Monadia burned at once. The Constellations, all of them, the patient bright eyes that had watched over this country since before <weather>, poured their light down into the people below. Swords cut deeper. Shields held longer. Every blow against {king} struck three times as hard.\n\nIt was not fair. It was not meant to be. It was the Last Stand." },
+        { "text": "“Now,” said <elder>, in the dark of a camp on the black hill, “now is the time to be foolish.”\n\nAbove them the sky was lit like a festival. The stars burned, and burned, and a thousand tired Chogs felt it in their arms and legs and hearts. <hope_line> {king} felt it too, on the far side of the glass, and for the first time in the whole season, {king} flinched.\n\nEvery blow struck three times as hard. It could not last. It did not have to." },
+        { "text": "On the last night of the season the stars came down.\n\nNot literally, though a few Chogs swore it, and a baker in the capital swore that she had caught one in a bun tin. It was a feeling. Every Chog on the black hill felt the same: a hand on the back, a push, a warmth in the sword arm, a certainty that someone, far away, was pulling for them.\n\n<curse> began, at last, to break." }
+      ]
+    },
+    {
+      "id": "hero_adv", "trigger": "hero", "slot": "heroTrack", "requires": "hero_track=adventurer", "title": "The Sword That Was Always Going To",
+      "variants": [
+        { "text": "No one in Monadia was surprised that it was {hero}. {hero} was {heroJobA}, after all, trained for exactly this, and had walked up the black hill so many times that the path knew their weight.\n\nBut surprise is not the same as understanding. At level {heroLevel}, with the throne room cracking and the green coming in through the cracks, {hero} found the one moment that all that training had been for, and took it. The old trainers say it was no luck. The old trainers are right.\n\n[[heroRival|{heroRival}, who had spent the whole season trying to be first, was the first to lift {hero} onto their shoulders.]]" },
+        { "text": "There is a special kind of calm that comes to a Chog who has done one thing, over and over, for a whole season. {hero} had it. In the black throne room they set their feet, breathed once, and did what they had done a thousand times in the training yard.\n\nIt was only afterwards, in the green dawn, that {hero} began to shake. [[heroCompanion|{heroCompanion} sat beside them on the steps, and said nothing, and handed over a crust of bread. That was the best part.]]" }
+      ]
+    },
+    {
+      "id": "hero_craft", "trigger": "hero", "slot": "heroTrack", "requires": "hero_track=craft", "title": "The Hero Who Made Things",
+      "variants": [
+        { "text": "Nobody had put {hero} on the list. {hero} was {heroJobA}, a crafter, a maker of things, and the list was for knights.\n\nBut the knights had been armed with {hero}'s work all season: blades, plates, flasks, bandages, and the new buckles that did not give way. When the black hill finally came down, and the Demon King lay at the foot of the throne, it was a blade of {hero}'s own forging that had done the work, in the hand that {hero} had trained.\n\n“I only made it,” said {hero}, in the green dawn. “They did the hard part.”\n\n“No,” said the one who held it. “You did. We just carried it up the hill.”" },
+        { "text": "The Hero of the season came from the workshop. At level {heroLevel}, with a hammer-callus on every finger, {hero} walked into the throne room of {king} with a hastily sharpened tool and a face of fierce concentration, as if the Demon King were an unusually stubborn rivet.\n\nThe craft guilds wept. The knights, who had hoped to be the ones, were gracious about it, which is to say they sulked for an hour and then bought {hero} a drink." }
+      ]
+    },
+    {
+      "id": "hero_civic", "trigger": "hero", "slot": "heroTrack", "requires": "hero_track=civic", "title": "The Hero Was in Administration",
+      "variants": [
+        { "text": "The ledger-keepers never expected to be in the songs. {hero}, {heroJobA}, had spent the season counting grain, signing orders and arguing with quartermasters, and had never once been known to raise a weapon.\n\nAnd yet at level {heroLevel}, when everyone with a sword was down and the black hill was holding by a thread, {hero} took up a spear and walked in, and said, in a tone usually reserved for late tax returns: “That will do.”\n\nThe Demon King, to the astonishment of everyone, stopped. And then {hero} hit them." },
+        { "text": "It turned out that the thing the season had needed was organisation. {hero} had it. In the final days they moved supplies, relieved the wounded, rotated the exhausted. When the last charge came, {hero} led it, in good order, in the correct formation, and with all paperwork signed.\n\n“Frankly,” said <elder>, “we should have asked the clerks first.”" }
+      ]
+    },
+    {
+      "id": "hero_service", "trigger": "hero", "slot": "heroTrack", "requires": "hero_track=service", "title": "The Hero Behind the Counter",
+      "variants": [
+        { "text": "{hero} was {heroJobA}. For a whole season they had fed, healed, taught or entertained the heroes of Monadia, and had never once been thanked in verse.\n\nAt level {heroLevel}, as the throne room cracked, {hero} stepped between {king} and a fallen friend and did the first brave thing they had ever done in a fight. And then the second. And then, quite by accident, the last.\n\n“It's what you do,” said {hero}, afterwards, dazed, to a crowd. “You see someone who needs something, and you bring it.” The crowd cheered. The next day, the inn was full." },
+        { "text": "Everybody in Monadia knew {hero}'s face. They had bought bread from them, or been bandaged by them, or heard them sing in a corner of the inn. Nobody had thought of them as a Hero.\n\nBut they had been at the walls, and in the dungeons, and in the temple at three in the morning, and by the end the black hill belonged to them in the way a house belongs to the one who cleans it." }
+      ]
+    },
+    {
+      "id": "hero_land", "trigger": "hero", "slot": "heroTrack", "requires": "hero_track=land", "title": "The Hero from the Fields",
+      "variants": [
+        { "text": "{hero} worked the land: {heroJobA}, with muddy knees and honest hands, and a strong opinion about the weather.\n\nNobody expected that hands used to hauling nets, ploughs or picks would make the final stroke against a Demon King. But the fight, it turned out, was a lot like a hard day's work. You put your back in it. You do not stop. You do it again.\n\nAt level {heroLevel}, {hero} stood in the cracked throne room covered in dust and not at all dismayed. “Now,” said {hero}, wiping their brow, “who's for supper?”" },
+        { "text": "There is a patience in those who grow things that cannot be taught. {hero} had it. For a season they had worked the land under a hostile sky, and in the throne room of {king}, they simply did the next thing, and the next, and the next, until there were no more next things.\n\nIt was the least dramatic Hero's tale in Monadia's history, and the one that made the old farmers weep." }
+      ]
+    },
+    {
+      "id": "hero_companion", "trigger": "hero", "requires": "heroCompanion", "chance": 0.7, "title": "Who Stood Beside Them",
+      "variants": [
+        { "text": "Heroes are not made alone. {heroCompanion} had been beside {hero} for most of the season, on the long roads and the cold nights, and was not going to be anywhere else for this.\n\nThey did not strike the final blow, and they would never claim to. But when it was over, and the green came in through the cracks, it was {heroCompanion} who found {hero} sitting on the broken steps, and sat beside them. “Well,” said {heroCompanion}. “That was a lot.”\n\n“It was,” said {hero}.\n\nThey stayed there until the sun came up." },
+        { "text": "Somewhere in the history of the season there is a Chog named {heroCompanion} who never appears in songs. They carried the extra waterskin. They watched {hero}'s back. They said “steady” at the right moment, over and over, until steady became a habit.\n\n“Without you,” said {hero}, at the end.\n\n“Don't,” said {heroCompanion}. “You'll make me cry.”" }
+      ]
+    },
+    {
+      "id": "hero_rival", "trigger": "hero", "requires": "heroRival", "chance": 0.7, "title": "The Rival's Cheer",
+      "variants": [
+        { "text": "{heroRival} had spent the season trying to beat {hero}. They had not succeeded. They would, they said, have a good go next season.\n\nBut when {hero} came out of the throne room with {king} on the floor behind them, it was {heroRival} who ran forward, and lifted them onto their shoulders, and carried them down the black hill singing the rudest song they knew.\n\nSome rivalries end in friendship. This one began with it." },
+        { "text": "“I'd have done it better,” said {heroRival}, in the green dawn, to nobody, to {hero}, to the sky.\n\n“I know,” said {hero}.\n\n“Don't agree with me. It spoils it.”\n\nThey sat together on the steps for a long time, two tired Chogs, listening to the bells." }
+      ]
+    },
+    {
+      "id": "hero_sponsor", "trigger": "hero", "requires": "heroSponsor", "chance": 0.8, "title": "The Star That Believed",
+      "variants": [
+        { "text": "High above the black hill, the star of {heroSponsor}, the Constellation who had believed in {hero} first, burned brighter than all the rest.\n\nNobody can say what a star feels. But it is recorded that on that night the star flared, held, and then slowly dimmed, like someone letting out a very long breath." },
+        { "text": "“I had a feeling about you,” said a voice in {hero}'s head, in the green dawn, and it sounded like {heroSponsor}.\n\n“You never said,” said {hero}, aloud.\n\n“I'm a star,” said the voice. “We're not good at saying. Well done.”" }
+      ]
+    },
+    {
+      "id": "season_ledger", "trigger": "season_end", "title": "Epilogue: The Hall of Heroes",
+      "variants": [
+        { "text": "They carved the names into the Hall of Heroes: {hero}, Season {season}. Beside it, smaller, the ones who broke the seals: {slayers}. Below those, the ones the bards would not stop singing about.\n\nIn all, Monadia completed {questsDone} quests that season, held its walls {raidsHeld} times and lost them {raidsLost} times, and every one of those numbers is somebody's story.\n\nThen the bells rang, and the clerks wrote at the bottom of the page, in a steady hand: *and then it began again.*" },
+        { "text": "The ledger of Season {season} is closed. Its last line reads: *Hero: {hero}.* Above it, in the long column: {slayers}. Beneath it, in the small print where history keeps its secrets, a note by <guild_clerk>: *quests, {questsDone}; raids held, {raidsHeld}; raids lost, {raidsLost}; soup, most of it.*\n\nThe clerk put down the pen, stretched, and looked out of the window. <weather>. Somewhere, another season was beginning. Somewhere, a lantern was being lit." }
+      ]
+    }
+  ]
+}

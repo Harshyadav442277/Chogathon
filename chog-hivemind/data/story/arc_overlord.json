@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "overlord.premise", "arc": "overlord", "trigger": "season_start", "slot": "premise", "title": "Morning in the Black Glass",
+      "variants": [
+        { "text": "The Demon King woke at six, as always, and the castle woke with them.\n\nIt was a very orderly castle. The corridors were swept. The torches burned in strict rotation. Somewhere below, in the long hall of the clerks, a thousand imps were dipping their quills in a thousand inkwells, and the whole building hummed with the busy sound of a vast bureaucracy starting its day.\n\n“Report,” said {king}, descending the great stair in a robe of dark glass, and from the shadows an imp named {j_imp} stepped forward with a scroll longer than they were tall.\n\n“Your Quiet Majesty,” said {j_imp}, bowing so low that the scroll unrolled across the floor. “Season {season}. The schedule says: *Conquer Monadia.* We are on track.”\n\n“On track?” said {king}.\n\n“Well,” said the imp. “We have a track. There's a track.”\n\nThat was the start of the season, seen from the other side. It would be a long one." },
+        { "text": "There is a myth that the Demon King spends their days sitting on a throne, brooding. This is false. The Demon King spends their days at a desk.\n\nIt is a big desk, made of black glass, in a room at the top of the castle that overlooks the whole of the demon realm: the ash-fields and the lava-farms and the neat little imp villages with their tidy gardens. {king} sits at it each morning, with a cup of tea, and reads: reports, requisitions, appeals, petitions about the drains.\n\n“This one's about the dragons,” says {j_imp}, laying down a new stack. “They want more cows.”\n\n“Fine,” says {king}.\n\n“And this is from the Ministry of Doom. They'd like to know if the doom could be moved to Thursdays.”\n\nThe Demon King sips their tea. “It's going to be one of those seasons,” says {king}." },
+        { "text": "{king} was not, in fact, evil. {king} was *thorough*, and it came to the same thing from the outside.\n\nIt was Season {season}. The list was on the desk, as it always was, written in a hand so precise it looked printed: *1. Awaken the generals. 2. Seal the four regions. 3. Raid the towns. 4. Wait for the Hero. 5. (Contingency.)* Item five had been crossed out and re-written so many times in so many seasons that the paper was nearly worn through.\n\n“Do we have to?” asked {j_imp}, who had been in the post for six seasons and had begun, privately, to wonder.\n\n{king} looked at the list for a very long time. “We have always done it,” said the Demon King, which is the saddest reason there is.\n\nAnd the season began." }
+      ]
+    },
+    {
+      "id": "overlord.realm", "arc": "overlord", "trigger": "season_start", "after": ["overlord.premise"], "title": "The Demon Realm, Considered",
+      "variants": [
+        { "text": "The demon realm, it must be said, is better run than most of Monadia.\n\nThe roads are paved. The drains drain. There is a free breakfast at the imp barracks every morning, and the dark knights have a pension, and the cultists, who are mostly retired accountants, have an excellent choir. The generals are a different matter. {g1} rules {r1} like a spoiled cat, expecting tribute and delivering naps. {g2} writes poetry about {r2}, all of it bad. {g3} has not been seen in daylight in nine seasons and sends letters in mirror-writing. And {g4} sings to the dead.\n\nBut they are loyal. After a fashion. They would die for {king}. They would not, however, do their paperwork.\n\n“It is a good realm,” says {j_imp}, to anyone who will listen. “It is simply that it is *surrounded*.”" },
+        { "text": "A short guide to the demon realm, as compiled by {j_imp}, junior clerk to the Throne:\n\n*Population: 4,213 imps, 311 dark knights, 56 cultists, 4 generals, 1 king, 1 goose (unaccounted for).*\n*Industries: ash, basalt, shadow-weaving, a small and unprofitable tourism sector.*\n*Morale: variable. Rises with pay, falls with raids, rises again with pie.*\n*Threats: the Heroes. Specifically, a vast number of purple creatures with excellent teamwork and no sense of self-preservation.*\n\nThe clerk read it over, frowned, and added: *Note: they do seem rather nice.*" }
+      ]
+    },
+    {
+      "id": "overlord.clerk", "arc": "overlord", "trigger": "progress_10", "after": ["overlord.realm"], "slot": "ally", "sets": ["clerk"], "title": "The Imp Who Read the Reports",
+      "variants": [
+        { "text": "{j_imp} was an unremarkable imp. Short, even for an imp. Round at the middle. A faint scorch mark on one ear from a first-day accident with a candle.\n\nBut {j_imp} read the reports. That was the thing. All the other imps skimmed them, signed them, put them on a pile. {j_imp} *read* them, every word, and one night in the third week, over a cold cup of cinder-tea, {j_imp} noticed a pattern.\n\nThe Heroes did not fight like soldiers. They fought like neighbours. They went into a dungeon and came out with strangers' children. They raided a ruin and left a lamp on in the window. A report from {mostRaided|a border village} said: *the defenders fed our wounded.*\n\n{j_imp} took the stack to {king}. “Sire,” said the imp, in a very small voice, “I don't think we're fighting the people we think we're fighting.”" },
+        { "text": "“Make a note of it,” said {king}.\n\n“Of what, Majesty?”\n\n“Of the thing you've been wanting to say for a week.”\n\n{j_imp}, who had hoped to get through the whole season without ever being noticed, swallowed. “It's just, Majesty, that in the raid on {mostRaided|the border village}, the defenders had a bake sale.”\n\n“A bake sale.”\n\n“In the middle of the raid. For the wounded. Of both sides.”\n\n{king} was silent for a long moment. Then the Demon King reached out, took the report, and read it, slowly, to the end." }
+      ]
+    },
+    {
+      "id": "overlord.prophet", "arc": "overlord", "trigger": "progress_10", "after": ["overlord.realm"], "slot": "ally", "sets": ["prophet"], "title": "The Cultist Who Saw the End",
+      "variants": [
+        { "text": "{j_cultist} was the realm's seer. This was not a particularly strong position. Seers, in the demon realm, were rather like weather forecasters: unloved, frequently wrong, and blamed for the rain.\n\nBut one night, in a chamber of candles, {j_cultist} saw something. A figure on the black hill, bright against the glass. A small one. A *purple* one. And behind them, a long line of lights.\n\n“It is the end,” said {j_cultist}, with relish.\n\n“Whose?” said {king}.\n\n{j_cultist} blinked. “I... didn't specify. Prophecies don't, as a rule. It's what makes them prophecies.”\n\n{king} looked out of the window. “Wonderful,” said the Demon King. “An ending, for someone. Add it to the schedule.”" }
+      ]
+    },
+    {
+      "id": "overlord.report", "arc": "overlord", "trigger": "progress_20", "after": ["overlord.realm"], "title": "Operations Report: The Raids",
+      "variants": [
+        { "text": "*FROM: Ministry of Raiding. TO: His Quiet Majesty. RE: Operations to date.*\n\n*Sire. Our forces have raided {raidsHeld} + {raidsLost} settlements to date. Of these, {raidsLost} were taken; {raidsHeld} were not. [[mostRaided|{mostRaided} has proved particularly resistant. We note that it has been raided {mostRaidedCount} times and shows no sign of giving up.]] Casualties: minor. Property damage: considerable. Morale among the imp: high, but it is mostly the pie.*\n\n*We respectfully note that the opposition appears to be organising.*\n\n*Yours in obedient darkness. P.S. Could someone please tell the dark knights to stop apologising?*" },
+        { "text": "The first raid had gone *poorly*, in the opinion of {g1}, who had insisted on leading it personally and been hit on the head by a ladle.\n\n“It was a *ladle*,” said {g1}, to a mortified council. “A *ladle*, Majesty!”\n\n“Wielded by whom?” said {king}.\n\n“A baker. A little one. In an apron. She said, and I quote, ‘Not in my kitchen.’”\n\nThere was a long, appalled silence in the black glass hall. “Well,” said the Demon King at last. “We had better assume they have more of those.”" }
+      ]
+    },
+    {
+      "id": "overlord.mutiny", "arc": "overlord", "trigger": "progress_30", "after": ["overlord.realm"], "slot": "twist", "sets": ["mutiny"], "weight": 2, "title": "A General Goes Quiet",
+      "variants": [
+        { "text": "{g3} was missing from the morning council.\n\n“Indisposed,” said an imp. “A cold.”\n\n“Generals do not have colds,” said {king}.\n\nIt took three days to find out. {g3}, it transpired, had been meeting in secret with the cultists, speaking of a world with no throne, a realm of mirrors in which nobody had to obey. It was not exactly rebellion, but it was, in the careful understanding of the clerks, *sedition with a very good decor.*\n\n{king} did nothing at first. The Demon King simply sat in the empty council chamber, stirring a cold tea, thinking of all the seasons gone by, and wondering when, exactly, it had become so hard to be obeyed." },
+        { "text": "“Sire,” said {j_imp}, in a whisper. “It's {g3}. They're building a second throne.”\n\n“A second throne,” said {king}.\n\n“In the east wing. Out of mirrors.”\n\nThe Demon King set down their tea. For a very long moment the room was so quiet that you could hear the glass cooling. Then {king} said, in a voice of terrible gentleness: “Have it dusted.”\n\n“Majesty?”\n\n“If it is to be used, it should be clean.”\n\nThe imp stared. It was, by a considerable margin, the most frightening thing they had ever heard anyone say." }
+      ]
+    },
+    {
+      "id": "overlord.letter", "arc": "overlord", "trigger": "progress_30", "after": ["overlord.realm"], "slot": "twist", "sets": ["letter"], "weight": 1, "title": "A Letter from the Wrong Side",
+      "variants": [
+        { "text": "The letter arrived in a plain envelope, delivered by a very frightened goose.\n\n*Dear Demon King,* it read, in a child's careful hand. *My name is a girl in {townA}. My father says you are the worst creature in the world. I wanted to tell you that I drew you a picture. You have a very big crown. I hope it does not hurt your head. Yours sincerely.*\n\nThere was a drawing. The crown was gigantic. The Demon King had been drawn with two enormous round eyes, and a smile.\n\n{king} read the letter four times. Then they hung the picture on the wall of the throne room, between a map of the realm and a cracked old mirror, where it hung all season, and where everyone pretended not to see it." }
+      ]
+    },
+    {
+      "id": "overlord.fall", "arc": "overlord", "trigger": "seals_2", "after": ["overlord.realm"], "title": "Two Seals Fallen",
+      "variants": [
+        { "text": "The castle felt it first in the glass. A fine hairline crack ran through the north wall, then another.\n\n“It is nothing,” said {king}, and put a hand on the wall, as if to calm it. In the gallery, the clerks looked up from their ledgers. In the kitchens, a great pan of cinders slid off a shelf. In the courtyard, a small imp stood looking at the sky, which had turned, for the first time anyone could remember, a very pale, very strange blue.\n\n“Two of the four are down, Majesty,” said {j_imp}.\n\n“I know.”\n\n“What shall we do?”\n\n{king} looked at the cracked wall for a long time. “Make tea,” said the Demon King. “Lots of it. We are going to have guests.”" }
+      ]
+    },
+    {
+      "id": "overlord.inn", "arc": "overlord", "trigger": "progress_55", "after": ["overlord.realm"], "title": "The Demon King Goes to an Inn",
+      "variants": [
+        { "text": "It was <night> when a tall figure in a plain grey cloak stepped through the door of <inn_scene> in {townB}.\n\nNobody paid it any mind. The inn was crowded: farmers, couriers, a handful of off-duty guards, and in a corner {cand1} the {cand1job}, telling a story to a rapt table. The stranger sat at a bench by the fire, ordered a mug of something hot, and listened.\n\nThey heard about the black hill. They heard about the generals. They heard {cand1} describe, with a grin and a lot of hand-waving, the exact kind of tyrant that the Demon King was.\n\n“And what,” said the stranger, quietly, “do you think they want?”\n\n{cand1} paused. “I think,” said {cand1}, slowly, “they're lonely.”\n\nThe stranger put down their mug, left a coin on the table, and went out into the night. The coin was black glass. Nobody saw it until morning." },
+        { "text": "{king} had never been to an inn.\n\nIt was a revelation. The tea was terrible. The chairs were uncomfortable. A bard sang a song about the Demon King that was, frankly, unflattering, and rhymed “lord” with “bored.” But nobody was afraid. Nobody was bowing. Children ran under the tables. A dog slept on {king}'s foot.\n\n“Do you come here often?” asked the innkeeper, who had not recognised them.\n\n“No,” said the Demon King. “But I think I should have.”\n\nThey stayed until midnight, and were late for the morning council, and it was the best night they had had in a thousand years." }
+      ]
+    },
+    {
+      "id": "overlord.stand", "arc": "overlord", "trigger": "phase_3", "title": "The Castle Prepares",
+      "variants": [
+        { "text": "All four seals were broken. The Heroes were coming.\n\nIn the castle, nobody ran. The imps formed an orderly queue at the armoury. The dark knights polished their boots, and wrote letters to their mothers. The cultists, in the choir loft, sang something low and sad and beautiful. {j_imp} put their ledgers in order, one by one, and dated each page.\n\n“It's an honour, you know,” said {j_dark_knight}, clanking over to {king}. “To have served you.”\n\n“Don't be absurd,” said the Demon King, a little hoarsely. “It was a pleasure.”\n\nThey stood in the cracking glass and watched a long line of lights climb the hill." }
+      ]
+    },
+    {
+      "id": "overlord.final", "arc": "overlord", "trigger": "hero", "after": ["overlord.stand"], "title": "The Throne Room, From the Throne",
+      "variants": [
+        { "text": "{king} did not fight to win.\n\nThey fought to be worthy, which is a different thing. When the doors of the throne room burst open and {hero} came through, {heroJobA} of {heroHome}, scratched and tired and wholly unafraid, the Demon King rose and drew a sword of black glass and met them in the middle of the floor.\n\nIt was the best duel of the season. Every blow was clean. Every parry was courteous. At one point {king} said “Very good,” and at another {hero} said “Thank you.”\n\nIn the end it was {hero}'s blow that landed, a plain, honest, enormously well-timed strike, and {king} went down onto one knee, smiling.\n\n“Tidy,” said the Demon King. “That was tidy.”" },
+        { "text": "“I have waited a long time for you,” said {king}.\n\n“I know,” said {hero}.\n\n“You are smaller than I expected.”\n\n“I get that a lot.”\n\nThe Demon King laughed, a short, startled sound like a stone dropping into a well. Then they fought: a long, strange, courteous battle, surrounded by the watching imps, who for once had put down their ledgers. And when {hero} won, they gathered quietly round, and the smallest of them, {j_imp}, laid a folded cloak over {king}'s shoulders.\n\n“Thank you,” whispered the Demon King. “It's been a long season.”" }
+      ]
+    },
+    {
+      "id": "overlord.ending", "arc": "overlord", "trigger": "season_end", "after": ["overlord.final"], "title": "Epilogue: The New Ledger",
+      "variants": [
+        { "text": "Afterwards, the black glass castle was a good deal less black.\n\nSomeone opened the windows. Someone, cautiously, took down the portcullis. The imps, who had been so afraid of what would come next, discovered that what came next was the Hero's party, bearing pie. There was a long and awkward conversation. Then there was a longer and less awkward one. By the end of the week, {j_imp} had been promoted to Minister of Peace, and {king} had been seen in the market at {townA}, in a plain cloak, buying a loaf.\n\nThe ledger of Season {season} was closed. The last line was written, in {j_imp}'s careful hand: *Result: unexpected. Recommendation: do it again.*" }
+      ]
+    }
+  ]
+}

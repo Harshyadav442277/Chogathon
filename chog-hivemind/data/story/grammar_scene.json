@@ -1,0 +1,151 @@
+{
+  "grammar": {
+    "weather": [
+      "a thin grey rain", "a bright wind off the coast", "a hush of heavy cloud", "a pale, rinsed sky", "a warm, dusty breeze",
+      "fog lying in the low fields like spilled milk", "an afternoon of gold light and long shadows", "sleet that could not decide",
+      "a sky as blue as a new coin", "a drizzle too soft to bother an umbrella", "a heat haze shaking above the roads",
+      "wind that smelled of rain a day away", "clouds stacked up like unwashed plates", "morning mist clinging to the rooftops",
+      "one stubborn cloud that would not leave", "a cold clear night with every star showing"
+    ],
+    "weather@lantern": [
+      "snow that fell and did not settle", "a long blue dusk of falling snow", "ice creaking along the rivers",
+      "a grey sky that the sun had forgotten", "frost feathering every window", "a wind that tasted of iron and snow"
+    ],
+    "weather@returner": [
+      "a morning that felt a little too familiar", "light slanting exactly as it had before", "a drizzle {w1} could have predicted to the minute"
+    ],
+    "weather@overlord": [
+      "a bruise-coloured sky over the black glass", "low red clouds above the demon realm", "ash drifting politely down onto the courtyards"
+    ],
+    "dawn": [
+      "At first light", "Before the bells had finished waking", "When the sky turned from black to pearl", "As the first cart creaked out of town",
+      "With the sun not quite over the walls", "In the thin hour when bakers are the only people awake", "While the lamps were still being put out",
+      "At the grey edge of morning", "As the roosters lost an argument with the sunrise", "When dew still clung to everything"
+    ],
+    "dusk": [
+      "As the lamps were lit", "When the light went the colour of tea", "With the shadows long and the soup on", "At the blue hour",
+      "Just as the market was packing up", "When the first star came out", "As the last bell rang the day off", "In the red end of the afternoon"
+    ],
+    "night": [
+      "Late that night", "Long after the lamps were lowered", "In the small hours", "While the town slept, or pretended to",
+      "In the deep part of the night", "Somewhere past midnight", "With the moon behind a cloud"
+    ],
+    "smell_street": [
+      "wood smoke and baking bread", "wet stone and horse", "hot iron from the smithy", "cinnamon and old books", "fried fish and river water",
+      "lamp oil and warm wool", "crushed mint underfoot", "bread, tar and rain", "something sweet frying somewhere", "fresh paint and drying herbs"
+    ],
+    "sound_town": [
+      "hammers ringing from three directions", "children arguing about the rules of a game", "a bard tuning, badly, in a doorway",
+      "cartwheels on cobbles", "bells, near and far, never quite agreeing", "a market seller shouting a price that kept dropping",
+      "the low steady drone of the smithy bellows", "somebody laughing at a window", "water slapping the quay",
+      "boots, and more boots, and a dog barking at the boots"
+    ],
+    "sound_wild": [
+      "a long way off, a wolf that was probably only a dog", "branches tapping like patient fingers", "the river muttering over stones",
+      "an owl out of season", "wind in tall grass like a crowd whispering", "nothing at all, which was worse",
+      "somewhere far, thunder trying out its voice", "frogs, in tens of thousands"
+    ],
+    "crowd_mood": [
+      "a crowd that could not decide whether to cheer or run", "a hush with a hundred people in it", "faces pale and shining",
+      "a muttering ring of neighbours", "grown-ups pretending they were not afraid", "folk standing closer than strangers usually do",
+      "a restless little knot of onlookers"
+    ],
+    "elder": [
+      "an old Chog with a stick and a long memory", "a grey-whiskered gaffer on a bench", "the town's oldest baker, powdered to the elbows",
+      "a retired sergeant with one boot and many opinions", "a granny shelling peas who missed nothing", "the ferry keeper, who had seen every kind of trouble twice",
+      "a stooped scribe holding a candle stub"
+    ],
+    "child_remark": [
+      "A small child tugged somebody's sleeve and asked whether the monsters were hungry.",
+      "A child on a wall announced, to nobody, that she would be the Hero one day, and that she would bring biscuits.",
+      "Somewhere a boy was explaining the entire war to a bored goose.",
+      "A girl with a wooden sword and a loose tooth was already giving orders.",
+      "Two small children were rehearsing the Demon King's death scene with great gusto and no mercy."
+    ],
+    "tremble": [
+      "felt their knees consider an alternative plan", "swallowed hard", "felt a cold finger run down their back",
+      "found their paws were damp", "felt their stomach drop like a dropped plate", "heard their own heart in their ears"
+    ],
+    "grin": [
+      "grinned, which was brave of them", "gave a lopsided smile", "laughed, a little too loudly", "smiled in spite of themselves",
+      "allowed themselves the smallest, most dangerous hope", "grinned like someone who had not read the warnings"
+    ],
+    "go_quiet": [
+      "went quiet", "said nothing for a long moment", "looked away, and then back", "let the silence do the talking",
+      "stared at their boots with great attention", "let out a breath they had been holding for a season"
+    ],
+    "deep_breath": [
+      "took a deep breath", "squared their shoulders", "tightened the strap of their pack", "straightened their collar, which helped nobody",
+      "wiped their paws on their coat", "shook out their hands, the way you do before a long job"
+    ],
+    "walk_on": [
+      "They set off down the road", "They walked on", "The road took them onward", "They went on, because that was what there was to do",
+      "They pressed on through the day", "Step by step, they went on", "They left the town behind them, and the road opened"
+    ],
+    "meanwhile": [
+      "Meanwhile, elsewhere in Monadia,", "Far from there,", "On the other side of the continent,", "In the same hour, a long way off,",
+      "At that very moment, across the map,", "Not far away, and not for long,"
+    ],
+    "later": [
+      "Some days after,", "A little later,", "By the end of that week,", "Before the next full moon,", "In the days that followed,", "Once the dust had settled,"
+    ],
+    "demon_pack": [
+      "a ragged line of imps, all teeth and pitchforks", "dark knights marching as if the ground owed them", "a swarm of grinning imps with a battering ram made of furniture",
+      "cultists in hoods, chanting something that made the candles lean", "a column of dark knights under a banner of torn black cloth",
+      "imps in stolen aprons, carrying stolen pies", "a cart of cultists, singing in a very bad key", "a shuffling, snickering mob with torches and bad intentions"
+    ],
+    "dread_line": [
+      "Every light in the street seemed to lean away from it.", "The dogs stopped barking, which was worse than barking.",
+      "Somewhere a shutter slammed, and then another, like a row of sleeping eyes closing.",
+      "Even the wind seemed to hold its breath.", "A chill rolled down the street like a dropped bucket of water.",
+      "The air tasted of coins and old smoke."
+    ],
+    "battle_sound": [
+      "steel on steel and a great deal of shouting", "the thud of shields and the rattle of spears", "a wall of noise that left no room for thought",
+      "a clatter of pots, pans and one very angry goose", "a roar from the walls that shook the lanterns"
+    ],
+    "wound_line": [
+      "tied a strip of cloth around a cut and carried on", "winced, spat, and went back in", "held a sleeve against a bleeding scratch and said it was nothing",
+      "limped on with a smile that fooled nobody", "sat down very suddenly and was handed a mug of something hot"
+    ],
+    "hope_line": [
+      "It was only a little hope, but it was the sort that spreads.", "Something in the room shifted, and nobody could say what.",
+      "For the first time in a long while, somebody laughed without looking over a shoulder.", "It felt, just for a moment, as though the odds had changed.",
+      "A small light, not a big one, but one that kept burning.", "Hope, it turns out, is contagious, and nobody had had their shots."
+    ],
+    "proverb": [
+      "The road is always longer behind you than in front.", "Even a long night ends in a morning.", "A small hand can still hold a lamp.",
+      "One brave foolishness is worth ten careful regrets.", "What is shared is lighter.", "No one is a Hero before breakfast.",
+      "A stone is the same stone until the day it's thrown.", "Courage is a habit, like brushing your teeth.",
+      "Even dragons were small once, and probably embarrassed about it.", "There is no map for the part you walk alone."
+    ],
+    "guild_clerk": [
+      "the guild clerk, a very thin Chog with a very large stamp", "a clerk with ink to the elbows and a face like a closed ledger",
+      "the harassed clerk behind the counter, who had been promised a quiet season", "a clerk whose spectacles had seen things",
+      "the guildmaster's deputy, a Chog who ranked quests by how likely they were to ruin a Tuesday"
+    ],
+    "board_notice": [
+      "\"Wanted: brave Chogs, or lightly brave ones, for the river road.\"",
+      "\"Rats in the cellar. They are polite, but they have organised.\"",
+      "\"Lost: one cart, one mule, one very good mood. Reward negotiable.\"",
+      "\"Escort wanted for a baker and a very nervous wedding cake.\"",
+      "\"Anyone who has seen a dungeon, please come and tell us honestly what is in it.\"",
+      "\"Cleansing: one haunted wash-house. Bring a mop and your sense of humour.\"",
+      "\"Herbs, urgently, for a cold that has become an epidemic of sniffling.\"",
+      "\"Scouts wanted. Must be able to run, hide and sulk.\""
+    ],
+    "inn_scene": [
+      "a low room full of steam and elbows", "a corner table lit by a single candle", "a fire that popped like a quiet argument",
+      "a long table of strangers passing a single loaf", "an inn so crowded that the cat had to stand", "a back room smelling of apples and wet coats",
+      "a loft room under a roof that sang when it rained"
+    ],
+    "temple_scene": [
+      "the temple, small and warm and smelling of wax", "rows of candles flickering like a field of tiny stars", "a long, low hall where healers moved like patient herons",
+      "cots lined up under a window where frost was losing its argument", "an altar heaped with offerings of bread and spare buttons"
+    ],
+    "road_scene": [
+      "a road of packed earth and old ruts", "a track between two walls of drowsing hedge", "a causeway over wet fields", "a cobbled road with grass in its teeth",
+      "a long white road under a long grey sky", "a path that ran beside a stream and refused to explain itself", "a ridge trail with the whole country spread below"
+    ]
+  }
+}

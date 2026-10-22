@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "hidden.premise", "arc": "hidden", "trigger": "season_start", "slot": "premise", "title": "The Quest Nobody Else Could See",
+      "variants": [
+        { "text": "It arrived while {w1} was sweeping the floor.\n\nA ping, like a bell struck underwater. A line of gold text, hanging in the air at the corner of the eye, in a script too fine and too old to be a Status Window. It said:\n\n*NEW QUEST. YOU HAVE BEEN CHOSEN.*\n*OBJECTIVE: SURVIVE THE DAY.*\n*REWARD: ONE LEVEL.*\n\n“What?” said {w1}. The broom fell. The text did not move. Nobody else in the room looked up, and {w1} understood, with a cold, crawling feeling, that nobody else could see it.\n\nThe quest was ridiculous. Survive the day. It was a Tuesday, and a quiet one. But by dusk, when the first demon came through the south gate, {w1} understood why it had been worded that way." },
+        { "text": "The stars choose strangely.\n\nThere were a thousand brighter, braver, stronger Chogs in Monadia that season, and the Constellations passed over every one of them. Their light came down on a {w1job} named {w1}, in a small room in {w1home}, at three in the morning, as they slept.\n\nIn the morning there was a line of gold text in the air, and it said, in a handwriting like the curl of a leaf: *Hello. We have a quest for you. We are sorry about the short notice.*\n\n{w1} stared at it for a long time. “Is this a dream?” they said, aloud.\n\n*No,* said the text, politely. *It is a ledger.*" }
+      ]
+    },
+    {
+      "id": "hidden.rules", "arc": "hidden", "trigger": "season_start", "after": ["hidden.premise"], "title": "How the Quest Log Works",
+      "variants": [
+        { "text": "The Quest Log had rules, and {w1} learned them one at a time, mostly by breaking them.\n\nRule one: it only showed what the stars wished. Rule two: each quest had a reward, a deadline, and a risk, and the risk was never written down. Rule three: you could not tell anyone. This was less a prohibition than a fact; when {w1} tried to describe the Log to {w2}, their words came out as weather. Rule four: the quests were always, and in every case, just a little bit too big.\n\n“Why me?” said {w1}, one night, to the ceiling.\n\n*WE DO NOT KNOW,* said the Log, and then, after a pause: *WE LIKED THE WAY YOU SWEPT.*" }
+      ]
+    },
+    {
+      "id": "hidden.star", "arc": "hidden", "trigger": "progress_10", "after": ["hidden.rules"], "slot": "ally", "sets": ["star"], "title": "A Star Speaks",
+      "variants": [
+        { "text": "The first time a star spoke aloud, {w1} was in a ditch.\n\n“Ahem,” said the sky. {w1} looked up. Between two clouds hung a single bright point of light, twinkling a little nervously. “Sorry,” said the star. “I'm not very good at this. I'm {giftSponsor|a Constellation}. I'm the one who chose you.”\n\n“You *chose* me?”\n\n“Don't take it personally. We had a list.”\n\n“Was I last?”\n\n“No!” The star flickered. “You were... you were seventh. Out of eight. But the seventh is a very good place. It's where the quiet ones are.” It paused. “I think you're going to be great. I'm sorry about the ditch.”" }
+      ]
+    },
+    {
+      "id": "hidden.rival", "arc": "hidden", "trigger": "progress_10", "after": ["hidden.rules"], "slot": "ally", "sets": ["rival_log"], "title": "The Other Log",
+      "variants": [
+        { "text": "{cand1} saw it first: the gold on the edge of {w1}'s vision, the flicker of the eyelid.\n\n“You have one too,” said {cand1}, slowly. “A Log. Don't pretend you don't.”\n\n{w1}, who had been about to pretend exactly that, closed their mouth.\n\n“I thought I was the only one,” said {cand1}. “I thought it was a curse. Now I find there's a second, and she looks like a baker.” They laughed, a short, startled sound. “Well. At least it's company.”\n\nThey compared Logs for an hour, in a corner of the tavern. The two of them had been given the same quest, from different stars, in different words. Neither of them could see why, until later." }
+      ]
+    },
+    {
+      "id": "hidden.daily", "arc": "hidden", "trigger": "progress_20", "after": ["hidden.rules"], "title": "Daily Quest",
+      "variants": [
+        { "text": "Every morning at six the Log chimed.\n\n*DAILY QUEST: HAUL TWENTY BUCKETS.*\n*DAILY QUEST: RUN TO {townA} AND BACK.*\n*DAILY QUEST: SPAR WITH SOMEONE BETTER THAN YOU.*\n\n{w1} did them all. Grumbling, aching, wishing the stars had picked a hobby that involved sitting, {w1} hauled and ran and sparred. For weeks nothing seemed to change. Then, one morning, the Log chimed in a different tone.\n\n*LEVEL UP. LEVEL {heroLevel|5}.*\n\n{w1} looked at their hands. They were callused, brown, a little scarred. They looked like someone else's. They looked like someone who could do things.\n\n“Huh,” said {w1}, quietly, and went to find breakfast." }
+      ]
+    },
+    {
+      "id": "hidden.penalty", "arc": "hidden", "trigger": "progress_30", "after": ["hidden.rules"], "slot": "twist", "sets": ["penalty"], "weight": 2, "title": "The Penalty Quest",
+      "variants": [
+        { "text": "The Log had a darker side, and {w1} found it on the thirtieth part of the season.\n\n*YOU HAVE FAILED A DAILY QUEST. PENALTY QUEST ISSUED.*\n*OBJECTIVE: SPEND A NIGHT IN THE HOLLOW.*\n*FAILURE: ???*\n\nThe Hollow was the one place in Monadia that nobody visited after dusk. The lore called it a place of old bones and older eyes. {w1} sat on their bed for an hour, staring at the gold, and then picked up a lantern and went.\n\nWhat happened there, {w1} would never fully say. Only that they returned at dawn, white-haired at the temples, and changed. And the Log said, in a very soft script: *WE ARE SORRY. WE DID NOT KNOW IT WOULD BE SO BAD.*" }
+      ]
+    },
+    {
+      "id": "hidden.truth", "arc": "hidden", "trigger": "progress_30", "after": ["hidden.rules"], "slot": "twist", "sets": ["truth"], "weight": 1, "title": "What the Stars Are",
+      "variants": [
+        { "text": "The stars were people.\n\nThat was the thing {w1} learned in the thirtieth part of the season, from a stray line of text that slipped through when a Constellation's attention wavered. *They are asleep,* the Log wrote, absently, as if talking to itself. *Most of them. We are the ones who remember.*\n\n“Remember what?” said {w1}.\n\nThere was a long, uncomfortable pause. *The world was bigger once,* said the Log. *There were a great many of us. We chose a great many heroes. We lost most of them. You are one of the last. We are very sorry to ask so much.*\n\n{w1} sat down in the street. “I'm not a hero,” they said. “I'm a {w1job}.”\n\n*YES,* said the Log. *THAT IS WHAT WE LIKED.*" }
+      ]
+    },
+    {
+      "id": "hidden.final_quest", "arc": "hidden", "trigger": "progress_55", "after": ["hidden.rules"], "title": "The Quest at the Bottom of the Log",
+      "variants": [
+        { "text": "At the fifty-fifth part of the season the Log chimed in a different voice.\n\n*FINAL QUEST UNLOCKED.*\n*OBJECTIVE: STAND IN FRONT OF THE DEMON KING.*\n*REWARD: ???*\n*FAILURE: ???*\n\n“No,” said {w1}, aloud, and the word was swallowed by the air. “I'm not ready. I'm not strong enough. I've seen what's in the black hill.”\n\n*WE KNOW,* said the Log, very gently. *WE ARE NOT ASKING YOU TO WIN. WE ARE ASKING YOU TO STAND.*\n\n“What difference does it make?”\n\n*A GREAT DEAL,* said the Log. *YOU WILL NOT BE ALONE.* And behind {w1}, on the road, one after another, other gold lights began to appear: {cand1}'s, {cand2}'s, {cand3}'s, a hundred, a thousand, all the little hidden Logs of Monadia, glittering like a dawn." }
+      ]
+    },
+    {
+      "id": "hidden.march", "arc": "hidden", "trigger": "phase_3", "title": "Everyone Has One",
+      "variants": [
+        { "text": "It turned out that everyone had a Log.\n\nNot the same kind. Some were silver, some were blue, one was written entirely in poetry. But as the column wound up the black hill, one Chog after another admitted it, in low voices, around the fires at night. *I've got a quest.* *Me too.* *Mine's to carry a message.* *Mine's to hold a door.*\n\n“We're all just playing our little parts,” said {cand1}, thoughtfully. “And none of us knew the others were.”\n\n“That's rather the point,” said {w1}. “Nobody knows what the whole thing looks like. We just do the bit in front of us.”\n\nAbove them, the stars were very bright, and, if you listened, very quiet." }
+      ]
+    },
+    {
+      "id": "hidden.final", "arc": "hidden", "trigger": "hero", "after": ["hidden.march"], "title": "Quest Complete",
+      "variants": [
+        { "text": "It was {hero} who landed the blow, and it was, in every sense that matters, the work of a whole sky.\n\nA hundred stars, a thousand, burned that night as they never had. Every Log in Monadia chimed at once. And in the throne room, as {king} fell, a single line of gold text appeared in front of every Chog on the black hill:\n\n*QUEST COMPLETE.*\n*REWARD: ONE WORLD.*\n\nIt was the biggest reward the stars had ever offered. It was also, said {w1}, afterwards, wiping their face, a bit of a joke. “You can't give someone a world. They already have one.”\n\n*YES,* said the Log, very softly. *BUT NOW IT IS YOURS.*" }
+      ]
+    },
+    {
+      "id": "hidden.ending", "arc": "hidden", "trigger": "season_end", "after": ["hidden.final"], "title": "Epilogue: The Last Line",
+      "variants": [
+        { "text": "The next morning there was no gold in the air.\n\n{w1} lay in bed for a long while, waiting for the chime. It did not come. The Log, it seemed, was finished. The stars had gone back to their quiet business, high and far off and slow.\n\nThen, at six o'clock, with a very faint sound, like the sound of someone clearing their throat very politely, a single line of gold text appeared at the edge of the world.\n\n*DAILY QUEST: HAVE BREAKFAST.*\n*REWARD: A GOOD DAY.*\n\n{w1} smiled. And got up. And did." }
+      ]
+    }
+  ]
+}

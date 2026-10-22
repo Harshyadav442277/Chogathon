@@ -1,0 +1,63 @@
+{
+  "nodes": [
+    { "id": "life.bond.companion", "section": "bonds", "slot": "b_companion", "order": 1, "requires": "companion", "variants": [
+      { "text": "Their most loyal companion this season is {companion}: {#companionN time/times} they have set out together. They bicker about directions, about food, about whose turn it is to be sensible, and they would, either of them, walk through fire for the other, if only to complain about it afterwards." },
+      { "text": "If you want to find {a}, look for {companion}. They are rarely far apart: {#companionN quest/quests} shared so far, and a long, quiet kind of understanding that needs no explanation. {companion} knows how {a} takes their tea. {a} knows what {companion} sings in the rain." },
+      { "text": "{a} and {companion} met by accident and kept meeting by choice. {#companionN party/parties} on the road have turned the two into a team, and the team into something rarer, a pair of people who finish each other's silences." } ] },
+    { "id": "life.bond.rival", "section": "bonds", "slot": "b_rival", "order": 2, "requires": "rival", "variants": [
+      { "text": "Then there is {rival}. Nobody in {home} can say how it started, but {a} and {rival} have been trading bouts, boasts and sidelong glances all season. They call it practice. The town calls it a rivalry. Each, in private, calls the other *the best I've fought.*" },
+      { "text": "{a} would never admit it, but {rival} is the reason they train as hard as they do. Every morning, in the yard, there is {rival}, doing one more lap, one more bout. {a} sighs, puts on their boots, and does two." } ] },
+    { "id": "life.bond.nemesis", "section": "bonds", "slot": "b_nemesis", "order": 3, "requires": "nemesis", "variants": [
+      { "text": "And somewhere in the dark of a dungeon is {nemesis}, who has knocked {a} down more than once. {a} does not speak of it. But in the evenings, they sharpen their blade with a very particular care, and a small, set, patient look." },
+      { "text": "There is one name {a} says differently from all the others: {nemesis}. It is a flat, quiet sort of name, the way you say the name of a debt. {a} intends, one day, to pay it." } ] },
+    { "id": "life.bond.sponsor", "section": "bonds", "slot": "b_sponsor", "order": 4, "requires": "sponsor", "variants": [
+      { "text": "A Constellation, {sponsor}, has taken an interest in {a}. Nobody can say what they see, but the gifts have come, small and perfect, at just the right moments. {a} looks up at night sometimes and says, softly, “thank you.”" } ] },
+    { "id": "life.bond.friend", "section": "bonds", "slot": "b_friend", "order": 5, "requires": "friend && !companion", "variants": [
+      { "text": "{a} has a friend in {friend}, a casual, easy, afternoon sort of friendship that began over a trade and never ended. They swap news, tools and the occasional joke. It is the kind of friendship nobody notices until it is missing." } ] },
+    { "id": "life.bond.alone", "section": "bonds", "slot": "b_alone", "order": 6, "requires": "!companion && !rival && !friend && !nemesis", "variants": [
+      { "text": "{a} keeps to themselves, for now. It is not that they dislike company. They are simply new, and shy, and waiting for the right person to knock. When they do, {a} has a kettle on." },
+      { "text": "No close friend yet, and no enemy either. {a} walks a quiet road this season. It is a good road for thinking, and {a} has done a great deal of it." } ] },
+
+    { "id": "life.rumor.kind", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Kind || temper=Gentle || temper=Humble || temper=Loyal", "variants": [
+      { "text": "People say {a} is the sort who will give you the last of the bread and then apologise for it being stale. People say there is not a stray in {home} that doesn't know their step." } ] },
+    { "id": "life.rumor.proud", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Proud || temper=Boastful || temper=Showy || temper=Dramatic", "variants": [
+      { "text": "They say {a} polishes their boots before every quest, and tells the same story about the same ogre in three different inns, with three different ogres. Nobody minds. It's a very good story, and each ogre is bigger." } ] },
+    { "id": "life.rumor.sly", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Sly || temper=Mischievous || temper=Thrifty", "variants": [
+      { "text": "There is a rumour that {a} once talked a dragon out of a hoard, and a bank out of a loan, and a baker out of an extra bun, all in the same week. {a} says they simply asked politely." } ] },
+    { "id": "life.rumor.brave", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Brave || temper=Reckless || temper=Competitive || temper=Stubborn", "variants": [
+      { "text": "The talk in the taverns is that {a} has never once turned back from a door. They say that if you told {a} a dungeon was haunted, they'd ask how many floors." } ] },
+    { "id": "life.rumor.calm", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Stoic || temper=Wise || temper=Patient || temper=Practical || temper=Cautious", "variants": [
+      { "text": "They say you can hand {a} a storm, a mob or a baby, and they will give back the same steady, unhurried look. It is thought to be a gift. It might just be that {a} has already worked out three ways to survive it." } ] },
+    { "id": "life.rumor.odd", "section": "rumors", "slot": "r1", "order": 1, "requires": "temper=Dreamy || temper=Curious || temper=Romantic || temper=Anxious || temper=Superstitious || temper=Restless || temper=Lazy || temper=Grumpy || temper=Cheerful || temper=Honest", "variants": [
+      { "text": "{a} is known in {home} mostly for one thing: {quirk}. It started as an oddity and became a trademark, and now people would be disappointed if they stopped." } ] },
+
+    { "id": "life.rumor.dream", "section": "rumors", "slot": "r2", "order": 2, "variants": [
+      { "text": "Ask {a} what they really want, and eventually, after a long pause and a cup of something warm, they will tell you: {dream}. They have not said so to many people. Please don't tell." },
+      { "text": "Somewhere under all the quests and the work, {a} has a quiet dream: {dream}. They talk about it only at night, and only to the fire." } ] },
+    { "id": "life.rumor.fear", "section": "rumors", "slot": "r3", "order": 3, "chance": 0.8, "variants": [
+      { "text": "Everyone is afraid of something. {a}'s thing is {fear}. They do not let it stop them. They just carry it, the way you carry a stone in your boot: noticed, tolerated, never allowed to win." },
+      { "text": "{a} will walk into a dungeon without a flinch, but ask them about {fear}, and you will see the colour leave their face. Nobody has teased them for it. Not twice." } ] },
+    { "id": "life.rumor.secret", "section": "rumors", "slot": "r4", "order": 4, "chance": 0.6, "variants": [
+      { "text": "And there is a whisper about {a}, which they have never confirmed or denied: that {secret}. Make of it what you will." },
+      { "text": "It is said, in the way that things are said in towns, that {a} {secret}. Nobody knows the truth. Everybody has an opinion." } ] },
+    { "id": "life.rumor.food", "section": "rumors", "slot": "r5", "order": 5, "chance": 0.7, "variants": [
+      { "text": "On the subject of food, {a} is firm: {food}, above all else. They have a favourite stall, a favourite hour, and a favourite excuse for going back." },
+      { "text": "Nothing makes {a} happier than {food}. Put some in front of them and watch the whole hard, careful face come undone. It is the best way to make a friend of them, and everybody knows it." } ] },
+    { "id": "life.rumor.hobby", "section": "rumors", "slot": "r6", "order": 6, "chance": 0.7, "variants": [
+      { "text": "In the evenings, {a} can be found {hobby}. They are rather good at it, and rather quiet about it, which is how the best hobbies are kept." } ] },
+    { "id": "life.rumor.motto", "section": "rumors", "slot": "r7", "order": 7, "chance": 0.8, "variants": [
+      { "text": "{a}'s motto, stitched on the inside of their coat where no one but them can see it, reads: “{motto}” They say it is the only advice they ever needed." },
+      { "text": "If you ask {a} how they got through the season, they say: “{motto}” And then they shrug, as if it explains everything. It might." } ] },
+
+    { "id": "life.legacy.first", "section": "legacy", "slot": "legacy", "order": 1, "requires": "seasonsPast=0", "variants": [
+      { "text": "This is {a}'s first season in Monadia. Everything is new, and the story has barely begun. What they will be, whom they will meet, how it ends: none of it is written. That is the best part." } ] },
+    { "id": "life.legacy.few", "section": "legacy", "slot": "legacy", "order": 1, "requires": "seasonsPast>=1 && seasonsPast<=3", "variants": [
+      { "text": "{a} has lived {#seasonsPast season/seasons} in Monadia before this one. Each time, the world gave them a new calling and a new road. They have begun, slowly, to see the shape behind it all: that every life is the same river, running through different country." } ] },
+    { "id": "life.legacy.many", "section": "legacy", "slot": "legacy", "order": 1, "requires": "seasonsPast>=4", "variants": [
+      { "text": "{seasonsPast} past lives sit behind {a}: {pastJobs}. A very old soul, as the folk in the temples say. {a} does not remember each one in detail, but now and then a smell, a song, or a stranger's face will unlock something, and they will stand perfectly still for a moment, as if listening." } ] },
+    { "id": "life.legacy.hero", "section": "legacy", "slot": "legacy2", "order": 2, "requires": "heroSeasons>=1", "weight": 3, "variants": [
+      { "text": "{a} has been the Hero before: {#heroSeasons time/times}. It is the kind of thing that does not wear off. Old soldiers nod at them in the street. Bards ask for permission, and then write the verse anyway." } ] },
+    { "id": "life.legacy.slayer", "section": "legacy", "slot": "legacy2", "order": 2, "requires": "pastSlays>=1", "weight": 2, "variants": [
+      { "text": "In a previous life, {a} broke a seal: {#pastSlays seal/seals} in all. It is carved on a stone somewhere. They don't go and look, but they know it is there." } ] }
+  ]
+}

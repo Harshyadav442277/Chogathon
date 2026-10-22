@@ -1,0 +1,83 @@
+{
+  "nodes": [
+    { "id": "int65.drill", "trigger": "progress_65", "slot": "int65", "chance": 0.9, "title": "Interlude: The Drill",
+      "variants": [
+        { "text": "{j_soldier} drilled the recruits in the yard at {townA}: left, right, left, spear, shield, spear. “Again!” The recruits, who included two bakers and a poet, did it again. “Again!” By sunset they could do it without tripping. “That,” said {j_soldier}, gruffly, “is the nicest thing I've ever seen.” They went inside, and, when no one was looking, wiped their eyes." } ] },
+    { "id": "int65.flowers", "trigger": "progress_65", "slot": "int65", "chance": 0.9, "title": "Interlude: Wreaths",
+      "variants": [
+        { "text": "{j_florist} wove wreaths all week, hundreds of them, from whatever would grow in the thawing ground. Some were for the walls. Some were for the temple. Some, small and quiet and tied with red thread, were for no reason that {j_florist} would explain. In the evenings, people came and took them away, and brought them back, one by one, to places that had lost someone." } ] },
+    { "id": "int65.horse", "trigger": "progress_65", "slot": "int65", "chance": 0.9, "title": "Interlude: The Stubborn Steed",
+      "variants": [
+        { "text": "{j_stablehand} had been given a horse to break, and the horse had other ideas. For nine days they stood in the paddock at {townB}, eye to eye, neither giving ground. On the tenth, a child wandered in, put out a hand, and was nuzzled. {j_stablehand} said nothing. They simply took the saddle off the fence and let the child, quite unexpectedly, show them how it was done." } ] },
+    { "id": "int65.mage", "trigger": "progress_65", "slot": "int65", "chance": 0.9, "title": "Interlude: A Lesson in Magic",
+      "variants": [
+        { "text": "“Magic,” said {j_mage_teacher}, to a class of twenty small Chogs, “is just paying attention in a very particular way.” They lit a candle with a thought, and twenty mouths dropped open. “Now you.” Twenty small faces screwed up. Nothing happened. Then, at the back, a candle lit. Then another. The teacher beamed. Outside, in the thawing street, the first real birds of the season were singing." } ] },
+    { "id": "int65.gossip", "trigger": "progress_65", "slot": "int65", "chance": 0.9, "title": "Interlude: What They Said About the King",
+      "variants": [
+        { "text": "The market whispered. “They say {king} has not slept.” “They say he cries.” “They say the black glass is cracking from the inside.” “They say it's all a clever trick.” Nobody knew which was true. But the rumours, passed from stall to stall, had a curious effect: the more they were told, the less frightening the Demon King became, until at last a small boy asked, in a perfectly ordinary voice, “Do you think he's lonely?”" } ] },
+
+    { "id": "int70.census", "trigger": "progress_70", "slot": "int70", "chance": 0.9, "title": "Interlude: The Census",
+      "variants": [
+        { "text": "{j_administrator} counted. It was the work of a fortnight: every household, every hearth, every barn. At the end of it was a figure: {chogs} souls in Monadia, give or take a goose. “It's a number,” said {j_administrator}, tapping the page. “But if you look at it right, it's also a list of everyone who has a reason to keep going.” They had the figure engraved on a plaque and hung it in the guild hall." } ] },
+    { "id": "int70.jewel", "trigger": "progress_70", "slot": "int70", "chance": 0.9, "title": "Interlude: A Small Seal",
+      "variants": [
+        { "text": "{j_jeweler} carved a tiny seal from a chip of moonstone, no bigger than a thumbnail. On it was a lantern, and around it, a ring of stars. “For the Hero,” said {j_jeweler}. “So they know whose they are.” They hung it on a thread and gave it to the guild clerk, to hold until it was needed, and the clerk put it in a drawer, and checked on it every morning." } ] },
+    { "id": "int70.bridge", "trigger": "progress_70", "slot": "int70", "chance": 0.9, "title": "Interlude: The Bridge",
+      "variants": [
+        { "text": "The old bridge at {townA} had washed out in the spring. {j_carpenter} rebuilt it in nine days with a crew of volunteers, a mountain of timber, and a great deal of tea. On the tenth, they laid the last plank. The first to cross was a very old Chog on a stick, who walked slowly to the middle, stopped, looked down at the river, and said, “Well. That's a good bridge.” {j_carpenter} thought it was the finest review they'd ever had." } ] },
+    { "id": "int70.inn", "trigger": "progress_70", "slot": "int70", "chance": 0.9, "title": "Interlude: The Innkeeper's Tale",
+      "variants": [
+        { "text": "On the wettest night of the season, {j_innkeeper} told the story of the first guest the inn had ever had. “A tall one,” they said, polishing a cup. “Silent. They sat by the fire, drank nothing, left a coin that turned out to be made of glass.” The room was very still. “I never found out who it was,” said {j_innkeeper}, “but I like to think they liked the soup.”" } ] },
+    { "id": "int70.ghost", "trigger": "progress_70", "slot": "int70", "chance": 0.9, "title": "Interlude: The Polite Ghost",
+      "variants": [
+        { "text": "The ghost in the wash-house of {townB} had been there for years. It was polite. It folded the towels. It never scared anyone, apart from the one time it sneezed. When the guild sent a party to cleanse the place, the party found the ghost in the middle of the room, standing at attention with a mop. “Hello,” said the ghost. “I've been waiting for someone to ask.” They had a cup of tea, and the ghost moved on at dawn, smiling." } ] },
+
+    { "id": "int80.truce", "trigger": "progress_80", "slot": "int80", "chance": 0.9, "title": "Interlude: A Night Without Swords",
+      "variants": [
+        { "text": "For one night, on the black hill, the fighting stopped. Nobody called it. A dark knight put down a spear, and a baker put down a ladle, and the two of them sat on the same log on the same cold hillside, and shared a flask. Nothing was said about it afterwards. In the morning, the war went on. But a few of them looked at each other, now and then, with a faint, odd recognition." } ] },
+    { "id": "int80.armor", "trigger": "progress_80", "slot": "int80", "chance": 0.9, "title": "Interlude: The Armour",
+      "variants": [
+        { "text": "{j_armorsmith} worked until the forge burned out. “It's not very pretty,” said {j_armorsmith}, holding up the last breastplate of the batch. It wasn't. It was dented and uneven and plain. But it was strong, and it fit, and when the soldier put it on, their shoulders dropped a little, as if somebody had taken off a weight. “That,” said {j_armorsmith}, “is all I ever wanted from it.”" } ] },
+    { "id": "int80.blade", "trigger": "progress_80", "slot": "int80", "chance": 0.9, "title": "Interlude: The Edge",
+      "variants": [
+        { "text": "{j_weaponsmith} tested every blade by hand, personally, before sending it to the front. “If I wouldn't hold it, why would they?” they said, brushing aside the apprentices. One blade rang a sour note against the anvil. {j_weaponsmith} put it back in the fire, grumbling, and started again. It is said that not a single sword from that forge ever broke in battle that season." } ] },
+    { "id": "int80.fever", "trigger": "progress_80", "slot": "int80", "chance": 0.9, "title": "Interlude: The Fever",
+      "variants": [
+        { "text": "A fever went through {townA} in the eightieth part of the season. It was not deadly, merely tedious: aching joints, bad tempers, and a sort of grumpy delirium in which people shouted at furniture. {j_alchemist} brewed a tonic that tasted like a wet shoe. It worked. The town recovered by Thursday, all of them cross, and all of them grateful, and nobody said so." } ] },
+    { "id": "int80.letter", "trigger": "progress_80", "slot": "int80", "chance": 0.9, "title": "Interlude: The Last Letters",
+      "variants": [
+        { "text": "{j_courier} was given a stack of letters at the foot of the black hill, each one sealed, each one addressed in a shaky, serious hand. “To be delivered,” said the sergeant, “if.” {j_courier} nodded, and put them carefully in the satchel, next to their heart, and said, quite steadily: “They'll never be needed.” Neither of them quite believed it, but the saying helped." } ] },
+
+    { "id": "int85.tank", "trigger": "progress_85", "slot": "int85", "chance": 0.9, "title": "Interlude: The Vow of the Shield",
+      "variants": [
+        { "text": "{j_tank} stood at the front of the line and took the blows, and did not move. “It's not courage,” they said, afterwards, to a worried friend. “It's just that if I step back, someone else has to step forward.” They were bandaged twice that week. Both times they went straight back to the line, and both times it was the same slow, patient, immovable thing: standing." } ] },
+    { "id": "int85.support", "trigger": "progress_85", "slot": "int85", "chance": 0.9, "title": "Interlude: Small Kindnesses",
+      "variants": [
+        { "text": "{j_support} did a hundred small things in a day that nobody noticed: a cup of water here, a strap tightened there, a word at the right moment. Nobody sang about it. Nobody put it in a ledger. But a long line of Chogs went up the black hill that week, a little less afraid than they might have been, and could not have told you why." } ] },
+    { "id": "int85.buffer", "trigger": "progress_85", "slot": "int85", "chance": 0.9, "title": "Interlude: The Blessing",
+      "variants": [
+        { "text": "{j_buffer} sat by the roadside, laid their paws on each passing Chog's shoulder, and murmured a few quiet words. There was no flash, no glory, just a faint warmth that settled in the shoulders and stayed. “What did you say?” asked a soldier. “Nothing special,” said {j_buffer}. “Only that you're allowed to be afraid, and also you can do it.”" } ] },
+    { "id": "int85.last_verse", "trigger": "progress_85", "slot": "int85", "chance": 0.9, "title": "Interlude: The Last Verse",
+      "variants": [
+        { "text": "{j_bard} wrote the final verse of the season's song on the back of a ration tin, in the firelight, with a charred stick. It was short. It did not rhyme. It said: *They were afraid and they went anyway.* The bard looked at it for a long time, nodded, and began to teach it to the nearest soldier, and the soldier taught the next." } ] },
+    { "id": "int85.healer_night", "trigger": "progress_85", "slot": "int85", "chance": 0.9, "title": "Interlude: A Long Night in the Temple",
+      "variants": [
+        { "text": "<temple_scene>. {j_healer} moved from cot to cot, in the guttering light, with a bowl of warm water and a pile of clean cloth. Nobody spoke much. A young Chog, bandaged from head to foot, whispered, “Will we win?” {j_healer} wrung out a cloth. “I don't know,” they said. “But I know you will get breakfast.”" } ] },
+
+    { "id": "int90.nerves", "trigger": "progress_90", "slot": "int90", "chance": 0.9, "title": "Interlude: Nerves",
+      "variants": [
+        { "text": "{j_main_dps} could not eat. They sat at the camp fire turning a spoon over and over in their paws, and the others, who knew better than to say anything, shuffled up to make room. “What if I miss?” said {j_main_dps}, at last. “Then we'll be there,” said {j_sub_dps}, and put a piece of bread in their hand. It was enough." } ] },
+    { "id": "int90.game", "trigger": "progress_90", "slot": "int90", "chance": 0.9, "title": "Interlude: The Children's Game",
+      "variants": [
+        { "text": "In the streets of {townA}, the children had invented a new game. It was called Hero. One of them was the Demon King, and stood on a barrel. The others were the Hero, all at once, and charged. “You can't all be the Hero!” cried the one on the barrel. “We can,” said the others. “It's the rule.” The barrel was toppled, to cheers. The grown-ups, passing, stopped to watch." } ] },
+    { "id": "int90.dispatch", "trigger": "progress_90", "slot": "int90", "chance": 0.9, "title": "Interlude: The Last Dispatch",
+      "variants": [
+        { "text": "The final dispatch of the war went out by courier at dawn. It contained, in a clerk's tight hand, the order of march, the name of every officer, and at the end, in a hurried scrawl, a postscript: *Good luck. We are all proud.* {j_courier} read it twice at the gate, then put it in their coat and ran." } ] },
+
+    { "id": "int95.eve", "trigger": "progress_95", "slot": "int95", "chance": 1, "title": "Interlude: The Night Before",
+      "variants": [
+        { "text": "<night>, the camp at the foot of the black hill was quiet. Nobody sang. Nobody drank much. They sat in small circles round small fires, eating whatever {j_cook} had managed, and talking of anything but tomorrow: of home, of old friends, of the best soup they'd ever had. <sound_wild>. Above them the stars burned patiently. “Whatever happens,” said somebody, “I'm glad it was you.” Nobody answered, but a dozen small hands found a dozen others." },
+        { "text": "{j_baker} had been baking since midnight. By dawn there were four hundred rolls laid out on the long camp table, still warm, in neat white rows. “For luck,” said {j_baker}, to anyone who asked. “For breakfast.” They took one each as they passed, in silence, like a kind of sacrament. Some pocketed theirs. Some ate it standing. A few, the youngest, just held it, warm, between both hands." }
+      ] }
+  ]
+}

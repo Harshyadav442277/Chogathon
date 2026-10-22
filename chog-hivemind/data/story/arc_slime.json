@@ -1,0 +1,82 @@
+{
+  "nodes": [
+    {
+      "id": "slime.premise", "arc": "slime", "trigger": "season_start", "slot": "premise", "title": "A Nobody Wakes",
+      "variants": [
+        { "text": "The slip of paper in {w1}'s paw said {w1job}, and {w1} was disappointed.\n\nIt was not the worst job. It was not the best. It was the sort of job that gets done by a Chog nobody remembers, in a room nobody visits, for a payment nobody counts. All around the crossroads other Chogs were looking at their slips and gasping: *Knight!* *Mage!* *Shield-bearer!* {w1} looked at theirs, and sighed.\n\n“Never mind,” said {w2}, patting {w1} on the shoulder. “Someone has to do it.”\n\n“Yes,” said {w1}. “Someone does.”\n\nAnd {w1}, who did not know it yet, who would not know it for weeks, shouldered a small pack and set off down the road. Behind them <weather>. Ahead, a clearing. And in the clearing, a very small, very empty, very promising piece of land." },
+        { "text": "Everybody has a story about the day they were summoned. {w1}'s was the shortest.\n\n“I woke up,” said {w1}, years later, to a hall full of delighted listeners. “I looked at my slip. I said, ‘Well, that's me.’ And I picked up a spade.”\n\nIt was not a great speech. But it was true. {w1} the {w1job}, with nothing in their pockets, no sword at their side, and no particular gifts, had walked out of the crossroads at dawn and begun, quite simply, to build something.\n\nIt did not look like much. It never does." },
+        { "text": "The first thing {w1} built was a fence.\n\nIt was a very poor fence. It leaned. The posts were different heights. A passing goat looked at it with open contempt. But it was a fence, and fences, as the old farmers will tell you, are the first sentence of a civilisation: they say *here, and not there*.\n\nIn the clearing outside {townA}, with the Hush in the distance and a single stubborn flower in the grass, {w1} stood back and looked at it. “It's a start,” said {w1}.\n\nA shadow fell across the ground. A very large, very green wild thing had stopped to watch, from the edge of the trees. It did not look dangerous. It looked, if anything, interested." }
+      ]
+    },
+    {
+      "id": "slime.home", "arc": "slime", "trigger": "season_start", "after": ["slime.premise"], "title": "A Place to Stand",
+      "variants": [
+        { "text": "A town begins with a well.\n\n{w1} dug it themselves, in the first week, in the middle of the clearing, a deep dark shaft that took three days and a great deal of swearing. When the water came, {w1} sat down on the edge and cried a little, out of relief.\n\nThen {w2} came, with a cart, and a sack of seed. Then {w3}, with a hammer. Then a stranger, a wandering {j_carpenter}, who stopped for the water and stayed for the company. By the end of the month there were eleven huts, a market stall, and a hand-lettered sign, spelled wrongly, that said WELCUM.\n\nThey did not yet have a name for it. They would, though. Everyone does, in the end." },
+        { "text": "“We could call it Home,” said {w2}.\n\n“Too small,” said {w3}.\n\n“Fieldfare,” said {w1}. “Because we'll be fed.”\n\n“Too grand.”\n\n“What about Maybe?” said someone at the back, a very young {j_farmer}.\n\nThey stopped and stared. “Maybe?” said {w1}.\n\n“Maybe it will work. Maybe it won't. But it's the right word, isn't it? For something just starting?”\n\nThe sign went up the next morning: MAYBE. POPULATION, 14. It would be, in time, the most famous sign in the continent." }
+      ]
+    },
+    {
+      "id": "slime.wild", "arc": "slime", "trigger": "progress_10", "after": ["slime.home"], "slot": "ally", "sets": ["wildfolk"], "title": "The Wild Folk Come to Dinner",
+      "variants": [
+        { "text": "They came at dusk, and nobody screamed.\n\nThat was the odd thing. Out of the dark of the wood came the wild folk, goblins, the soft grey slimes, a slow bear in a patched coat, a whole shuffling line of the creatures that humans fled from, and they stopped at the edge of the lamplight and looked at the cooking pot. \n\n“They're hungry,” said {w1}.\n\n“They're monsters!” said someone.\n\n“They're *hungry*,” said {w1}, and took the biggest ladle, and filled the biggest bowl, and walked out to the edge of the light.\n\nA slime the size of a cushion slithered forward, sniffed, and made a sound very like “oh.” And that was how the first treaty of Maybe was signed: with soup, and without a single word." },
+        { "text": "{w1} discovered, somewhat to their surprise, that the wild things were no worse than anyone else. They were afraid, mostly. They had been chased out of every settlement on the continent. They had not been asked in, ever.\n\nThe first to join was a goblin named Pip, who could make hinges. The second was a slime that could clean a floor in an afternoon. By the end of the month, the little settlement had a smithy, a laundry, and a very serious bear who stood guard at the gate with a spoon.\n\n“You can't just *employ* monsters,” said a passing courier, scandalised.\n\n“Why not?” said {w1}. “They work harder than the rest of us. And they say thank you.”" }
+      ]
+    },
+    {
+      "id": "slime.founders", "arc": "slime", "trigger": "progress_10", "after": ["slime.home"], "slot": "ally", "sets": ["founders"], "title": "The First Council",
+      "variants": [
+        { "text": "A town needs people who can do things.\n\nIn the third week {w1} called the first council in the half-built hall: a rickety table, six mismatched chairs, and a candle in a jar. Around it sat the founders of Maybe: {j_baker} the baker, who had brought the first bread; {j_blacksmith} the smith, whose forge was now the heart of the street; {j_healer} the healer, always tired; {j_farmer} the farmer, always muddy; and {j_innkeeper}, who had opened the first inn in a barn, and cried when they got their first customer.\n\n“What do we need?” said {w1}.\n\n“Everything,” said the baker.\n\n“Right,” said {w1}. “Write it down. In order.”\n\nIt was the beginning of what the bards would later, and wrongly, call a government." }
+      ]
+    },
+    {
+      "id": "slime.road", "arc": "slime", "trigger": "progress_20", "after": ["slime.home"], "title": "The Road to Maybe",
+      "variants": [
+        { "text": "Roads are the veins of a nation. {w1} did not know this, but {j_merchant} did.\n\n“You need a road,” said the merchant, in a tone of enormous patience. “Without a road there is no trade. Without trade there is no money. Without money you will be a pleasant little hamlet until the end of time.”\n\n“We could build one,” said {w1}, doubtfully.\n\n“You *must*.”\n\nThey built it in six weeks. It was crooked, but it ran from Maybe to {townA}, and on the first day a cart came down it, and on the second day two, and on the third there was a queue. By the end of the month Maybe had a market. By the end of the season, it would have a name that people said in other regions, with a faint, respectful pause." },
+        { "text": "Every town needs a story, and Maybe's was the road.\n\nIt was told in the taverns of {townB} for years. *They say there's a town in the south where the monsters pave the roads and the bread is free on Fridays.* It was not true, quite. The bread was cheap on Fridays. But a rumour, once it begins, will have its own way, and by the end of the season there was a steady stream of travellers on the road to Maybe, each of them hoping to find a home." }
+      ]
+    },
+    {
+      "id": "slime.envoy", "arc": "slime", "trigger": "progress_30", "after": ["slime.home"], "slot": "twist", "sets": ["envoy"], "weight": 2, "title": "An Envoy in Black",
+      "variants": [
+        { "text": "The envoy arrived on a grey horse, in a coat the colour of a closed door.\n\n“I bring greetings,” said the envoy, “from my lord {king}, who has noted the rapid development of your settlement with interest.”\n\n“How kind,” said {w1}, wiping their hands.\n\n“He wishes to propose an alliance.”\n\n“Oh?”\n\n“A modest contribution,” said the envoy, smiling a thin smile. “A tithe. Half the harvest, half the iron. In return, your settlement is under my lord's protection. You would hardly want it otherwise.”\n\nThere was a silence. Behind {w1}, the entire town of Maybe had gone very, very still. {w1}, who had never in their life refused anybody anything, took a deep breath, and said:\n\n“No, thank you.”" },
+        { "text": "“He sends you this,” said the envoy, laying a black glass box on the table in the half-built hall.\n\nInside was a crown, small, elegant and altogether too clean. “It is yours,” said the envoy, “if you pledge fealty. You would be King of Maybe, by my lord's favour. You would live in a palace.”\n\n{w1} looked at the crown for a long time. It was, they were slightly appalled to find, rather tempting. Then they looked at the bear with the spoon, and the baker with her bread, and the very young farmer, and the slimes in the laundry, and closed the box.\n\n“We don't have kings,” said {w1}. “We have a table. Do you want some tea?”" }
+      ]
+    },
+    {
+      "id": "slime.famine", "arc": "slime", "trigger": "progress_30", "after": ["slime.home"], "slot": "twist", "sets": ["famine"], "weight": 1, "title": "The Thin Month",
+      "variants": [
+        { "text": "A bad harvest takes a settlement by the throat.\n\nIn the thirtieth part of the season, the barley failed. It did not fail dramatically. It simply grew thin, and pale, and tasted of nothing. The market stalls emptied by degrees. {j_baker} began baking bread with half the flour and twice the apology. Children asked why the porridge was thinner.\n\n“We'll manage,” said {w1}, who had no idea whether this was true.\n\nThey managed. The goblins found a hidden grove of wild apples. The bear taught the humans to fish through the ice. The slimes, those unlikely saints, ate what nobody else could and gave back what everybody needed. When spring came, Maybe had lost nobody, and the people who stayed were bound together in a way that no feast could ever have achieved." }
+      ]
+    },
+    {
+      "id": "slime.siege", "arc": "slime", "trigger": "progress_55", "after": ["slime.home"], "title": "The Day the Walls Went Up",
+      "variants": [
+        { "text": "[[envoy|The tithe was refused, and the demons came to collect.]][[!envoy|The demons came, as they come to every settlement that grows too proud to ignore.]]\n\nThey came at dawn: <demon_pack>. Behind them, the dark knights with their banner. Before them, a town that had not existed a season ago, with a sign on the gate that said MAYBE.\n\nThe wall was not a good wall. It was made of carts, and barrels, and a statue of a long-forgotten mayor. But behind it stood a bear with a spoon, and forty goblins with hinges, and a baker with a rolling pin, and a very young farmer, and a Chog who had been summoned at a crossroads as a nobody.\n\n“They're coming,” said {w2}.\n\n“I know,” said {w1}.\n\n“What do we do?”\n\n“What we've always done,” said {w1}. “Hold the line, and put the kettle on.”" }
+      ]
+    },
+    {
+      "id": "slime.peace", "arc": "slime", "trigger": "progress_60", "after": ["slime.siege"], "title": "Maybe Holds",
+      "variants": [
+        { "text": "It held.\n\nNo one could say exactly how. Perhaps it was the bear. Perhaps it was the kettle. Perhaps it was only that the demons, faced with a town that was not afraid of them, did not know what to do. But as the sun came up on the second day, the demon host drew back from the wall, and left behind a single white flag, and an imp, the smallest of the imps, who stepped forward with a trembling little scroll.\n\n“I am here,” said the imp, “to enquire about citizenship.”\n\nThere was a long silence. Then {w1} began to laugh, and could not stop, and the rest of the town laughed with them, and the imp, who had not expected this, went pink and began to laugh too." }
+      ]
+    },
+    {
+      "id": "slime.nation", "arc": "slime", "trigger": "phase_3", "title": "A Nation, By Accident",
+      "variants": [
+        { "text": "Somewhere in the middle of the season, Maybe stopped being a town.\n\nNobody could say when. A letter came, addressed to “The Nation of Maybe,” and {w1} laughed, and then stopped laughing, and read it again. A delegation arrived from {townB}, asking to join. A bard wrote a song with the line “from a fence to a flag,” and it was a bad line, but nobody forgot it.\n\nThere were now six hundred souls within the walls of Maybe, and nobody had voted on it. The hall had become a parliament, the table a debating chamber, the candle in the jar a lamp on a pole. {w1} was still the same Chog who had dug the well. They simply had a great many more people to look after.\n\n“I never wanted to be a king,” said {w1}.\n\n“Good,” said {w2}. “It's the people who don't want to who are best at it.”" }
+      ]
+    },
+    {
+      "id": "slime.final", "arc": "slime", "trigger": "hero", "after": ["slime.nation"], "title": "The Hero Comes to Maybe",
+      "variants": [
+        { "text": "{hero} came to Maybe in the last week of the season, on the way to the black hill, and stayed for supper.\n\nIt was the best supper of {hero}'s life. The table was crooked, the plates did not match, and the soup was served by a slime in an apron. {hero}, the {heroJob}, looked around the hall, at a bear and a baker and a hundred happy faces, and understood, for the first time, what they were fighting for.\n\nThe next morning, {hero} marched on the black glass throne. And when {king} fell, the whole nation of Maybe, from the bear to the very young farmer, was waiting at the foot of the hill with a banner and a pot of tea." }
+      ]
+    },
+    {
+      "id": "slime.ending", "arc": "slime", "trigger": "season_end", "after": ["slime.final"], "title": "Epilogue: The Sign",
+      "variants": [
+        { "text": "Years later, if you take the road south from {townA}, you will come to a gate, and on the gate a sign. The sign says MAYBE. It has been repainted many times, and corrected, and misspelled again.\n\nThe town behind it is large now, and beautiful, and full of the strangest mixture of people you have ever seen. There is a school where goblins teach engineering. There is an orchard planted by a bear. And at the heart of it all, in a small plain house with a well in the garden, lives a Chog who is not a king, and who has the same slip of paper in their pocket that they had on the day they were summoned.\n\nIt says {w1job}. It has been read so many times that the word has nearly worn away." }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    { "id": "int5.market", "trigger": "progress_5", "slot": "int5", "chance": 0.9, "title": "Interlude: Market Day",
+      "variants": [
+        { "text": "<dawn>, the market of {townA} opened, and {j_merchant} was already shouting. <sound_town>. <smell_street>. The stalls were a patchwork of newcomers who had not yet learned the prices, and old hands who had learned them too well. A pair of strangers haggled over a single apple for twenty minutes, and then split it. <child_remark>" },
+        { "text": "“Fresh bread!” “Spare buttons!” “Prophecies, two for a copper!” The market of {townA} was a chorus. {j_merchant} stood on a crate, weighing a pocketful of coins in one paw and a bargain in the other. At the corner a juggler dropped everything, and the crowd, which loved them, cheered the loudest at the drop." } ] },
+    { "id": "int5.baker", "trigger": "progress_5", "slot": "int5", "chance": 0.9, "title": "Interlude: A Bad Batch",
+      "variants": [
+        { "text": "{j_baker} swore it was the flour. The loaves had come out of the oven looking like small grey stones, and the queue outside the bakery had gone quiet with polite alarm. “It's rustic,” said {j_baker}, to the room at large. “It's meant to be rustic.” A child bit one, winced, and said: “It's very rustic.” By the afternoon, the entire town had agreed to eat them anyway, with plenty of jam." } ] },
+    { "id": "int5.bard", "trigger": "progress_5", "slot": "int5", "chance": 0.9, "title": "Interlude: The First Song",
+      "variants": [
+        { "text": "The first song of the season was composed in a doorway by {j_bard}, and it was dreadful. It rhymed “glory” with “Tuesday.” It had a chorus that went on a bar too long. But by evening three inns were singing it, and by the next week it had become the unofficial hymn of the continent, and nobody dared admit they hadn't liked it from the start." } ] },
+    { "id": "int5.library", "trigger": "progress_5", "slot": "int5", "chance": 0.9, "title": "Interlude: The Lecture",
+      "variants": [
+        { "text": "{j_librarian} gave a lecture on the history of the Hush to an audience of eleven, of whom three were asleep and one was a cat. It was long, thorough and enormously dull, until, at the very end, the librarian said: “And what nobody has noticed is that it ends in the same place every time. The hero is always someone small.” The room woke up. The cat, to its credit, did not." } ] },
+    { "id": "int5.child", "trigger": "progress_5", "slot": "int5", "chance": 0.9, "title": "Interlude: The Lost Child",
+      "variants": [
+        { "text": "A child went missing in {townB} at noon, and by one o'clock four hundred Chogs were looking. It was a remarkable thing to see: soldiers and florists, bards and bakers, spread through the alleys calling a single name. They found the child in a barrel, asleep, with a cat. The cheering could be heard three streets away. <hope_line>" } ] },
+
+    { "id": "int15.festival", "trigger": "progress_15", "slot": "int15", "chance": 0.9, "title": "Interlude: A Festival, Improvised",
+      "variants": [
+        { "text": "Nobody had planned the festival. It simply happened, as these things do, on the evening that {j_cook} lit the big stove and someone found a fiddle. By dusk there was dancing in the square of {townA}, and lanterns on strings, and the bears and goblins of the neighbouring wood had come to look. <sound_town>. “What are we celebrating?” somebody asked.\n\n“Not being dead,” said {j_cook}. “It's a perfectly good reason.”" } ] },
+    { "id": "int15.smith", "trigger": "progress_15", "slot": "int15", "chance": 0.9, "title": "Interlude: The Masterpiece",
+      "variants": [
+        { "text": "{j_blacksmith} worked for three days and nights on a single blade. The forge sang. The hammer fell with the steady regularity of a heartbeat. At the end of it, the smith held the thing up to the light, turned it, and set it on the bench, and everyone in the shop fell quiet, because it was the most beautiful object any of them had ever seen.\n\n“It's not for me,” said {j_blacksmith}. “It's for whoever needs it.” They wrapped it in a cloth and sent it to the capital, and never learned whose hand it ended up in." } ] },
+    { "id": "int15.wedding", "trigger": "progress_15", "slot": "int15", "chance": 0.9, "title": "Interlude: A Wedding in the Wrong Season",
+      "variants": [
+        { "text": "They married in the guild hall, between the notice-board and the stamp, because the temple was full of the injured. <guild_clerk> officiated, solemnly. The bride wore a borrowed cloak. The groom had been up all night repairing the bridge. Half the town came. The other half sent pies. When the clerk said “you may now kiss,” the whole hall cheered so loudly that the roof dropped a few tiles." } ] },
+    { "id": "int15.harvest", "trigger": "progress_15", "slot": "int15", "chance": 0.9, "title": "Interlude: The First Harvest",
+      "variants": [
+        { "text": "{j_farmer} came into town with a cart of what looked, at first, like ordinary turnips. “First of the season,” said {j_farmer}, and let a child bite one. The child went quiet. “It tastes,” said the child, finally, “like a turnip.” “Yes,” said {j_farmer}, with a wide, wet-eyed smile. “That's the miracle.” The market bought the entire cart before noon." } ] },
+    { "id": "int15.caravan", "trigger": "progress_15", "slot": "int15", "chance": 0.9, "title": "Interlude: A Caravan from Elsewhere",
+      "variants": [
+        { "text": "A caravan arrived at {townB} from a country nobody had heard of, with strange fabrics and stranger songs, and traded for a day and a night. “From the Far Coast,” said the leader, in an odd accent. “We were not sure there was anyone left.” {j_merchant} struck a bargain involving three spices and a promise. The caravan left at dawn, and in its wake lay the faint, unfamiliar scent of somewhere else." } ] },
+
+    { "id": "int35.treasure", "trigger": "progress_35", "slot": "int35", "chance": 0.9, "title": "Interlude: The Rumour of Treasure",
+      "variants": [
+        { "text": "By Thursday every inn in {townA} had a map. By Friday, no two maps agreed. The treasure was in the Hollow, said one. The treasure was under the Altar, said another. The treasure was, said a very small old Chog in a corner, in the bread, and nobody listened. Forty parties set out. Thirty-nine returned empty-handed and happy. The fortieth never came back, and was later discovered running a successful tavern in {townB}." } ] },
+    { "id": "int35.fisher", "trigger": "progress_35", "slot": "int35", "chance": 0.9, "title": "Interlude: A Strange Catch",
+      "variants": [
+        { "text": "{j_fisher} hauled up the net and stared. In among the usual silver was a shining glass bottle, and inside it a rolled scrap of paper, and on the paper, in an unfamiliar hand, was written: *We are still here. Keep going.* The note was passed round the harbour. Nobody knew who had written it. But that night, several boats stayed out an hour longer than they needed to, just in case." } ] },
+    { "id": "int35.courier", "trigger": "progress_35", "slot": "int35", "chance": 0.9, "title": "Interlude: Letters Home",
+      "variants": [
+        { "text": "{j_courier} ran a hundred miles that week, and every mile carried a letter: from a soldier to a mother, from a baker to a rival, from a Chog in {townA} to a Chog they had met once, at a crossroads, in the snow. The letters said many things. But in a surprising number of them, if you read between the lines, there was the same small sentence: *I'm all right. Don't worry.* Nobody believed it. Everybody wrote it." } ] },
+    { "id": "int35.alchemy", "trigger": "progress_35", "slot": "int35", "chance": 0.9, "title": "Interlude: The Accident",
+      "variants": [
+        { "text": "{j_alchemist} was experimenting. This was, in itself, not unusual. What was unusual was the sound, a sort of cheerful *whump*, and the colour of the smoke, which was a bright pleasing pink, and the fact that, when it cleared, every cat in {townA} was floating three inches off the ground. “It will wear off,” said {j_alchemist}. It did, in a day. The cats were insufferable for a week." } ] },
+    { "id": "int35.storm", "trigger": "progress_35", "slot": "int35", "chance": 0.9, "title": "Interlude: The Storm",
+      "variants": [
+        { "text": "The storm came in off the sea like a thrown plate. For a whole night the roofs of {townB} sang, and the shutters clapped, and the bells, which had no business ringing, rang. In the morning, there were branches in the street and a fishing boat on the church roof. Nobody was hurt. By noon, the whole town was out with ladders, laughing, putting everything back." } ] },
+
+    { "id": "int40.duel", "trigger": "progress_40", "slot": "int40", "chance": 0.9, "title": "Interlude: The Tournament",
+      "variants": [
+        { "text": "There was a tournament in the training yard at {townA}, officially to improve morale and unofficially because {cand1} and {cand2} could not stop looking at each other. The bouts were friendly. Mostly. The final went to a draw, which satisfied nobody, and was therefore declared a great success. A child in the crowd was heard to say: “I'm going to be champion next year.” Nobody had the heart to say it was a war." } ] },
+    { "id": "int40.tailor", "trigger": "progress_40", "slot": "int40", "chance": 0.9, "title": "Interlude: The Banner",
+      "variants": [
+        { "text": "{j_tailor} stayed up three nights sewing a banner. It was wide as a barn door, deep violet, with a lantern in the centre and a ring of tiny stars. “For the march,” said {j_tailor}, shaking out the cloth. “So we know who we are, when we get there.” Nobody said it was a bit big. It was hung over the capital gate the next morning, and caught the wind like a sail." } ] },
+    { "id": "int40.dream", "trigger": "progress_40", "slot": "int40", "chance": 0.9, "title": "Interlude: The Same Dream",
+      "variants": [
+        { "text": "A strange thing happened in the fortieth part of the season: three hundred Chogs woke on the same morning, in different towns, having dreamed the same dream. A long road. A green door. A voice, saying their names. At the guild, the clerks tried to chart it, and failed. The old folk simply nodded. “It's the Constellations,” they said. “Stretching.”" } ] },
+    { "id": "int40.healer", "trigger": "progress_40", "slot": "int40", "chance": 0.9, "title": "Interlude: A Healer Rests",
+      "variants": [
+        { "text": "{j_healer} had not slept in three days. At last, in the small hours, a young patient put a blanket round their shoulders and said, sternly, “Sit.” {j_healer} sat. Within a minute, they were asleep. The patient, who was in fact much worse hurt than they had pretended, sat watch over the ward with a lamp, and a bandaged arm, until dawn. It is an old law of temples: the healed heal." } ] },
+    { "id": "int40.mine", "trigger": "progress_40", "slot": "int40", "chance": 0.9, "title": "Interlude: What the Miner Found",
+      "variants": [
+        { "text": "{j_miner} broke through a wall at the bottom of the shaft and stood, lamp raised, in a hall of crystal. It was beautiful beyond saying. And, near the middle, sitting on a stone chair as though it had been waiting, was a small skeleton in a very old cloak, holding a note: *If you find this, you are further than I got. Keep digging. — A friend.* {j_miner} sat down on the next stone and cried a little." } ] },
+
+    { "id": "int45.eclipse", "trigger": "progress_45", "slot": "int45", "chance": 0.9, "title": "Interlude: The Falling Star",
+      "variants": [
+        { "text": "A star fell in the forty-fifth part of the season. It fell across the whole sky, slowly, trailing silver, and the entire continent came out to watch. “Make a wish,” said <elder>. Nobody spoke. Then a child said, in a very clear voice: “I wish everyone gets home.” The star went out over the hills. For a long time afterwards the people of Monadia stood in the dark, quiet, together." } ] },
+    { "id": "int45.toys", "trigger": "progress_45", "slot": "int45", "chance": 0.9, "title": "Interlude: The Puppet Show",
+      "variants": [
+        { "text": "{j_toymaker} set up a tiny theatre in the square of {townA}, and put on a puppet show about the Hero. There was a small wooden knight. There was a papier-mâché dragon. There was, in the final act, a hand-painted king on a throne, who fell with a satisfying clunk, and the audience of small children roared. The grown-ups at the back, watching, did not laugh. But they stayed to the end." } ] },
+    { "id": "int45.priest", "trigger": "progress_45", "slot": "int45", "chance": 0.9, "title": "Interlude: The Sermon",
+      "variants": [
+        { "text": "{j_priest}'s sermon that week was about candles. “A candle,” said the priest, “does not argue with the dark. It simply does what it is for.” The congregation shifted. “Each of you is a candle.” A pause. “Some of you are rather smoky.” Laughter ran through the temple. And then, quite unexpectedly, the priest began to cry, and the whole room went quiet, and stayed quiet, and lit, one after another, the little candles at their seats." } ] },
+    { "id": "int45.refugees", "trigger": "progress_45", "slot": "int45", "chance": 0.9, "title": "Interlude: The Road of Strangers",
+      "variants": [
+        { "text": "They came up the road from the burned villages in the dusk: families with carts, grandmothers in wheelbarrows, a single cat on a leash. They did not ask for anything. They simply stood at the gate of {townA}, and waited to see whether they would be let in. The gate opened before anyone had decided. By midnight there was a bed for each, and a bowl, and a quiet space by a fire." } ] },
+    { "id": "int45.feast", "trigger": "progress_45", "slot": "int45", "chance": 0.9, "title": "Interlude: The Feast",
+      "variants": [
+        { "text": "{j_cook} cooked for six hundred. It was a ridiculous thing to attempt, in a kitchen designed for forty, with a broken oven and a week's notice. But when the long tables were laid in the square of {townB} and the platters came out, steaming, golden, smelling of every home anybody had ever missed, nobody said a word for a full minute. Then {j_cook} appeared at the kitchen door, flour to the elbows, and received the longest ovation of the season." } ] }
+  ]
+}
