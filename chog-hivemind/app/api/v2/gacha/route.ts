@@ -36,7 +36,10 @@ const save = (p: Player, pulls: Pull[]) => run(
   [p.author, p.season, JSON.stringify(pulls), Date.now()],
 );
 
-const cardData = (c: Card) => ({ kind: c.kind, ...(c.kind === "skill" ? SKILL_BY_ID.get(c.id) : QUEST_BY_ID.get(c.id)) });
+// A quest has its own "kind" (hunt, explore...): keep it as questKind so "kind" stays skill | quest.
+const cardData = (c: Card) => c.kind === "skill"
+  ? { ...SKILL_BY_ID.get(c.id), kind: "skill" }
+  : { ...QUEST_BY_ID.get(c.id), questKind: QUEST_BY_ID.get(c.id)?.kind, kind: "quest" };
 
 async function state(p: Player, extra: Record<string, unknown> = {}) {
   const pulls = await load(p);
