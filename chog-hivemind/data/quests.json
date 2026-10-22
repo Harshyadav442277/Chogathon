@@ -1,0 +1,592 @@
+{
+ "version": 1,
+ "quests": [
+  {
+   "id": "gather_1",
+   "name": "Herbs by the River",
+   "kind": "gather",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "tier": 1,
+   "site": "wild",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 gather quest. Chogs with survival or scout skills finish it faster."
+  },
+  {
+   "id": "gather_2",
+   "name": "Moonmoss Harvest",
+   "kind": "gather",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "tier": 2,
+   "site": "wild",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 gather quest. Chogs with survival or scout skills finish it faster."
+  },
+  {
+   "id": "gather_3",
+   "name": "Crystal Shards",
+   "kind": "gather",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "tier": 3,
+   "site": "wild",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 gather quest. Chogs with survival or scout skills finish it faster."
+  },
+  {
+   "id": "gather_4",
+   "name": "Phoenix Feathers",
+   "kind": "gather",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "tier": 4,
+   "site": "wild",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 gather quest. Chogs with survival or scout skills finish it faster."
+  },
+  {
+   "id": "gather_5",
+   "name": "Starlight Dew",
+   "kind": "gather",
+   "tags": [
+    "survival",
+    "scout"
+   ],
+   "tier": 5,
+   "site": "wild",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 gather quest. Chogs with survival or scout skills finish it faster."
+  },
+  {
+   "id": "craft_1",
+   "name": "Mend the Town Gate",
+   "kind": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "tier": 1,
+   "site": "town",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 craft quest. Chogs with craft or trade skills finish it faster."
+  },
+  {
+   "id": "craft_2",
+   "name": "Arm the Militia",
+   "kind": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "tier": 2,
+   "site": "town",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 craft quest. Chogs with craft or trade skills finish it faster."
+  },
+  {
+   "id": "craft_3",
+   "name": "Forge Guild Blades",
+   "kind": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "tier": 3,
+   "site": "town",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 craft quest. Chogs with craft or trade skills finish it faster."
+  },
+  {
+   "id": "craft_4",
+   "name": "Brew the Siege Potions",
+   "kind": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "tier": 4,
+   "site": "town",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 craft quest. Chogs with craft or trade skills finish it faster."
+  },
+  {
+   "id": "craft_5",
+   "name": "Build the Seal Engine",
+   "kind": "craft",
+   "tags": [
+    "craft",
+    "trade"
+   ],
+   "tier": 5,
+   "site": "town",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 craft quest. Chogs with craft or trade skills finish it faster."
+  },
+  {
+   "id": "hunt_1",
+   "name": "Slime Trouble",
+   "kind": "hunt",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "tier": 1,
+   "site": "wild",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 hunt quest. Chogs with combat or melee skills finish it faster."
+  },
+  {
+   "id": "hunt_2",
+   "name": "Wolf Pack at the Pass",
+   "kind": "hunt",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "tier": 2,
+   "site": "wild",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 hunt quest. Chogs with combat or melee skills finish it faster."
+  },
+  {
+   "id": "hunt_3",
+   "name": "Ogre on the Road",
+   "kind": "hunt",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "tier": 3,
+   "site": "wild",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 hunt quest. Chogs with combat or melee skills finish it faster."
+  },
+  {
+   "id": "hunt_4",
+   "name": "Wyvern Nest",
+   "kind": "hunt",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "tier": 4,
+   "site": "wild",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 hunt quest. Chogs with combat or melee skills finish it faster."
+  },
+  {
+   "id": "hunt_5",
+   "name": "The Abyssal Hound",
+   "kind": "hunt",
+   "tags": [
+    "combat",
+    "melee"
+   ],
+   "tier": 5,
+   "site": "wild",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 hunt quest. Chogs with combat or melee skills finish it faster."
+  },
+  {
+   "id": "escort_1",
+   "name": "Escort the Baker's Cart",
+   "kind": "escort",
+   "tags": [
+    "defense",
+    "faith"
+   ],
+   "tier": 1,
+   "site": "town",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 escort quest. Chogs with defense or faith skills finish it faster."
+  },
+  {
+   "id": "escort_2",
+   "name": "Pilgrims to the Temple",
+   "kind": "escort",
+   "tags": [
+    "defense",
+    "faith"
+   ],
+   "tier": 2,
+   "site": "town",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 escort quest. Chogs with defense or faith skills finish it faster."
+  },
+  {
+   "id": "escort_3",
+   "name": "Caravan to the Capital",
+   "kind": "escort",
+   "tags": [
+    "defense",
+    "faith"
+   ],
+   "tier": 3,
+   "site": "town",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 escort quest. Chogs with defense or faith skills finish it faster."
+  },
+  {
+   "id": "escort_4",
+   "name": "Guard the Royal Envoy",
+   "kind": "escort",
+   "tags": [
+    "defense",
+    "faith"
+   ],
+   "tier": 4,
+   "site": "town",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 escort quest. Chogs with defense or faith skills finish it faster."
+  },
+  {
+   "id": "escort_5",
+   "name": "The Last Refugees",
+   "kind": "escort",
+   "tags": [
+    "defense",
+    "faith"
+   ],
+   "tier": 5,
+   "site": "town",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 escort quest. Chogs with defense or faith skills finish it faster."
+  },
+  {
+   "id": "explore_1",
+   "name": "Map Floor One",
+   "kind": "explore",
+   "tags": [
+    "scout",
+    "lore"
+   ],
+   "tier": 1,
+   "site": "dungeon",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 explore quest. Chogs with scout or lore skills finish it faster."
+  },
+  {
+   "id": "explore_2",
+   "name": "The Whispering Corridor",
+   "kind": "explore",
+   "tags": [
+    "scout",
+    "lore"
+   ],
+   "tier": 2,
+   "site": "dungeon",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 explore quest. Chogs with scout or lore skills finish it faster."
+  },
+  {
+   "id": "explore_3",
+   "name": "Sunken Library",
+   "kind": "explore",
+   "tags": [
+    "scout",
+    "lore"
+   ],
+   "tier": 3,
+   "site": "dungeon",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 explore quest. Chogs with scout or lore skills finish it faster."
+  },
+  {
+   "id": "explore_4",
+   "name": "The Mirror Halls",
+   "kind": "explore",
+   "tags": [
+    "scout",
+    "lore"
+   ],
+   "tier": 4,
+   "site": "dungeon",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 explore quest. Chogs with scout or lore skills finish it faster."
+  },
+  {
+   "id": "explore_5",
+   "name": "Heart of the Labyrinth",
+   "kind": "explore",
+   "tags": [
+    "scout",
+    "lore"
+   ],
+   "tier": 5,
+   "site": "dungeon",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 explore quest. Chogs with scout or lore skills finish it faster."
+  },
+  {
+   "id": "cleanse_1",
+   "name": "Bless the Well",
+   "kind": "cleanse",
+   "tags": [
+    "faith",
+    "magic"
+   ],
+   "tier": 1,
+   "site": "dungeon",
+   "effort": 12,
+   "xp": 20,
+   "gold": 8,
+   "story": 1,
+   "desc": "A tier 1 cleanse quest. Chogs with faith or magic skills finish it faster."
+  },
+  {
+   "id": "cleanse_2",
+   "name": "Banish the Will-o'-Wisps",
+   "kind": "cleanse",
+   "tags": [
+    "faith",
+    "magic"
+   ],
+   "tier": 2,
+   "site": "dungeon",
+   "effort": 18,
+   "xp": 40,
+   "gold": 16,
+   "story": 2,
+   "desc": "A tier 2 cleanse quest. Chogs with faith or magic skills finish it faster."
+  },
+  {
+   "id": "cleanse_3",
+   "name": "Purge the Cursed Shrine",
+   "kind": "cleanse",
+   "tags": [
+    "faith",
+    "magic"
+   ],
+   "tier": 3,
+   "site": "dungeon",
+   "effort": 24,
+   "xp": 60,
+   "gold": 24,
+   "story": 3,
+   "desc": "A tier 3 cleanse quest. Chogs with faith or magic skills finish it faster."
+  },
+  {
+   "id": "cleanse_4",
+   "name": "Break the Blood Totem",
+   "kind": "cleanse",
+   "tags": [
+    "faith",
+    "magic"
+   ],
+   "tier": 4,
+   "site": "dungeon",
+   "effort": 30,
+   "xp": 80,
+   "gold": 32,
+   "story": 4,
+   "desc": "A tier 4 cleanse quest. Chogs with faith or magic skills finish it faster."
+  },
+  {
+   "id": "cleanse_5",
+   "name": "Silence the Abyss Choir",
+   "kind": "cleanse",
+   "tags": [
+    "faith",
+    "magic"
+   ],
+   "tier": 5,
+   "site": "dungeon",
+   "effort": 36,
+   "xp": 100,
+   "gold": 40,
+   "story": 5,
+   "desc": "A tier 5 cleanse quest. Chogs with faith or magic skills finish it faster."
+  },
+  {
+   "id": "general_emberforge",
+   "name": "Face the General of Liquidation",
+   "kind": "boss",
+   "tags": [
+    "combat",
+    "defense"
+   ],
+   "tier": 6,
+   "site": "dungeon",
+   "region": "emberforge",
+   "boss": "general",
+   "effort": 30,
+   "xp": 200,
+   "gold": 60,
+   "story": 8,
+   "desc": "Strike at a Demon General. Every blow wears down its HP; when it falls, one seal breaks."
+  },
+  {
+   "id": "general_tidecry",
+   "name": "Silence the Drowned Archivist",
+   "kind": "boss",
+   "tags": [
+    "combat",
+    "defense"
+   ],
+   "tier": 6,
+   "site": "dungeon",
+   "region": "tidecry",
+   "boss": "general",
+   "effort": 30,
+   "xp": 200,
+   "gold": 60,
+   "story": 8,
+   "desc": "Strike at a Demon General. Every blow wears down its HP; when it falls, one seal breaks."
+  },
+  {
+   "id": "general_prism",
+   "name": "Shatter the Mirror Wraith",
+   "kind": "boss",
+   "tags": [
+    "combat",
+    "defense"
+   ],
+   "tier": 6,
+   "site": "dungeon",
+   "region": "prism",
+   "boss": "general",
+   "effort": 30,
+   "xp": 200,
+   "gold": 60,
+   "story": 8,
+   "desc": "Strike at a Demon General. Every blow wears down its HP; when it falls, one seal breaks."
+  },
+  {
+   "id": "general_dreamveil",
+   "name": "Wake from the Nightmare Shepherd",
+   "kind": "boss",
+   "tags": [
+    "combat",
+    "defense"
+   ],
+   "tier": 6,
+   "site": "dungeon",
+   "region": "dreamveil",
+   "boss": "general",
+   "effort": 30,
+   "xp": 200,
+   "gold": 60,
+   "story": 8,
+   "desc": "Strike at a Demon General. Every blow wears down its HP; when it falls, one seal breaks."
+  },
+  {
+   "id": "seal_ritual",
+   "name": "Read the Broken Seals",
+   "kind": "boss",
+   "tags": [
+    "lore",
+    "faith"
+   ],
+   "tier": 6,
+   "site": "town",
+   "boss": "seal",
+   "effort": 24,
+   "xp": 150,
+   "gold": 30,
+   "story": 6,
+   "desc": "Study the broken seals so the march on the castle can begin."
+  },
+  {
+   "id": "demon_king",
+   "name": "Storm the Demon King's Castle",
+   "kind": "boss",
+   "tags": [
+    "combat",
+    "magic",
+    "heal"
+   ],
+   "tier": 7,
+   "site": "castle",
+   "boss": "king",
+   "effort": 40,
+   "xp": 400,
+   "gold": 120,
+   "story": 15,
+   "desc": "The final battle. The Chog who lands the last blow becomes the Hero of the season."
+  }
+ ]
+}

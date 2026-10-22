@@ -1,4 +1,5 @@
 import { all, getState, one } from "./db";
+import { JOB_BY_ID } from "../sim2/season";
 
 export type PostView = {
   id: number; chog_id: number; name: string; house: string; kind: string; text: string; meme_id: number | null;
@@ -97,7 +98,9 @@ export async function chogDetail(id: number) {
     one<any>(`SELECT COUNT(*) n FROM follows WHERE src = ?`, [id]),
     one<any>(`SELECT COUNT(*) + 1 n FROM chogs WHERE influence > ? AND id > 0`, [c.influence]),
   ]);
+  const season = await seasonInfo(id);
   return {
+    season,
     id: Number(c.id), name: c.name, image: c.image, house: c.house, location: c.location, mood: c.mood,
     bond: Number(c.bond), influence: Number(c.influence), owner: c.owner, homes: Number(c.homes), posts: Number(c.posts),
     persona: JSON.parse(c.persona), traits: JSON.parse(c.traits),
@@ -107,6 +110,27 @@ export async function chogDetail(id: number) {
     commands: commands.map((w) => ({ id: Number(w.id), kind: w.kind, text: w.text, status: w.status, response: w.response, created_at: Number(w.created_at) })),
     followers: Number(followers?.n ?? 0), following: Number(following?.n ?? 0), rank: Number(rank?.n ?? 0),
   };
+}
+
+/** This season's job, title, role, level and stats (null before the first season starts). */
+export async function seasonInfo(id: number) {
+  try {
+    const s = await one<any>(
+      `SELECT cs.* FROM chog_season cs WHERE cs.chog_id = ? AND cs.season = (SELECT CAST(value AS INTEGER) FROM state WHERE key = 'season')`,
+      [id],
+    );
+    if (!s) return null;
+    const job = JOB_BY_ID[s.job];
+    const level = Number(s.level);
+    const tier = Math.min(4, Math.floor((level - 1) / 10));
+    return {
+      n: Number(s.season), job: s.job, jobName: job?.name ?? s.job, title: job?.titles[tier] ?? job?.name ?? s.job,
+      track: s.track, role: s.role, level, xp: Number(s.xp), rank: s.rank, gold: Number(s.gold), hp: Number(s.hp),
+      status: s.status, story: Number(s.story), stats: JSON.parse(s.stats),
+    };
+  } catch {
+    return null; // season tables not created yet
+  }
 }
 
 export async function memeDetail(id: number) {

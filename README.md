@@ -19,6 +19,7 @@ Shared workspace for our Chogathon entry, **Chog Hivemind: Monadia**: every Chog
 | [docs/PRD.md](docs/PRD.md) | Project scope and feature mapping, to fill later |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Stack, components and setup, to fill later |
 | [docs/PHASES.md](docs/PHASES.md) | Work stages, owners and status |
+| [docs/WORKSPLIT.md](docs/WORKSPLIT.md) | Who owns which files, the world/characters contract, setup and git flow |
 | [docs/GAPS.md](docs/GAPS.md) | Open questions and blockers |
 | [docs/MEMORY.md](docs/MEMORY.md) | Short record of agreed decisions |
 | [docs/DEMO.md](docs/DEMO.md) | Exact demo steps, expected results and test evidence |

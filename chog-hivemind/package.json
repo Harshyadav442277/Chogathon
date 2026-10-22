@@ -16,7 +16,10 @@
     "edition": "tsx scripts/edition.ts",
     "typecheck": "tsc --noEmit",
     "gen:world": "tsx scripts/gen-world.ts",
-    "atlas": "node scripts/atlas.mjs"
+    "atlas": "node scripts/atlas.mjs",
+    "export:terrain": "tsx scripts/export-terrain.ts",
+    "season": "tsx scripts/season.ts",
+    "play:build": "node scripts/build-play.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.136.0",
