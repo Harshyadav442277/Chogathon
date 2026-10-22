@@ -116,7 +116,23 @@ async function pool<T, R>(items: T[], n: number, fn: (t: T) => Promise<R>): Prom
   return out;
 }
 
+/**
+ * One world tick, guarded by a lock in the state table so two tickers (GitHub Actions and a backup cron)
+ * never run at once. A lock older than 8 minutes is treated as stale (a crashed run).
+ */
 export async function tick(opts: { agents?: number; brain?: "auto" | "offline" | "claude" } = {}) {
+  const at = Date.now();
+  await run(`INSERT OR IGNORE INTO state(key, value) VALUES('tick_lock', '0')`);
+  const got = await run(`UPDATE state SET value = ? WHERE key = 'tick_lock' AND CAST(value AS INTEGER) < ?`, [String(at), at - 8 * 60_000]);
+  if (!got.rowsAffected) return { tick: 0, skipped: true, reason: "another tick is running" } as any;
+  try {
+    return await tickUnlocked(opts);
+  } finally {
+    await run(`UPDATE state SET value = '0' WHERE key = 'tick_lock' AND value = ?`, [String(at)]);
+  }
+}
+
+async function tickUnlocked(opts: { agents?: number; brain?: "auto" | "offline" | "claude" } = {}) {
   const t = Number(await getState("tick", "0")) + 1;
   await setState("tick", t);
   const useClaude = opts.brain === "claude" || (opts.brain !== "offline" && hasClaude());

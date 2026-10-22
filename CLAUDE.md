@@ -1,4 +1,6 @@
-# Chog Hivemind: Monadia (context for Claude Code)
+# ChogSekai (context for Claude Code)
+
+The game was called *Chog Hivemind: Monadia* until 2026-10-22; the code folder keeps the old name `chog-hivemind/`. The world inside the game is still called Monadia.
 
 @AGENTS.md
 

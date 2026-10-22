@@ -8,6 +8,8 @@ import { WORLD } from "../world/data";
 import { mulberry32 } from "../world/terrain";
 import { hash } from "../sim/world";
 import { narrate } from "./narrate";
+import { advanceThreads, emptySignals, ensureThreadSchema } from "./threads";
+import { writeChapters, type NovelCtx } from "./novel";
 import skillsJson from "../../data/skills.json";
 import questsJson from "../../data/quests.json";
 
@@ -21,7 +23,6 @@ export const SKILL_BY_ID = new Map(SKILLS.map((s) => [s.id, s]));
 export const QUESTS = (questsJson as { quests: Quest[] }).quests;
 export const QUEST_BY_ID = new Map(QUESTS.map((q) => [q.id, q]));
 export const MAX_SKILLS = 6;
-export const DAILY_STAR_POINTS = 3;
 
 export const SCHEMA_V3 = [
   `CREATE TABLE IF NOT EXISTS agents (
@@ -38,13 +39,29 @@ export const SCHEMA_V3 = [
   )`,
   `CREATE INDEX IF NOT EXISTS gifts_author_day ON gifts(author, day)`,
   `CREATE INDEX IF NOT EXISTS gifts_status ON gifts(status)`,
+  // A Chog's life, kept across seasons: one structured row per meaningful moment (docs/STORY_PLAN.md §2).
+  `CREATE TABLE IF NOT EXISTS chog_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, chog_id INTEGER NOT NULL, season INTEGER NOT NULL, tick INTEGER NOT NULL,
+    at INTEGER NOT NULL, kind TEXT NOT NULL, other INTEGER, ref TEXT, text TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS chog_history_chog ON chog_history(chog_id, id DESC)`,
+  `CREATE INDEX IF NOT EXISTS chog_history_kind ON chog_history(season, kind)`,
+  // Hall of Heroes: one row per finished season.
+  `CREATE TABLE IF NOT EXISTS season_archive (
+    season INTEGER PRIMARY KEY, hero INTEGER, hero_name TEXT, hero_job TEXT, started INTEGER, ended INTEGER,
+    slayers TEXT NOT NULL DEFAULT '[]', top TEXT NOT NULL DEFAULT '[]', sponsors TEXT NOT NULL DEFAULT '[]'
+  )`,
 ];
+// Columns added after the first release of the agents table.
+const MIGRATIONS = [`ALTER TABLE agents ADD COLUMN dmg INTEGER NOT NULL DEFAULT 0`];
 
 let schemaReady = false;
 /** Creates the simulation tables if needed (API routes call this before the first tick has run). */
 export async function ensureSimSchema() {
   if (schemaReady) return;
   for (const q of SCHEMA_V3) await run(q);
+  for (const m of MIGRATIONS) await run(m).catch(() => {});  // already applied
+  await ensureThreadSchema();
   schemaReady = true;
 }
 
@@ -82,7 +99,7 @@ type Agent = {
   id: number; name: string; house: string; job: Job; stats: Record<string, number>;
   state: string; place: string; home: string; work: string; quest: string | null; qprog: number; qneed: number; qgiver: string | null;
   skills: string[]; hp: number; maxhp: number; level: number; xp: number; gold: number; story: number; kills: number; until: number;
-  log: string[];
+  log: string[]; dmg: number;
 };
 
 type Boss = { chog: number; region: string; dungeon: number; hp: number; max: number; down: boolean };
@@ -90,6 +107,7 @@ export type SeasonState = {
   season: number; started: number; phase: number; generals: Boss[]; king: Boss; seals: number;
   hero: number | null; heroName: string | null; heroAt: number | null; lastStand: boolean;
   raid: { town: number; raiders: number[]; until: number } | null;
+  raids?: Record<string, { held: number; lost: number }>;  // per town, for the novel's interludes
 };
 
 const SCHOOL_OF: Record<string, string> = {
@@ -155,7 +173,7 @@ async function loadState(season: number, agents: Agent[], now: number): Promise<
 
 function initAgent(a: Agent, st: SeasonState) {
   // New season (or first run): a fresh life. Memories (posts) live elsewhere and are kept.
-  Object.assign(a, { level: 1, xp: 0, gold: 20, story: 0, kills: 0, quest: null, qprog: 0, qneed: 0, qgiver: null, log: [] });
+  Object.assign(a, { level: 1, xp: 0, gold: 20, story: 0, kills: 0, quest: null, qprog: 0, qneed: 0, qgiver: null, log: [], dmg: 0 });
   const region = regionOfHouse(a.house);
   a.home = `p:${pickOr(townsOf(region), ALL_TOWNS, hash(`home:${a.id}`))}`;
   const school = SCHOOL_OF[a.job.role ?? a.job.track];
@@ -189,13 +207,13 @@ function workplaceOf(a: Agent): number {
 }
 
 // ---------------------------------------------------------------------------------------------------------
-export async function simTick(tick: number, now = Date.now()): Promise<{ lines: number; phase: number; hero: number | null }> {
-  for (const s of SCHEMA_V3) await run(s);
+export async function simTick(tick: number, now = Date.now()): Promise<{ lines: number; phase: number; hero: number | null; writes?: number }> {
+  await ensureSimSchema();
   const season = Number(await getState("season", "0"));
   if (!season) return { lines: 0, phase: 0, hero: null };
   const rows = await all<any>(
     `SELECT c.id, c.name, c.house, cs.job, cs.stats, a.season AS aseason, a.state, a.place, a.home, a.work, a.quest, a.qprog, a.qneed,
-            a.qgiver, a.skills, a.hp, a.maxhp, a.level, a.xp, a.gold, a.story, a.kills, a.until, a.log
+            a.qgiver, a.skills, a.hp, a.maxhp, a.level, a.xp, a.gold, a.story, a.kills, a.until, a.log, a.dmg
      FROM chogs c JOIN chog_season cs ON cs.chog_id = c.id AND cs.season = ?
      LEFT JOIN agents a ON a.chog_id = c.id
      WHERE c.id > 0 ORDER BY c.id`,
@@ -207,7 +225,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     quest: r.quest ?? null, qprog: Number(r.qprog ?? 0), qneed: Number(r.qneed ?? 0), qgiver: r.qgiver ?? null,
     skills: JSON.parse(r.skills || "[]"), hp: Number(r.hp ?? 100), maxhp: Number(r.maxhp ?? 100), level: Number(r.level ?? 1),
     xp: Number(r.xp ?? 0), gold: Number(r.gold ?? 20), story: Number(r.story ?? 0), kills: Number(r.kills ?? 0),
-    until: Number(r.until ?? 0), log: JSON.parse(r.log || "[]"),
+    until: Number(r.until ?? 0), log: JSON.parse(r.log || "[]"), dmg: Number(r.dmg ?? 0),
     ...(Number(r.aseason) === season ? {} : { state: "" }),
   }));
   const st = await loadState(season, agents, now);
@@ -216,13 +234,31 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
   const byId = new Map(agents.map((a) => [a.id, a]));
   const rand = mulberry32((tick * 2654435761) >>> 0);
   const lines: { kind: string; chog: number | null; text: string }[] = [];
+  const hist: { chog: number; kind: string; other: number | null; ref: string | null; text: string }[] = [];
+  /** Remember a moment in this Chog's life (chog_history). */
+  const remember = (a: Agent, kind: string, text: string, other: number | null = null, ref: string | null = null) =>
+    hist.push({ chog: a.id, kind, other, ref, text });
+  for (const id of fresh) {
+    const a = byId.get(id)!;
+    remember(a, "summoned", isDemon(a)
+      ? `Rose in the demon realm as ${article(a.job.name)}, serving the Demon King from ${placeName(a.work)}.`
+      : `Summoned to Monadia as ${article(a.job.name)} of ${placeName(a.home)}.`, null, a.job.id);
+  }
   const say = (kind: string, a: Agent | null, vars: Record<string, string | number>, toLog = true) => {
     const text = narrate(kind, hash(`${kind}:${tick}:${a?.id ?? 0}:${lines.length}`), { a: a?.name ?? "", ...vars });
     lines.push({ kind, chog: a?.id ?? null, text });
     if (a && toLog) a.log = [`${tick}: ${text}`, ...a.log].slice(0, 8);
   };
   const progress = (now - st.started) / seasonMs();
-  const XM = xpMul();
+  const sig = emptySignals();
+  let raidNow: NovelCtx["raid"] = null;
+  let heroArchive: Agent | null = null;
+  // Real-time pacing: a late or skipped tick (GitHub Actions can lag) counts for the time that actually
+  // passed, within 0.5x..3x, so a 24-hour season keeps its rhythm.
+  const lastAt = Number(await getState("sim_last_at", "0"));
+  const pace = lastAt ? Math.min(3, Math.max(0.5, (now - lastAt) / (Number(process.env.SIM_TICK_SECONDS || 45) * 1000))) : 1;
+  const XM = xpMul() * pace;
+  const levelBefore = new Map(agents.map((a) => [a.id, a.level]));
   const before = new Map(agents.map((a) => [a.id, fresh.has(a.id) ? "" : rowKey(a)]));  // new agents always save
 
   // 1. Player gifts (skills and quests from Constellations), applied before anyone acts.
@@ -233,10 +269,14 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     if (g.kind === "skill" && SKILL_BY_ID.has(g.ref) && !a.skills.includes(g.ref) && a.skills.length < MAX_SKILLS) {
       a.skills.push(g.ref);
       say("gift_skill", a, { skill: SKILL_BY_ID.get(g.ref)!.name });
+      sig.gift.push({ chog: a.id, author: String(g.author) });
+      remember(a, "gift_skill", `A Constellation (${who(g.author)}) granted the skill "${SKILL_BY_ID.get(g.ref)!.name}".`, null, String(g.author));
     } else if (g.kind === "quest" && QUEST_BY_ID.has(g.ref) && !isDemon(a)) {
       startQuest(a, QUEST_BY_ID.get(g.ref)!, st, String(g.author));
       a.hp = Math.max(a.hp, Math.round(a.maxhp * 0.5));
       say("gift_quest", a, { quest: QUEST_BY_ID.get(g.ref)!.name });
+      sig.gift.push({ chog: a.id, author: String(g.author) });
+      remember(a, "gift_quest", `A Constellation (${who(g.author)}) set the quest "${QUEST_BY_ID.get(g.ref)!.name}".`, null, String(g.author));
     }
   }
   if (gifts.length) await batch(gifts.map((g) => ({ sql: `UPDATE gifts SET status = 'done' WHERE id = ?`, args: [g.id] })));
@@ -261,6 +301,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     b.hp = Math.max(f, b.hp - dmg);
     if (b.hp <= 0) {
       b.down = true;
+      sig.slay.push({ chog: a.id, region: b === st.king ? "king" : b.region });
       const bossName = byId.get(b.chog)?.name ?? "the boss";
       if (b === st.king) {
         st.hero = a.id;
@@ -268,10 +309,15 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
         st.heroAt = tick;
         a.story += 50;
         say("hero", a, { job: a.job.name, n: season });
+        remember(a, "hero", `Landed the final blow on ${byId.get(b.chog)?.name ?? "the Demon King"}, the Demon King. Hero of Season ${season}.`, b.chog);
+        heroArchive = a;
       } else {
         st.seals += 1;
         a.story += 20;
         say("general_down", a, { boss: `${bossName} the Demon General`, n: st.seals });
+        remember(a, "slay_general", `Slew ${bossName}, Demon General of ${cap(b.region)}, breaking seal ${st.seals} of 4.`, b.chog, b.region);
+        const gAgent = byId.get(b.chog);
+        if (gAgent) remember(gAgent, "fell", `Fell to ${a.name} in the dungeon of ${cap(b.region)}.`, a.id);
         const g = byId.get(b.chog);
         if (g) { g.state = "rest"; g.place = `b:${CASTLE}`; g.hp = 0; }
       }
@@ -287,15 +333,22 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     const def = defenders.reduce((s, a) => s + power(a), 0) * (0.8 + rand() * 0.4);
     const town = P[r.town]?.name ?? "a town";
     if (def >= atk) {
-      for (const d of defenders) { d.xp += Math.round(15 * XM); d.story += 1; d.kills += 1; }
+      for (const d of defenders) { d.xp += Math.round(15 * XM); d.story += 1; d.kills += 1; remember(d, "raid_held", `Defended ${town} against ${raiders.length} demons.`, null, String(r.town)); }
+      for (const x of raiders) remember(x, "raid_lost", `Raided ${town} and was driven back.`, null, String(r.town));
       for (const x of raiders) { x.hp = 0; x.state = "rest"; x.place = x.work; }
       say("raid_won", defenders[0] ?? null, { place: town });
     } else {
       const hurt = defenders.filter(() => rand() < 0.5);
-      for (const d of hurt) d.hp = Math.max(0, d.hp - 40);
+      for (const d of hurt) { d.hp = Math.max(0, d.hp - 40); remember(d, "raid_hurt", `Was wounded when the demons overran ${town}.`, null, String(r.town)); }
+      for (const x of raiders) remember(x, "raid_won", `Raided ${town} and carried off its loot.`, null, String(r.town));
       for (const x of raiders) { x.xp += Math.round(10 * XM); x.state = "idle"; x.place = x.work; }
       say("raid_lost", null, { place: town, n: hurt.length }, false);
     }
+    sig.raid.push({ town: r.town, held: def >= atk, defenders: defenders.map((d) => d.id) });
+    st.raids ??= {};
+    const tally = (st.raids[String(r.town)] ??= { held: 0, lost: 0 });
+    if (def >= atk) tally.held += 1; else tally.lost += 1;
+    raidNow = { town: r.town, held: def >= atk, size: raiders.length, defender: defenders[0]?.id ?? null };
     st.raid = null;
   } else if (!st.raid && st.phase >= 2 && st.phase < 4 && rand() < 0.2) {
     const ready = agents.filter((a) => a.job.role === "henchman" && a.hp > 0 && a.state !== "rest");
@@ -335,13 +388,15 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     if (a.quest) {
       const q = QUEST_BY_ID.get(a.quest);
       if (!q) { a.quest = null; continue; }
-      a.qprog += (1 + skillMatch(a.skills, q) + a.level * 0.04) * (0.8 + r() * 0.4);
+      a.qprog += (1 + skillMatch(a.skills, q) + a.level * 0.04) * (0.8 + r() * 0.4) * pace;
       const danger = q.boss || q.site === "dungeon" || q.kind === "hunt";
       if (danger) {
         const hurt = q.tier * 5 * (0.4 + r()) / (1 + defense(a));
         a.hp = Math.round(a.hp - hurt);
         if (a.hp <= 0) {
           if (narrated++ < 6) say("quest_fail", a, { quest: q.name });
+          if (q.boss === "general" && q.region) sig.ko.push({ chog: a.id, region: q.region });
+          remember(a, "quest_fail", `Was knocked out during "${q.name}" and carried to the temple.`, null, q.id);
           a.quest = null; a.state = "rest"; a.qgiver = null;
           continue;
         }
@@ -351,15 +406,21 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
         const boss = q.boss === "king" ? st.king : st.generals[gi];
         if (!boss || boss.down) { a.quest = null; a.state = "idle"; a.place = a.home; continue; }
         const dmg = Math.round(power(a) * (0.6 + r() * 0.8) * dmgMul);
+        a.dmg += dmg;
+        sig.hit.push({ chog: a.id, region: q.boss === "king" ? "king" : String(q.region) });
         hitBoss(boss, gi, dmg, a);
         if (r() < 0.04 && narrated++ < 6) say("boss_hit", a, { boss: `${byId.get(boss.chog)?.name ?? "the boss"} the ${q.boss === "king" ? "Demon King" : "Demon General"}`, n: dmg });
       }
       if (a.qprog >= a.qneed) {
         a.xp += Math.round(q.xp * XM); a.gold += q.gold; a.story += q.story;
         if (narrated++ < 10 || a.qgiver) say("quest_done", a, { quest: q.name, place: placeName(a.place), n: q.xp });
+        sig.questDone.push({ chog: a.id, gifted: !!a.qgiver });
+        remember(a, "quest_done", q.boss === "general" || q.boss === "king"
+          ? `Survived "${q.name}", dealing ${a.dmg} damage.` : `Completed "${q.name}" at ${placeName(a.place)}.`, null, q.id);
+        a.dmg = 0;
         a.quest = null; a.qgiver = null; a.state = "idle"; a.place = a.home; a.until = tick + 1;
       }
-      levelUp(a, say);
+      levelUp(a, say, remember);
       continue;
     }
     if (a.until > tick) continue;
@@ -378,7 +439,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     if (roll < pQuest + 0.1) { free.push(a); continue; }
     if (r() < 0.7) { a.state = "work"; a.place = a.work; a.xp += Math.round(2 * XM); a.gold += 1; a.until = tick + 2 + Math.floor(r() * 4); }
     else { a.state = "idle"; a.place = a.home; a.until = tick + 1 + Math.floor(r() * 3); }
-    levelUp(a, say);
+    levelUp(a, say, remember);
   }
 
   // 5. Meetings: pairs from the same town train, trade, gossip, heal or team up.
@@ -391,7 +452,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
       const k = rand();
       const vars = { b: b.name, place: placeName(a.home) };
       a.state = "idle"; b.state = "idle"; a.place = a.home; b.place = a.home; a.until = b.until = tick + 2;
-      if (k < 0.3) { a.xp += Math.round(6 * XM); b.xp += Math.round(6 * XM); if (social++ < 4) say("train", a, vars); }
+      if (k < 0.3) { sig.spar.push([a.id, b.id]); a.xp += Math.round(6 * XM); b.xp += Math.round(6 * XM); if (social++ < 4) say("train", a, vars); }
       else if (k < 0.5) { a.gold += 2; b.gold = Math.max(0, b.gold - 1); if (social++ < 4) say("trade", a, vars); }
       else if (k < 0.75) {
         a.story += 1;
@@ -404,34 +465,84 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
           startQuest(b, q, st, null);
           b.place = a.place;
           if (social++ < 4) say("party", a, { ...vars, quest: q.name });
+          remember(a, "party", `Formed a party with ${b.name} for "${q.name}".`, b.id, q.id);
+          remember(b, "party", `Joined ${a.name} on "${q.name}".`, a.id, q.id);
         }
       }
     }
   }
 
-  // 6. Season end: once a Hero exists and the season clock is up, a new season re-rolls every job.
+  // 6. Story threads: rivals, nemeses, sieges, sponsored Chogs, underdogs.
+  if (tick % 10 === 0)
+    sig.candidates = agents.filter((a) => !isDemon(a)).sort((a, b) => b.story - a.story || b.level - a.level).slice(0, 5)
+      .filter((a) => a.job.track !== "adventurer").map((a) => a.id);
+  const genName = (region: string) => {
+    const g = region === "king" ? st.king : st.generals.find((x) => x.region === region);
+    return g ? `${byId.get(g.chog)?.name ?? "a demon"} the ${region === "king" ? "Demon King" : "Demon General"}` : "a Demon General";
+  };
+  const threadLines = await advanceThreads(season, tick, sig, (id) => byId.get(id)?.name ?? "someone", (i) => P[i]?.name ?? "a town", genName);
+  for (const t of threadLines) {
+    lines.push({ kind: "thread", chog: t.chog, text: t.text });
+    for (const id of t.actors) {
+      const x = byId.get(id);
+      if (x) remember(x, "thread", t.text.replace(/^\[THREAD\] /, ""), null, t.kind);
+    }
+  }
+
+  // 7. The season novel: chapters whose milestone was reached this tick.
+  const novelCtx = (seasonEnd: boolean): NovelCtx => ({
+    season, tick, now, st, progress, seasonStart: fresh.size > 1000, seasonEnd, raid: raidNow, placeName,
+  });
+  const chapter = async (end: boolean) => {
+    for (const title of await writeChapters(novelCtx(end))) lines.push({ kind: "chapter", chog: null, text: `[CHRONICLE] A new chapter is written: "${title}".` });
+  };
+
+  // 8. Season end: once a Hero exists and the season clock is up, a new season re-rolls every job.
   if (st.hero && progress >= 1) {
-    await saveAll(agents, season, before);
+    await saveAll(agents, season, before, levelBefore);
+    await writeHistory(hist, season, tick, now);
+    await chapter(true);
+    await setState("sim_last_at", now);
+    await batch(lines.map((l) => ({ sql: `INSERT INTO chronicle(season, tick, at, kind, chog, text) VALUES(?,?,?,?,?,?)`, args: [season, tick, now, l.kind, l.chog, l.text] })));
     await startSeason(season + 1);
     await setState("sim_state", "");
     return { lines: lines.length, phase: 4, hero: st.hero };
   }
 
-  await saveAll(agents, season, before);
+  const writes = await saveAll(agents, season, before, levelBefore);
+  await writeHistory(hist, season, tick, now);
+  await chapter(false);
+  await setState("sim_last_at", now);
+  if (heroArchive) await archiveSeason(season, st, heroArchive, agents, now);
   await setState("sim_state", JSON.stringify(st));
   if (lines.length)
     await batch(lines.map((l) => ({ sql: `INSERT INTO chronicle(season, tick, at, kind, chog, text) VALUES(?,?,?,?,?,?)`, args: [season, tick, now, l.kind, l.chog, l.text] })));
-  return { lines: lines.length, phase: st.phase, hero: st.hero };
+  return { lines: lines.length, phase: st.phase, hero: st.hero, writes: writes + hist.length + lines.length };
 }
 
-function levelUp(a: Agent, say: (k: string, a: Agent, v: Record<string, string | number>) => void) {
+/** Title tier for a level: a new title every 3 levels (titles in data/jobs.json). */
+export const titleTier = (level: number) => Math.min(4, Math.floor((level - 1) / 3));
+
+function levelUp(a: Agent, say: (k: string, a: Agent, v: Record<string, string | number>) => void,
+  remember: (a: Agent, kind: string, text: string, other?: number | null, ref?: string | null) => void) {
   while (a.xp >= a.level * 50) {
     a.xp -= a.level * 50;
+    const tier = titleTier(a.level);
     a.level += 1;
     a.maxhp += 8;
     if (a.level >= 4) say("level_up", a, { n: a.level });
+    remember(a, "level", `Reached level ${a.level}.`, null, String(a.level));
+    if (titleTier(a.level) > tier) remember(a, "title", `Earned the title "${a.job.titles[titleTier(a.level)]}".`, null, a.job.titles[titleTier(a.level)]);
   }
 }
+
+const article = (w: string) => (/^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`);
+const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
+/** Short public label for a gift's author: 0x12ab…cd34, or "a judge". */
+const who = (author: unknown) => {
+  const s = String(author);
+  return s.startsWith("judge") ? "a judge" : s.startsWith("0x") ? `${s.slice(0, 6)}…${s.slice(-4)}` : s;
+};
 
 function chooseQuest(a: Agent, st: SeasonState, progress: number, r: () => number): Quest | null {
   const maxTier = Math.min(5, 1 + Math.floor(a.level / 3), 1 + Math.floor(progress * 6));
@@ -467,24 +578,49 @@ function startQuest(a: Agent, q: Quest, st: SeasonState, giver: string | null) {
 }
 
 const rowKey = (a: Agent) => JSON.stringify([a.state, a.place, a.home, a.work, a.quest, a.qprog, a.qneed, a.qgiver, a.skills, a.hp, a.maxhp,
-  a.level, a.xp, a.gold, a.story, a.kills, a.until, a.log]);
+  a.level, a.xp, a.gold, a.story, a.kills, a.until, a.log, a.dmg]);
 
-/** Writes only the agents that changed this tick (most working Chogs don't), plus level changes to chog_season. */
-async function saveAll(agents: Agent[], season: number, before: Map<number, string>) {
+/** Writes only the agents that changed this tick (most working Chogs don't), plus level changes to
+ *  chog_season (the free database tier counts every row written). Returns the number of rows written. */
+async function saveAll(agents: Agent[], season: number, before: Map<number, string>, levelBefore: Map<number, number>) {
   const changed = agents.filter((a) => before.get(a.id) !== rowKey(a));
   const stmts = changed.map((a) => ({
-    sql: `INSERT INTO agents(chog_id, season, state, place, home, work, quest, qprog, qneed, qgiver, skills, hp, maxhp, level, xp, gold, story, kills, until, log)
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    sql: `INSERT INTO agents(chog_id, season, state, place, home, work, quest, qprog, qneed, qgiver, skills, hp, maxhp, level, xp, gold, story, kills, until, log, dmg)
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
           ON CONFLICT(chog_id) DO UPDATE SET season=excluded.season, state=excluded.state, place=excluded.place, home=excluded.home, work=excluded.work,
             quest=excluded.quest, qprog=excluded.qprog, qneed=excluded.qneed, qgiver=excluded.qgiver, skills=excluded.skills, hp=excluded.hp,
             maxhp=excluded.maxhp, level=excluded.level, xp=excluded.xp, gold=excluded.gold, story=excluded.story, kills=excluded.kills,
-            until=excluded.until, log=excluded.log`,
+            until=excluded.until, log=excluded.log, dmg=excluded.dmg`,
     args: [a.id, season, a.state, a.place, a.home, a.work, a.quest, +a.qprog.toFixed(2), a.qneed, a.qgiver, JSON.stringify(a.skills),
-      Math.max(0, Math.round(a.hp)), a.maxhp, a.level, a.xp, a.gold, a.story, a.kills, a.until, JSON.stringify(a.log)],
+      Math.max(0, Math.round(a.hp)), a.maxhp, a.level, a.xp, a.gold, a.story, a.kills, a.until, JSON.stringify(a.log), a.dmg],
   }));
   for (let i = 0; i < stmts.length; i += 500) await batch(stmts.slice(i, i + 500));
-  // Mirror level/HP/gold/story into the season table that older panels read.
-  const mirror = changed.map((a) => ({ sql: `UPDATE chog_season SET level = ?, xp = ?, gold = ?, hp = ?, story = ? WHERE chog_id = ? AND season = ?`,
+  // Mirror into the season table that older panels read, only when the level changed (titles and levels).
+  const mirror = changed.filter((a) => levelBefore.get(a.id) !== a.level).map((a) => ({ sql: `UPDATE chog_season SET level = ?, xp = ?, gold = ?, hp = ?, story = ? WHERE chog_id = ? AND season = ?`,
     args: [a.level, a.xp, a.gold, Math.max(0, Math.round(a.hp)), a.story, a.id, season] }));
   for (let i = 0; i < mirror.length; i += 500) await batch(mirror.slice(i, i + 500));
+  return changed.length + mirror.length;
+}
+
+async function writeHistory(hist: { chog: number; kind: string; other: number | null; ref: string | null; text: string }[], season: number, tick: number, now: number) {
+  const stmts = hist.map((h) => ({
+    sql: `INSERT INTO chog_history(chog_id, season, tick, at, kind, other, ref, text) VALUES(?,?,?,?,?,?,?,?)`,
+    args: [h.chog, season, tick, now, h.kind, h.other, h.ref, h.text],
+  }));
+  for (let i = 0; i < stmts.length; i += 500) await batch(stmts.slice(i, i + 500));
+}
+
+/** Hall of Heroes: the Hero, who slew each general, the top Chogs and the Constellations behind the Hero. */
+async function archiveSeason(season: number, st: SeasonState, hero: Agent, agents: Agent[], now: number) {
+  const slayers = await all<any>(
+    `SELECT h.chog_id id, c.name, h.ref region FROM chog_history h JOIN chogs c ON c.id = h.chog_id WHERE h.season = ? AND h.kind = 'slay_general'`, [season]);
+  const top = agents.filter((a) => !isDemon(a)).sort((a, b) => b.story - a.story || b.level - a.level).slice(0, 10)
+    .map((a) => ({ id: a.id, name: a.name, job: a.job.name, level: a.level, story: a.story }));
+  const sponsors = await all<any>(`SELECT DISTINCT author FROM gifts WHERE chog_id = ? AND status = 'done'`, [hero.id]);
+  await run(
+    `INSERT OR REPLACE INTO season_archive(season, hero, hero_name, hero_job, started, ended, slayers, top, sponsors) VALUES(?,?,?,?,?,?,?,?,?)`,
+    [season, hero.id, hero.name, hero.job.name, st.started, now,
+      JSON.stringify(slayers.map((x) => ({ id: Number(x.id), name: x.name, region: x.region }))), JSON.stringify(top),
+      JSON.stringify(sponsors.map((x) => who(x.author)))],
+  );
 }

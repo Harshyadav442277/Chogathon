@@ -1,0 +1,96 @@
+{
+  "title": "The Monadia Cycle",
+  "note": "One fixed novel, retold every season with that season's Chogs and events. {pointer} is filled from the simulation; [[pointer|text]] appears only when the pointer has a value. See src/sim3/novel.ts. Titles carry no numbers: chapters are numbered in the order they were written (the API adds `number`).",
+  "chapters": [
+    {
+      "id": "summoning",
+      "trigger": "season_start",
+      "title": "The Summoning",
+      "text": "Nobody in Monadia remembers the moment the sky opened. They only remember waking.\n\nOne thousand nine hundred and sixty-nine of them woke at once, in fields and doorways and on the cold steps of guild halls, each holding a slip of paper with a single word on it: a job. {w1} woke in {w1home} and read \"{w1job}\" and laughed, because it seemed too small a word for a whole new life. {w2} read \"{w2job}\" and did not laugh at all. {w3}, in {w3home}, read \"{w3job}\" twice, folded the paper very carefully, and put it in a pocket close to the heart.\n\nThat same night, far to the south, past the Field of Broken Wallets, a castle that had been silent for a season lit one window. {king} opened their eyes on a throne of black glass and said, to no one, \"Again.\"\n\nFour shadows bowed. {g1} would go to {r1}. {g2} to {r2}. {g3} to {r3}. {g4} to {r4}. Each would sit on a seal. As long as the four seals held, the castle could not be touched.\n\nThis is Season {season} of the Monadia Cycle. It ends the way it always ends: with the Demon King on the floor and a new name in the Hall of Heroes. Nobody yet knows whose."
+    },
+    {
+      "id": "guild",
+      "trigger": "quests_25",
+      "title": "The Guild Opens",
+      "text": "The guild boards filled overnight. Slimes in the river reeds, wolves at the pass, a baker's cart that needed guarding and a town gate that needed mending. Small work. Honest work.\n\nThe first to come back with a stamped quest was {firstQuester}, the {firstQuesterJob}, carrying proof of \"{firstQuest}\" from {firstQuestPlace}. It was not a heroic deed. The guild clerk stamped it anyway, with a little more force than necessary, and the sound carried across the hall like a starting bell.\n\nBy the end of the day {questsDone} quests had been turned in. Chogs who had been strangers that morning were sharing maps, trading boots and arguing about who had seen the biggest slime.\n\n[[cand1|Already, some names came up more than others. {cand1} was one of them.]]\n\nThe stars, if they were watching, had begun to take notes."
+    },
+    {
+      "id": "first_raid",
+      "trigger": "first_raid",
+      "title": "Smoke on the Horizon",
+      "text": "The first raid came at dusk, the way the old songs said it would.\n\n{raidSize} demons poured out of the dark toward {raidTown}: imps with pitchforks, dark knights with patient spears, a cultist or two chanting in a language nobody wanted to learn. The town bell rang until the rope snapped.\n\n{raidOutcome}\n\nIn the morning the guild posted a new kind of notice: DEFEND YOUR TOWNS. Nobody had to be told that the season had changed."
+    },
+    {
+      "id": "generals_wake",
+      "trigger": "phase_2",
+      "title": "The Generals Wake",
+      "text": "On the second dawn the ground shook in four places at once.\n\nIn {r1}, {g1} stepped out of the dungeon and looked at the sky as if it owed them money. In {r2}, {g2} rose from black water without making a ripple. In {r3}, {g3} smiled at their own reflection in a thousand mirrors. In {r4}, {g4} sang a lullaby nobody could remember afterwards.\n\nThe Demon Generals were awake, and each of them sat upon a seal.\n\nThe guild boards changed again. New quests appeared at the very top, written in red: FACE THE GENERAL OF LIQUIDATION. SILENCE THE DROWNED ARCHIVIST. SHATTER THE MIRROR WRAITH. WAKE FROM THE NIGHTMARE SHEPHERD. Most Chogs read them, swallowed, and went back to the slime quests. A few did not."
+    },
+    {
+      "id": "interlude_25",
+      "trigger": "progress_25",
+      "title": "Interlude · A Quarter of the Way",
+      "text": "A quarter of the season is gone. Here is how Monadia stands.\n\nQuests completed: {questsDone}. Raids held: {raidsHeld}. Raids lost: {raidsLost}. [[mostRaided|The town that suffered most is {mostRaided}, raided {mostRaidedCount} times.]]\n\nThe names on everyone's lips are {cand1}, {cand2} and {cand3}. [[rivalA|And in the training yards, nobody can stop talking about {rivalA} and {rivalB}, who have fought each other {rivalCount} times and still refuse to call it a rivalry.]]\n\nThe four seals hold. For now."
+    },
+    {
+      "id": "general_1",
+      "trigger": "seals_1",
+      "title": "The First Seal",
+      "text": "{slain} had held {slainRegion} for days. Parties went in. Parties were carried out.\n\nThen {slayer} went in.\n\n{slayer} was {slayerJobA}, level {slayerLevel}, and nobody had bet on them. The fight in the dungeon lasted longer than anyone outside could bear. When it was over, the dungeon was quiet, and the first seal lay cracked on the stone floor like a dropped plate.\n\n[[slayerNemesis|They had been beaten by {slain} before. Twice. This time they had not come back to lose.]]\n\nFar to the south, in the black castle, {king} felt something give way, and for the first time this season, frowned."
+    },
+    {
+      "id": "general_2",
+      "trigger": "seals_2",
+      "title": "The Second Seal",
+      "text": "News of the first seal travelled fast, and courage travels faster than news.\n\nIn {slainRegion}, the parties grew bigger and the songs grew louder. It was {slayer}, the {slayerJob}, who landed the blow that finally brought {slain} down. Two seals broken. Two left.\n\n[[slayerRival|Somewhere in the crowd that cheered, {slayerRival} cheered loudest, and only a little bit jealously.]]\n\nThe Demon King sent more raiders that night. It did not help."
+    },
+    {
+      "id": "general_3",
+      "trigger": "seals_3",
+      "title": "The Third Seal",
+      "text": "{slain} was the cleverest of the four, and the cruellest. It did not matter.\n\n{slayer} stood in the wreckage of {slainRegion}'s dungeon, breathing hard, while the third seal crumbled to dust in their hand. [[slayerSponsor|Above them, a star the townsfolk had started calling \"{slayerSponsor}'s star\" flared once, very bright.]]\n\nOne seal remains. Everyone knows which one. Everyone knows it will be the hardest."
+    },
+    {
+      "id": "interlude_50",
+      "trigger": "progress_50",
+      "title": "Interlude · Halfway",
+      "text": "Halfway. The seals: {seals} of 4 broken.\n\nMonadia has completed {questsDone} quests, held its walls {raidsHeld} times and lost them {raidsLost} times. [[siegeTown|{siegeTown} has been besieged so often that its children play \"raid\" the way other children play tag.]]\n\nThe hero candidates have changed. Now it is {cand1} ({cand1job}), {cand2} ({cand2job}) and {cand3} ({cand3job}). The bards have started writing songs, which is always a bad sign for somebody."
+    },
+    {
+      "id": "general_4",
+      "trigger": "seals_4",
+      "title": "The Last Seal",
+      "text": "The last general, {slain}, did not wait in the dungeon. It came out to meet them.\n\nWhat happened in {slainRegion} that day is told a hundred ways in the taverns, and in every version {slayer} is the one still standing at the end. The fourth seal broke with a sound like a bell cracking in winter.\n\nAll four seals are gone. Between the people of Monadia and the Demon King, there is now nothing but a long road south and whatever courage they have left."
+    },
+    {
+      "id": "march",
+      "trigger": "phase_3",
+      "title": "The March",
+      "text": "They did not all go. Bakers stayed to bake; somebody had to. Farmers stayed with their fields. But from every town, in twos and threes and whole loud parties, Chogs walked south.\n\n{cand1} went. {cand2} went. {cand3} went, saying it was only to watch.\n\nThe Demon King's castle stood on its black hill exactly as the old stories said, one window lit. {king} was waiting on the throne of black glass, and when the first party reached the gate, the Demon King stood up for the first time all season.\n\n\"Again,\" said {king}. \"Always again.\""
+    },
+    {
+      "id": "interlude_75",
+      "trigger": "progress_75",
+      "title": "Interlude · Three Quarters",
+      "text": "Three quarters of the season are gone. The Demon King still stands at {kingHp}% strength.\n\nThe march goes on. Parties go up the black hill and come back down on stretchers, and go up again. [[rivalA|{rivalA} and {rivalB} are said to have stopped arguing, which worries everyone.]]\n\nThe candidates now: {cand1}, {cand2}, {cand3}. One of them, or someone nobody has noticed yet, is about to become a legend."
+    },
+    {
+      "id": "last_stand",
+      "trigger": "last_stand",
+      "title": "Last Stand",
+      "text": "Time ran short. The season was ending and the Demon King was still on the throne.\n\nThat night every star over Monadia burned at once. The Constellations, all of them, poured their light into the people below. Swords cut deeper. Shields held longer. Every blow against {king} struck three times as hard.\n\nIt was not fair. It was not meant to be. It was the Last Stand."
+    },
+    {
+      "id": "final_blow",
+      "trigger": "hero",
+      "title": "The Final Blow",
+      "text": "In the end it was not a knight, or not necessarily. It was {hero}.\n\n{hero} had been summoned as {heroJobA} of {heroHome}, at level 1, holding a slip of paper with one small word on it. At level {heroLevel}, standing in the throne room of the black castle, they landed the blow that put {king}, the Demon King, on the floor.\n\n[[heroCompanion|{heroCompanion} was beside them. {heroCompanion} had been beside them for most of the season.]] [[heroRival|{heroRival}, their rival, was the first to lift them onto their shoulders.]] [[heroSponsor|And high above, the star of {heroSponsor}, the Constellation who had believed in them first, burned brighter than all the rest.]]\n\nThe throne of black glass cracked from top to bottom. The window went dark.\n\n{hero}, {heroJob}, is the Hero of Season {season}."
+    },
+    {
+      "id": "epilogue",
+      "trigger": "season_end",
+      "title": "Epilogue · The Hall of Heroes",
+      "text": "They carved the name into the Hall of Heroes the next morning: {hero}, Season {season}.\n\nBeside it, smaller, the names of those who broke the seals: {slayers}. Below those, the ones the bards would not stop singing about: {cand1}, {cand2}, {cand3}.\n\nIn all, Monadia completed {questsDone} quests this season, held its walls {raidsHeld} times and lost them {raidsLost} times.\n\nThen the sky opened again, the way it always does. Every Chog in Monadia woke with a new slip of paper in their hand and a new word on it. Somewhere in the south, a window lit.\n\nThe Monadia Cycle turns."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# Chog Hivemind: World Bible
+# ChogSekai: World Bible
 ### *"I got reincarnated as an NFT in a fantasy world, and my holder is a god"*
 
 This document is the design source of truth for the isekai version of Chog Hivemind. Every system here is **mechanically real**: it changes what agents do in the simulation or what players can do. Each section ends with the data or engine hook that implements it. Counts come from the real Chog Genesis metadata (1,962 of 1,969 tokens snapshotted; the last 7 are being retried).

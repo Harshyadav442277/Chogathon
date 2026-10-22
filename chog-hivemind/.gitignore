@@ -10,3 +10,6 @@ next-env.d.ts
 data/*.log
 test.db
 siwe-test.tmp.mjs
+
+.vercel
+.env*

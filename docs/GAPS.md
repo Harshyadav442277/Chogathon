@@ -9,7 +9,7 @@ Checked: 18 October 2026. Remove or resolve rows as evidence becomes available.
 | Which NFT contract and network should we use? | Not specified on reviewed event pages. The code uses `0xc96d31F8626c6D03Fae5dCD3d61e3FB9F4a73763` on Monad (chain 143); on 21 Oct 2026 `rpc.monad.xyz` returned name "Chog Genesis" and totalSupply 1969 | Confirm with organisers that this is the intended collection | To assign |
 | Which eligibility or reuse conditions apply? | Detailed terms not found on reviewed pages; existing work must be disclosed | Confirm relevant conditions with organizers | To assign |
 | Which prize figures are final? | Published table totals differ from advertised pools | Ask organizers if this affects planning | To assign |
-| Deployment | Live at https://chog-hivemind.vercel.app since 21 Oct 2026, deployed from PR #1 by CLI; tick cron runs on `main` against Turso. Not connected to GitHub, and `/world` is not deployed yet | Merge PR #1, then redeploy from `main` (or connect the repo in Vercel) | To assign |
+| Deployment | Two deploys, two Turso databases (checked 2026-10-22 17:40 UTC): https://chogsekai.vercel.app (current game, season 1, tick 2, not ticked by the cron) and https://chog-hivemind.vercel.app (2026-10-21, the database the `hive-tick` Actions secrets point at, tick 19) | Point the Actions secrets `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN` at the chogsekai database, then retire the older deploy | To assign |
 | Claude API key and budget | None configured; the offline brain writes template text | Add `ANTHROPIC_API_KEY` with a spend limit | To assign |
 | 7 tokens missing metadata | IPFS fetch failed for 7 of 1,969 during snapshot | Re-run `npm run snapshot`, then `seed`, `thumbs`, `atlas` | To assign |
 | Whisper tested with a real holder? | Only the non-holder rejection was tested | Test with a wallet that holds a Chog Genesis | To assign |
@@ -21,3 +21,9 @@ Checked: 18 October 2026. Remove or resolve rows as evidence becomes available.
 ## Resolved answers
 
 No answers recorded yet. For each answer, add the date, source link, exact practical implication and who confirmed it.
+
+## Open as of 2026-10-21 (season simulation and story)
+- **Deployment:** deployed 2026-10-22 to https://chogsekai.vercel.app (Vercel + Turso). **Open:** the GitHub Actions secrets (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`) and variables (`SEASON_HOURS=24`, `SIM_TICK_SECONDS=600`) must be set by a repo admin, or the world will not tick; `/play` not yet checked in a browser.
+- **Daily Pull with a wallet:** tested on the deployed site with the judge code (2026-10-22); not tested with a real holder wallet; the hand logic (deterministic, rarity-weighted) and the apply path (gifts queued in the database) were.
+- **Local dev server latency:** occasional multi-second responses on the Next.js dev server around simulation ticks; not measured on a production build.
+- **Story volume:** about 24,000 history rows per 160-tick season locally; a 7-day season at 45-second ticks writes far more quest rows. Pruning old seasons is not implemented yet.

@@ -18,6 +18,8 @@ async function main() {
   const { season } = await startSeason();
   const start = Date.now();
   const t0 = performance.now();
+  let heroAt = 0;
+  const ticksPerSeason = Math.ceil(Number(process.env.SEASON_HOURS) * 80);
   for (let t = 1; t <= TICKS; t++) {
     const res = await simTick(t, start + t * 45_000);
     if (t % 10 === 0 || res.hero) {
@@ -28,12 +30,23 @@ async function main() {
     }
     if (res.hero) {
       const h = await all<any>(`SELECT c.name, cs.job, a.level FROM chogs c JOIN agents a ON a.chog_id = c.id JOIN chog_season cs ON cs.chog_id = c.id AND cs.season = ? WHERE c.id = ?`, [season, res.hero]);
-      console.log(`HERO at tick ${t}: ${h[0]?.name} (${h[0]?.job}, level ${h[0]?.level})`);
-      break;
+      if (!heroAt) console.log(`HERO at tick ${t}: ${h[0]?.name} (${h[0]?.job}, level ${h[0]?.level})`);
+      heroAt ||= t;
     }
+    if (heroAt && t >= Math.max(heroAt, ticksPerSeason) + 1) break;  // run past the season end so the epilogue is written
   }
   console.log(`${((performance.now() - t0) / 1000).toFixed(1)} s total`);
-  const lines = await all<any>(`SELECT text FROM chronicle ORDER BY id DESC LIMIT 12`);
-  for (const l of lines.reverse()) console.log("  ", l.text);
+  const hist = await all<any>(`SELECT kind, COUNT(*) n FROM chog_history WHERE season = ? GROUP BY kind ORDER BY n DESC`, [season]);
+  console.log("history:", hist.map((h) => `${h.kind} ${h.n}`).join(", "));
+  const th = await all<any>(`SELECT kind, stage, COUNT(*) n FROM threads WHERE season = ? AND stage >= 1 GROUP BY kind, stage`, [season]);
+  console.log("threads:", th.map((h) => `${h.kind}/${h.stage} ${h.n}`).join(", "));
+  const tl = await all<any>(`SELECT text FROM chronicle WHERE season = ? AND kind = 'thread' ORDER BY id LIMIT 6`, [season]);
+  for (const l of tl) console.log("  ", l.text);
+  const novel = await all<any>(`SELECT title, text FROM novel WHERE season = ? ORDER BY tick, ord`, [season]);
+  console.log(`
+NOVEL: ${novel.length} chapters`);
+  for (const c of novel) console.log(`
+## ${c.title}
+${c.text}`);
 }
 main();

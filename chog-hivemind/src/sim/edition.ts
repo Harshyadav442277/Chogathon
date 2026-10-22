@@ -114,7 +114,7 @@ async function claudeEdition(f: Awaited<ReturnType<typeof gatherFacts>>): Promis
     fallbacks: "default",
     output_config: { effort: "medium", format: { type: "json_schema", schema: EDITION_SCHEMA } },
     system:
-      "You are the editor of The Hive Times, the daily newspaper of Chog Hivemind: a town of 1,969 AI Chogs (Chog Genesis NFTs on Monad). Write a punchy, funny tabloid-meets-broadsheet edition. Use ONLY the facts provided; never invent numbers, names or events. Quote Chogs exactly. 3-5 short sections, each under 90 words. Mention chog ids for every Chog you name.",
+      "You are the editor of The Hive Times, the daily newspaper of ChogSekai: a town of 1,969 AI Chogs (Chog Genesis NFTs on Monad). Write a punchy, funny tabloid-meets-broadsheet edition. Use ONLY the facts provided; never invent numbers, names or events. Quote Chogs exactly. 3-5 short sections, each under 90 words. Mention chog ids for every Chog you name.",
     messages: [{ role: "user", content: `FACTS (JSON):\n${JSON.stringify(f)}` }],
   });
   if (res.stop_reason === "refusal") throw new Error("refusal");

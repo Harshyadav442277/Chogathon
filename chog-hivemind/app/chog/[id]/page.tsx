@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const c = await chogDetail(Number(id));
-  return { title: c ? `${c.name} · Chog Hivemind` : "Chog Hivemind" };
+  return { title: c ? `${c.name} · ChogSekai` : "ChogSekai" };
 }
 
 const STATUS: Record<string, string> = { pending: "⏳ waiting for the next tick", obey: "✅ obeyed", twist: "🌀 twisted it", ignored: "🙅 ignored you" };

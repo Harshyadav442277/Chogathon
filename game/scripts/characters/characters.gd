@@ -10,8 +10,8 @@ const MIN_SCREEN := 0.0065  # character.gdshader min_screen
 const STATES := {"walk": 0, "work": 1, "fight": 2, "idle": 3, "rest": 3, "quest": 1, "raid": 2}
 ## Wandering per server state: radius around the server's spot, chance to move when a pause ends, pause range (s).
 const WANDER := {
-	"work": [2.5, 0.35, 5.0, 14.0], "idle": [9.0, 0.75, 2.0, 6.0], "quest": [5.0, 0.6, 3.0, 8.0],
-	"fight": [3.0, 0.5, 2.0, 5.0], "rest": [1.5, 0.1, 8.0, 20.0], "raid": [6.0, 0.7, 1.0, 3.0],
+	"work": [3.0, 0.55, 3.0, 8.0], "idle": [9.0, 0.85, 1.5, 4.0], "quest": [5.0, 0.7, 2.0, 6.0],
+	"fight": [3.5, 0.65, 1.5, 4.0], "rest": [2.0, 0.25, 6.0, 14.0], "raid": [6.0, 0.8, 1.0, 2.5],
 }
 const WANDER_SPEED := 1.6
 const WANDER_SLICE := 160  # agents whose pause timer is checked per frame
@@ -106,7 +106,9 @@ func _on_positions() -> void:
 			_yaw[i] = fmod(_ids[i] * 2.39996, TAU)  # golden-angle spread so idle crowds don't all face one way
 			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), _cur[i]))
 		elif _cur[i].distance_to(_tgt[i]) > float(WANDER[_wstate[i]][0]) * 1.5:
-			_walk_to_target(i)  # the server sent it somewhere else: walk there
+			# The server sent it somewhere else: it appears there (no long walks across lakes and rivers).
+			_cur[i] = _tgt[i]
+			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, _yaw[i]), _cur[i]))
 		else:
 			_tgt[i] = _cur[i]  # same place: keep wandering around the new anchor
 		var state: int = STATES.get(sname, 1)
@@ -148,14 +150,22 @@ func _wander() -> void:
 			var x := a.x + cos(ang) * r
 			var z := a.z + sin(ang) * r
 			var h := terrain.height_at(x, z) if terrain else 0.0
-			if terrain and h < 0.8:
-				continue  # water
+			if terrain and not _dry_path(_cur[i], x, z):
+				continue  # the step would touch water
 			if towns and towns.has_method("is_open") and not towns.is_open(x, z):
 				continue  # inside a building, fountain or wall
 			_tgt[i] = Vector3(x, maxf(h, 0.3), z)
 			_walk_to_target(i, WANDER_SPEED)
 			break
 	_wander_cursor = (_wander_cursor + WANDER_SLICE) % n
+
+
+## True when the straight step from `from` to (x, z) stays on dry ground (checked at a third, two thirds and the end).
+func _dry_path(from: Vector3, x: float, z: float) -> bool:
+	for t in [0.33, 0.66, 1.0]:
+		if terrain.height_at(lerpf(from.x, x, t), lerpf(from.z, z, t)) < 0.8:
+			return false
+	return true
 
 
 ## Starts a walk when the server moved this Chog: constant speed, facing the direction of travel.

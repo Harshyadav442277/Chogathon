@@ -64,7 +64,7 @@ export async function buildingDetail(id: number) {
     );
     keepers = rows.map((r) => {
       const job = r.job ? JOB_BY_ID[r.job] : undefined;
-      const tier = Math.min(4, Math.floor((Number(r.level ?? 1) - 1) / 10));
+      const tier = Math.min(4, Math.floor((Number(r.level ?? 1) - 1) / 3));  // same as titleTier in src/sim3/sim.ts
       return { id: Number(r.id), name: r.name, job: job?.name ?? "", title: job?.titles[tier] ?? "" };
     });
   }

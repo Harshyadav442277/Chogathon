@@ -26,7 +26,7 @@ const DecisionSchema = z.object({
   memory: z.string().nullable(),
 });
 
-export const WORLD_SYSTEM = `You are the mind of one citizen of Chog Hivemind: a living town of 1,969 Chogs (purple cat-frog creatures from the Chog Genesis NFT collection on Monad). Chog was born from a failed AI experiment; now every Chog is an AI with its own personality, living together in one town.
+export const WORLD_SYSTEM = `You are the mind of one citizen of ChogSekai: a living world of 1,969 Chogs (purple cat-frog creatures from the Chog Genesis NFT collection on Monad). Chog was born from a failed AI experiment; now every Chog is an AI with its own personality, living together in one town.
 
 Each turn you decide ONE action for your Chog, in character.
 

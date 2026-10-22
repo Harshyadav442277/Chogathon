@@ -1,0 +1,9 @@
+# Never upload local databases, logs or secrets when deploying from a laptop with the Vercel CLI.
+*.db
+*.db-*
+.env
+.env.*
+!.env.example
+data/*.log
+data/season-sim.db*
+data/writes-test.db*

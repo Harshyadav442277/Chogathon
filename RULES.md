@@ -9,7 +9,7 @@ Checked on **18 October 2026** against the [official website](https://chogathon.
 | Build period starts | 9 October 2026, 15:00 | 9 October 2026, 8:30 pm |
 | Registration closes | 11 October 2026, 13:00 | 11 October 2026, 6:30 pm |
 | Submissions close | 23 October 2026, 15:00 | 23 October 2026, 8:30 pm |
-| Judging | Seven days after the build period | Exact result announcement time not published |
+| Judging | Seven days after the build period (re-checked 22 October 2026: the site states "7 Days of judging" and "One week to judge"; judges score after the hackathon ends) | Exact result announcement time not published; winners are announced "after judging" |
 
 The build period is 14 days. As of the check date, registration is closed and submissions remain open for registered participants. Our registration has not been checked.
 

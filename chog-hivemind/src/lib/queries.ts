@@ -122,7 +122,7 @@ export async function seasonInfo(id: number) {
     if (!s) return null;
     const job = JOB_BY_ID[s.job];
     const level = Number(s.level);
-    const tier = Math.min(4, Math.floor((level - 1) / 10));
+    const tier = Math.min(4, Math.floor((level - 1) / 3));  // same as titleTier in src/sim3/sim.ts
     return {
       n: Number(s.season), job: s.job, jobName: job?.name ?? s.job, title: job?.titles[tier] ?? job?.name ?? s.job,
       track: s.track, role: s.role, level, xp: Number(s.xp), rank: s.rank, gold: Number(s.gold), hp: Number(s.hp),
