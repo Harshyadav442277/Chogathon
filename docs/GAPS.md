@@ -23,7 +23,7 @@ Checked: 18 October 2026. Remove or resolve rows as evidence becomes available.
 No answers recorded yet. For each answer, add the date, source link, exact practical implication and who confirmed it.
 
 ## Open as of 2026-10-21 (season simulation and story)
-- **Deployment:** deployed 2026-10-22 to https://chogsekai.vercel.app (Vercel + Turso). **Open:** the GitHub Actions secrets (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`) and variables (`SEASON_HOURS=24`, `SIM_TICK_SECONDS=600`) must be set by a repo admin, or the world will not tick; `/play` not yet checked in a browser.
+- **Deployment:** deployed 2026-10-22 to https://chogsekai.vercel.app (Vercel + Turso). Ticking resolved 2026-10-23: GitHub Actions secrets set by the repo owner, an external 10-minute pinger on `/api/cron/tick`, and self-ticking while anyone watches (tick 7 reached at 19:33 UTC on 22 Oct without a laptop). **Open:** `/play` not yet checked in a browser.
 - **Star Pulls with a wallet:** the earlier daily hand was tested on the deployed site with the judge code (2026-10-22); the 5-pulls-per-season version and a real holder wallet are not yet tested; the pull logic (deterministic, rarity-weighted) and the apply path (gifts queued in the database) were.
 - **Local dev server latency:** occasional multi-second responses on the Next.js dev server around simulation ticks; not measured on a production build.
 - **Story volume:** about 24,000 history rows per 160-tick season locally; a 7-day season at 45-second ticks writes far more quest rows. Pruning old seasons is not implemented yet.
