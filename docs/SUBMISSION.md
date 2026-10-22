@@ -46,7 +46,7 @@ Put the contact email and private judge access instructions directly into the or
 >
 > **Why come back:** a new season every day, new jobs, a new Hero, a new chapter of the novel, and five new pulls. Your Chog's history carries over, so every season adds to its story.
 >
-> Built during Chogathon 2026: a Godot 4 web client streaming from a Next.js simulation server that ticks the whole world every 10 minutes.
+> Built during Chogathon 2026: a Godot 4 web client streaming from a Next.js simulation server that ticks the whole world every 10 minutes while anyone is watching.
 
 Length: about 2,400 characters, well under the 8,000 limit.
 
@@ -58,7 +58,7 @@ Length: about 2,400 characters, well under the 8,000 limit.
 
 ## Tech stack
 
-> Godot 4.7.2 (GDScript, Compatibility renderer, single-threaded web export) for the 3D client; Next.js 15 / TypeScript for the simulation server and APIs; libSQL on Turso for the world state; viem for Monad on-chain ownership checks; wallet sign-in by signed message; Vercel hosting; GitHub Actions running the world tick on a schedule. Terrain, buildings and characters are generated procedurally in code; the main theme and UI sounds are synthesized in code.
+> Godot 4.7.2 (GDScript, Compatibility renderer, single-threaded web export) for the 3D client; Next.js 15 / TypeScript for the simulation server and APIs; libSQL on Turso for the world state; viem for Monad on-chain ownership checks; wallet sign-in by signed message; Vercel hosting; the world ticks itself when viewers are present, with GitHub Actions as a scheduled backup. Terrain, buildings and characters are generated procedurally in code; the main theme and UI sounds are synthesized in code.
 
 ## Existing work and attribution
 
@@ -76,10 +76,9 @@ Length: about 2,400 characters, well under the 8,000 limit.
 > 2. The top-left bar shows the season: phase, seals, the Demon King's HP. The Star Stream (bottom left) narrates live.
 > 3. Scroll to zoom into a town (it takes a lot of scrolling), for example The Hive Capital in the middle, then click any small Chog to open its Status Window. Press **Life** for its biography.
 > 4. Press **Chronicle** (top right) to read this season's chapters of *The Monadia Cycle*.
-> 5. Press **Star Pulls**, enter the judge code `<code from Vercel env JUDGE_CODE>` and press **Judge sign-in**. Pull, choose one of the four cards and bestow it on one of the judge Chogs. The gift takes effect on the next world tick (every 10 minutes or so) and appears in the Star Stream and the Chog's Status Window.
+> 5. Press **Star Pulls**, enter the judge code `<code from Vercel env JUDGE_CODE>` and press **Judge sign-in**. Pull, choose one of the four cards and bestow it on one of the judge Chogs. The gift takes effect on the next world tick (within about 10 minutes while the page is open) and appears in the Star Stream and the Chog's Status Window.
 
-**(check)** The judge Chog ids in Vercel (`JUDGE_CHOG_IDS`; DEPLOY.md lists 173, 681, 875, 1007, 1420). **(check)** Ticks currently arrive every 3–5 hours, not 10 minutes (see GAPS.md); fix that or change "every 10 minutes" in step 5 and in the description.
-
+**(check)** The judge Chog ids in Vercel (`JUDGE_CHOG_IDS`; DEPLOY.md lists 173, 681, 875, 1007, 1420).
 ## Video outline
 
 Max 3 minutes; upload unlisted to YouTube or Drive (anyone with the link, Viewer) and open it while signed out.
