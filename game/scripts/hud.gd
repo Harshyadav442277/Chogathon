@@ -45,6 +45,7 @@ var _clock_skew := 0  # server clock minus local clock, ms
 var _sfx := {}
 var _pic: TextureRect
 var _pics := {}  # chog id -> ImageTexture (NFT pictures, cached)
+var _now_playing: Label
 var _signin: HBoxContainer
 var _judge_code: LineEdit
 
@@ -86,6 +87,25 @@ func _ready() -> void:
 				_toggle_gacha()
 			else:
 				_toggle_novel()
+
+
+## "Now playing" note under the buttons (top right) when a track starts; fades after a few seconds.
+func show_track(title: String, credit: String) -> void:
+	if _now_playing == null:
+		_now_playing = _label("", 12, CREAM)
+		_now_playing.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		_now_playing.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		_now_playing.offset_left = -560
+		_now_playing.offset_right = -14
+		_now_playing.offset_top = 48
+		_now_playing.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_root.add_child(_now_playing)
+	_now_playing.text = "♪ %s
+%s" % [title, credit]
+	_now_playing.modulate.a = 1.0
+	var tw := _now_playing.create_tween()
+	tw.tween_interval(6.0)
+	tw.tween_property(_now_playing, "modulate:a", 0.0, 1.5)
 
 
 func sfx(name: String) -> void:
@@ -261,7 +281,7 @@ func _on_positions() -> void:
 func _build_buttons() -> void:
 	var h := HBoxContainer.new()
 	h.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	h.offset_left = -470
+	h.offset_left = -560
 	h.offset_right = -10
 	h.offset_top = 10
 	h.alignment = BoxContainer.ALIGNMENT_END
@@ -274,16 +294,24 @@ func _build_buttons() -> void:
 	h.add_child(pull)
 	var song := _button("Music")
 	song.pressed.connect(func():
-		var m := get_parent().get("music") as AudioStreamPlayer
+		var m := get_parent().get("music") as Jukebox
 		if m == null:
 			return
-		if not m.playing:
-			m.play()
+		if not m.playing and not m.stream_paused:
+			m.start()
 			song.text = "Music"
 		else:
 			m.stream_paused = not m.stream_paused
 			song.text = "Music (off)" if m.stream_paused else "Music")
 	h.add_child(song)
+	var skip := _button("Next ♪")
+	skip.tooltip_text = "Next track"
+	skip.pressed.connect(func():
+		var m := get_parent().get("music") as Jukebox
+		if m:
+			song.text = "Music"
+			m.next())
+	h.add_child(skip)
 	var hide := _button("Hide (H)")
 	hide.pressed.connect(func(): _root.visible = false)
 	h.add_child(hide)

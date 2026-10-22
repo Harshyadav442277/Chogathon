@@ -72,9 +72,9 @@ func get_json_if_changed(path: String) -> Variant:
 
 
 ## GET raw bytes (images). Returns an empty array on failure.
-func get_bytes(path: String) -> PackedByteArray:
+func get_bytes(path: String, timeout := 30.0) -> PackedByteArray:
 	var req := HTTPRequest.new()
-	req.timeout = 30.0
+	req.timeout = timeout
 	add_child(req)
 	if req.request(base_url + path) != OK:
 		req.queue_free()

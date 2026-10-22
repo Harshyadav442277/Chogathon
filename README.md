@@ -54,3 +54,11 @@ Keep passwords, wallet keys, private contact details and judge login credentials
 4. [Developer community](https://discord.gg/chog)
 
 Event details checked on 18 October 2026. The organizer's current website and announcements take precedence over this summary.
+
+## Credits
+- Main theme "Over the Floating Citadel" and UI sounds: original, synthesized in code (`game/tools/make_theme.py`, `game/tools/make_sfx.py`).
+- Music from [Free To Use](https://freetouse.com/music), streamed from `chog-hivemind/public/music/`:
+  - Aylex - Guardians
+  - Aylex - Glorious
+  - Aylex - Dark Frequency
+  - Pufino - There Be Dragons

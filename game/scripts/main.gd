@@ -9,7 +9,7 @@ const CHARACTERS_SCRIPT := "res://scripts/characters/characters.gd"
 var rig: CameraRig
 var towns: Settlements
 var interiors: Interiors
-var music: AudioStreamPlayer
+var music: Jukebox
 
 
 func _ready() -> void:
@@ -38,16 +38,16 @@ func _ready() -> void:
 	interiors = Interiors.new()
 	interiors.world_rig = rig
 	add_child(interiors)
-	add_child(Hud.new())
-	# Main theme (original, made by tools/make_theme.py). Starts on the title screen's button: browsers
-	# only allow audio after a user gesture. Dev runs (any -- flag) skip the title screen.
-	music = AudioStreamPlayer.new()
-	music.stream = preload("res://assets/music/monadia_theme.wav")
-	music.volume_db = -9.0
+	var hud := Hud.new()
+	add_child(hud)
+	# Music: the original theme, then the streamed playlist (scripts/jukebox.gd). Starts on the title screen's
+	# button: browsers only allow audio after a user gesture. Dev runs (any -- flag) skip the title screen.
+	music = Jukebox.new()
 	add_child(music)
+	music.track_changed.connect(hud.show_track)
 	if OS.get_cmdline_user_args().is_empty() or OS.get_cmdline_user_args().has("--title"):
 		var title := TitleScreen.new()
-		title.entered.connect(music.play)
+		title.entered.connect(music.start)
 		add_child(title)
 	GameState.selection_changed.connect(_on_selected)
 	if not GameState.positions.is_empty():
