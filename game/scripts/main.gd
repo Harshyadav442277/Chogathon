@@ -40,13 +40,15 @@ func _ready() -> void:
 	add_child(interiors)
 	var hud := Hud.new()
 	add_child(hud)
-	# Music: the original theme, then the streamed playlist (scripts/jukebox.gd). Starts on the title screen's
-	# button: browsers only allow audio after a user gesture. Dev runs (any -- flag) skip the title screen.
+	# Music (scripts/jukebox.gd): a title track, then one track per region of the map. Starts on the first
+	# click on the title screen: browsers only allow audio after a user gesture. Dev runs (any -- flag) skip the title screen.
 	music = Jukebox.new()
+	music.rig = rig
 	add_child(music)
 	music.track_changed.connect(hud.show_track)
 	if OS.get_cmdline_user_args().is_empty() or OS.get_cmdline_user_args().has("--title"):
 		var title := TitleScreen.new()
+		title.woke.connect(music.title)
 		title.entered.connect(music.start)
 		add_child(title)
 	GameState.selection_changed.connect(_on_selected)

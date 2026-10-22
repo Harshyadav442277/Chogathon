@@ -305,7 +305,7 @@ func _build_buttons() -> void:
 			song.text = "Music (off)" if m.stream_paused else "Music")
 	h.add_child(song)
 	var skip := _button("Next ♪")
-	skip.tooltip_text = "Next track"
+	skip.tooltip_text = "Another track (each region of the map has its own)"
 	skip.pressed.connect(func():
 		var m := get_parent().get("music") as Jukebox
 		if m:

@@ -4,12 +4,17 @@ extends CanvasLayer
 ## behind it. The click also starts the music (browsers only allow audio after a user gesture).
 
 signal entered
+signal woke  ## the first click or key press on the title screen (browsers allow audio only after one)
 
 const GOLD := Color("#f2cf63")
 
 
+var _woke := false
+
+
 func _ready() -> void:
 	layer = 20
+	add_to_group("title_screen")
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(root)
@@ -65,7 +70,7 @@ func _ready() -> void:
 	b.add_theme_stylebox_override("pressed", hover)
 	b.pressed.connect(_enter.bind(root))
 	box.add_child(b)
-	box.add_child(_text("Watch every Chog live · Holders draw skills and quests daily · H hides the HUD", 12, Color("#bdb59a"), 4))
+	box.add_child(_text("Watch every Chog live · Holders get 5 Star Pulls a season · H hides the HUD", 12, Color("#bdb59a"), 4))
 
 
 func _text(t: String, size: int, col: Color, outline: int) -> Label:
@@ -79,7 +84,17 @@ func _text(t: String, size: int, col: Color, outline: int) -> Label:
 	return l
 
 
+func _input(e: InputEvent) -> void:
+	if not _woke and ((e is InputEventMouseButton and e.pressed) or (e is InputEventKey and e.pressed)):
+		_woke = true
+		woke.emit()
+
+
 func _enter(root: Control) -> void:
+	remove_from_group("title_screen")
+	if not _woke:
+		_woke = true
+		woke.emit()
 	entered.emit()
 	var tw := create_tween()
 	tw.tween_property(root, "modulate:a", 0.0, 0.6)
