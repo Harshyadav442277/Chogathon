@@ -93,7 +93,7 @@ func _ready() -> void:
 			if arg.ends_with("pull"):
 				_toggle_gacha()
 			elif arg.ends_with("life"):
-				await get_tree().create_timer(4.0).timeout
+				await get_tree().create_timer(1.5).timeout
 				_toggle_life()
 			else:
 				_toggle_novel()
