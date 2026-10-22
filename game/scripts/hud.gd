@@ -15,6 +15,8 @@ var _skill_pick: OptionButton
 var _quest_pick: OptionButton
 var _gift_msg: Label
 var _library := {}
+var _novel_panel: PanelContainer
+var _novel_text: RichTextLabel
 
 
 func _ready() -> void:
@@ -34,6 +36,11 @@ func _ready() -> void:
 	_info.add_theme_font_size_override("font_size", 13)
 	_info.add_theme_color_override("font_color", Color("#a49bc9"))
 	col.add_child(_info)
+	var read := Button.new()
+	read.text = "Read the Chronicle"
+	read.tooltip_text = "The Monadia Cycle: this season's story so far, written as it happens."
+	read.pressed.connect(_toggle_novel)
+	col.add_child(read)
 
 	var help := Label.new()
 	help.text = "Drag: pan    Right-drag: rotate    Wheel/pinch: zoom    Click a Chog: Status Window"
@@ -77,6 +84,37 @@ func _ready() -> void:
 	_agent = _rich(inner)
 	_body = _rich(inner)
 	_build_gifts(inner)
+
+	_novel_panel = PanelContainer.new()
+	_novel_panel.add_theme_stylebox_override("panel", _box(Color(0.08, 0.06, 0.04, 0.96), Color("#ffd166")))
+	_novel_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_KEEP_SIZE)
+	_novel_panel.custom_minimum_size = Vector2(640, 620)
+	_novel_panel.offset_left = -320
+	_novel_panel.offset_right = 320
+	_novel_panel.offset_top = -310
+	_novel_panel.offset_bottom = 310
+	_novel_panel.visible = false
+	add_child(_novel_panel)
+	var nv := VBoxContainer.new()
+	_novel_panel.add_child(nv)
+	var nh := HBoxContainer.new()
+	nv.add_child(nh)
+	var ntitle := Label.new()
+	ntitle.text = "THE MONADIA CYCLE"
+	ntitle.add_theme_color_override("font_color", Color("#ffd166"))
+	ntitle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nh.add_child(ntitle)
+	var nclose := Button.new()
+	nclose.text = "X"
+	nclose.flat = true
+	nclose.pressed.connect(func(): _novel_panel.visible = false)
+	nh.add_child(nclose)
+	_novel_text = RichTextLabel.new()
+	_novel_text.bbcode_enabled = true
+	_novel_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_novel_text.scroll_active = true
+	_novel_text.add_theme_font_size_override("normal_font_size", 14)
+	nv.add_child(_novel_text)
 
 	var season_panel := PanelContainer.new()
 	season_panel.add_theme_stylebox_override("panel", _box(Color(0.1, 0.03, 0.08, 0.82), Color("#ff6b8b")))
@@ -140,6 +178,30 @@ func _refresh_stream() -> void:
 		var col: String = STREAM_COLORS.get(str(line.get("kind", "")), "#ffffff")
 		out.append("[color=%s]%s[/color]" % [col, str(line.get("text", "")).replace("[", "[lb]")])
 	_stream.text = "\n".join(out)
+
+
+func _toggle_novel() -> void:
+	_novel_panel.visible = not _novel_panel.visible
+	if not _novel_panel.visible:
+		return
+	_novel_text.text = "Opening the book..."
+	var d = await Api.get_json("/api/v2/novel")
+	if not (d is Dictionary):
+		_novel_text.text = "The chronicle could not be read."
+		return
+	var out := PackedStringArray()
+	out.append("[center][font_size=24][color=#ffd166]%s[/color][/font_size]
+[color=#a49bc9]Season %d · %d of %d chapters written so far[/color][/center]
+" % [str(d.get("title", "")), int(d.get("season", 0)), (d.get("chapters", []) as Array).size(), int(d.get("total", 0))])
+	for c in d.get("chapters", []):
+		out.append("[font_size=18][color=#ffd166]%s[/color][/font_size]" % str(c["title"]))
+		out.append(str(c["text"]).replace("[", "[lb]") + "
+")
+	if (d.get("chapters", []) as Array).is_empty():
+		out.append("[i]Nothing has been written yet. The story begins when the season does.[/i]")
+	_novel_text.text = "
+".join(out)
+	_novel_text.scroll_to_line(0)
 
 
 func _rich(parent: Control) -> RichTextLabel:
@@ -298,6 +360,24 @@ func _agent_text(a: Dictionary) -> String:
 	return "\n".join(lines)
 
 
+## "Life": the biography assembled from this Chog's history, its past lives and its latest moments.
+func _life_text(l: Dictionary) -> String:
+	var lines := PackedStringArray()
+	lines.append("[color=#ffd166][b]LIFE[/b][/color]")
+	if str(l.get("bio", "")) != "":
+		lines.append("[i]%s[/i]" % str(l["bio"]))
+	var past: Array = l.get("pastLives", [])
+	if not past.is_empty():
+		lines.append("[color=#c9a7ff]Past lives:[/color] " + " ".join(PackedStringArray(past)))
+	var tl: Array = l.get("timeline", [])
+	if not tl.is_empty():
+		lines.append("[color=#a49bc9]Latest moments[/color]")
+		for e in tl.slice(0, 6):
+			lines.append("· [color=#7a7a8a]S%d t%d[/color] %s" % [int(e["season"]), int(e["tick"]), str(e["text"])])
+	return "
+".join(lines)
+
+
 func _box(bg: Color, border: Color) -> StyleBoxFlat:
 	var b := StyleBoxFlat.new()
 	b.bg_color = bg
@@ -334,6 +414,10 @@ func _on_selected(chog_id: int) -> void:
 	var c: Dictionary = data["chog"]
 	if data.get("agent") is Dictionary:
 		_agent.text = _agent_text(data["agent"])
+	if data.get("life") is Dictionary:
+		_agent.text += "
+
+" + _life_text(data["life"])
 	var persona: Dictionary = c.get("persona", {})
 	var house_i := ["laser", "teardrop", "glass", "moonbeam"].find(str(c.get("house", "")))
 	var house_name: String = GameState.HOUSE_NAMES[house_i] if house_i >= 0 else str(c.get("house", ""))

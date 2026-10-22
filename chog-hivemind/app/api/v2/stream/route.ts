@@ -41,9 +41,9 @@ async function buildStream() {
     });
   }
   // Season simulation chronicle: raids, seals, quests, gifts, the Hero.
-  const SYSTEM = new Set(["hero", "general_down", "march", "last_stand", "season"]);
+  const SYSTEM = new Set(["hero", "general_down", "march", "last_stand", "season", "chapter"]);
   for (const c of chronicle) {
-    const kind = SYSTEM.has(c.kind) ? "system" : c.kind.startsWith("raid") ? "event" : c.kind.startsWith("gift") ? "constellation" : "meme";
+    const kind = SYSTEM.has(c.kind) ? "system" : c.kind === "thread" ? "question" : c.kind.startsWith("raid") ? "event" : c.kind.startsWith("gift") ? "constellation" : "meme";
     lines.push({ at: Number(c.at), kind, chog: c.chog == null ? undefined : Number(c.chog), text: String(c.text) });
   }
   lines.sort((a, b) => b.at - a.at);

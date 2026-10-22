@@ -33,6 +33,7 @@ Weights from [RULES.md](../RULES.md#judging).
 | Season arc: generals break the seals, march on the castle, any job can land the final blow and become Hero | Fun, Retention (a new season re-rolls jobs) |
 | Constellation powers: 3 Star Points a day to grant skills (60) or give quests (36) to any Chog; skills change how long quests take | Retention, Chog NFT essential (holders only) |
 | Live view: season bar, Star Stream chronicle, Status Window with quest progress, skills and recent actions | Clarity |
+| Chog history across seasons, a Life biography per Chog, story threads and *The Monadia Cycle* season novel (fixed prose with pointers, read in the HUD) | Fun, Retention, Clarity |
 | Template narration (no model needed); deterministic, seeded mechanics; fast-forward check `npx tsx scripts/season-sim.ts` | Execution |
 
 ## Out of scope for the deadline
