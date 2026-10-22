@@ -23,7 +23,6 @@ export const SKILL_BY_ID = new Map(SKILLS.map((s) => [s.id, s]));
 export const QUESTS = (questsJson as { quests: Quest[] }).quests;
 export const QUEST_BY_ID = new Map(QUESTS.map((q) => [q.id, q]));
 export const MAX_SKILLS = 6;
-export const DAILY_STAR_POINTS = 3;
 
 export const SCHEMA_V3 = [
   `CREATE TABLE IF NOT EXISTS agents (

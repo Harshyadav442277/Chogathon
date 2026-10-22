@@ -24,6 +24,6 @@ No answers recorded yet. For each answer, add the date, source link, exact pract
 
 ## Open as of 2026-10-21 (season simulation and story)
 - **Deployment:** nothing is deployed. Needs the team's Vercel and Turso accounts; set `SEASON_HOURS=168` there.
-- **Wallet gifts:** the signed `/api/v2/gift` request was not tested with a real holder wallet or a judge code; only the apply path was (gifts queued in the database).
+- **Daily Pull with a wallet:** `/api/v2/gacha` (draw and bestow) was not tested with a real holder wallet or a judge code; the hand logic (deterministic, rarity-weighted) and the apply path (gifts queued in the database) were.
 - **Local dev server latency:** occasional multi-second responses on the Next.js dev server around simulation ticks; not measured on a production build.
 - **Story volume:** about 24,000 history rows per 160-tick season locally; a 7-day season at 45-second ticks writes far more quest rows. Pruning old seasons is not implemented yet.
