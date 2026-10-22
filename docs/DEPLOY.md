@@ -4,7 +4,7 @@
 |---|---|---|
 | Website, APIs, the Godot game at `/play` | Vercel (Hobby) | Next.js host; static files for the web build |
 | Database | Turso (free) | libSQL, same as local; ~5 GB, 10M rows written per month |
-| Simulation ticks | GitHub Actions (`.github/workflows/tick.yml`) | Free on public repos; every 10 minutes, connects to Turso directly |
+| Simulation ticks | The site itself while anyone watches (`src/sim/autotick.ts`, `AUTO_TICK=0` disables), plus GitHub Actions (`.github/workflows/tick.yml`) as a backup | GitHub's schedule is best-effort and ran only every 3–5 hours here; a site tick takes ~6 s |
 
 Measured locally (2026-10-22): about 1,300 rows written per tick at the production interval, so roughly
 2.7M rows over 14 days for the season simulation, inside Turso's free tier.
