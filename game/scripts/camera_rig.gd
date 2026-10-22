@@ -41,6 +41,9 @@ func fly_to(target: Vector3, to_dist := 70.0) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
+		var over_ui := get_viewport().gui_get_hovered_control() != null  # scrolling a window must not zoom the map
+		if over_ui and mb.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			return
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:
 			_zoom(0.88)
 		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN and mb.pressed:

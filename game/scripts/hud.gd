@@ -30,13 +30,18 @@ var _life_btn: Button
 var _novel: PanelContainer
 var _novel_text: RichTextLabel
 var _gacha: PanelContainer
-var _gacha_cards: GridContainer
 var _gacha_info: Label
 var _gacha_target: OptionButton
 var _gacha_btn: Button
-var _gacha_draw: Button
 var _gacha_state := {}
-var _picked := {}  # {"kind": "skill"|"quest", "ref": id}
+var _slots: HBoxContainer
+var _offers: HBoxContainer
+var _offer_title: Label
+var _bestow_row: HBoxContainer
+var _wait_label: Label
+var _view := -1  # the pull being looked at
+var _choice := -1  # the offer picked in it
+var _clock_skew := 0  # server clock minus local clock, ms
 var _sfx := {}
 var _pic: TextureRect
 var _pics := {}  # chog id -> ImageTexture (NFT pictures, cached)
@@ -159,6 +164,7 @@ func _modal(size: Vector2) -> PanelContainer:
 	p.offset_top = -size.y / 2.0
 	p.offset_bottom = size.y / 2.0
 	p.visible = false
+	p.mouse_filter = Control.MOUSE_FILTER_STOP  # the wheel scrolls the window, never zooms the map behind it
 	_root.add_child(p)
 	return p
 
@@ -193,6 +199,7 @@ func _build_banner() -> void:
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", _box())
 	p.position = Vector2(10, 10)
+	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(p)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
@@ -293,6 +300,7 @@ func _build_stream() -> void:
 	_stream_box.offset_right = 430
 	_stream_box.offset_top = -150
 	_stream_box.offset_bottom = -10
+	_stream_box.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(_stream_box)
 	var v := VBoxContainer.new()
 	_stream_box.add_child(v)
@@ -337,6 +345,7 @@ func _build_status() -> void:
 	_panel.offset_top = 52
 	_panel.offset_bottom = 52 + 430  # compact: about half the screen height at most, the rest of the world stays visible
 	_panel.visible = false
+	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(_panel)
 	var v := VBoxContainer.new()
 	_panel.add_child(v)
@@ -508,58 +517,71 @@ func _toggle_novel() -> void:
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Star Pulls (centred window): each season a holder gets 5 pulls; every pull reveals one card (a skill or a
-# quest) that can be bestowed once on a Chog they hold.
+# Star Pulls (centred window): each season a holder gets 5 pulls, unlocked one at a time across the day. A pull
+# reveals 4 cards (skills and quests); the holder chooses one and bestows it on a Chog they hold.
 
 func _build_gacha() -> void:
-	_gacha = _modal(Vector2(660, 520))
+	_gacha = _modal(Vector2(780, 600))
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 6)
+	v.add_theme_constant_override("separation", 8)
 	_gacha.add_child(v)
 	v.add_child(_header("STAR PULLS", func(): _gacha.visible = false))
-	_gacha_info = _label("", 12, DIM)
+	_gacha_info = _label("", 13, DIM)
 	_gacha_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_gacha_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(_gacha_info)
 	# Sign-in row (shown only when signed out): a wallet signature, or a judge code.
 	_signin = HBoxContainer.new()
+	_signin.alignment = BoxContainer.ALIGNMENT_CENTER
 	_signin.visible = false
 	v.add_child(_signin)
 	var wallet := _button("Connect wallet")
 	wallet.pressed.connect(_connect_wallet)
 	_signin.add_child(wallet)
+	_signin.add_child(_label("   or   ", 12, DIM))
 	_judge_code = LineEdit.new()
 	_judge_code.placeholder_text = "judge code"
 	_judge_code.secret = true
 	_judge_code.custom_minimum_size = Vector2(180, 0)
+	_judge_code.text_submitted.connect(func(_t): _judge_signin())
 	_signin.add_child(_judge_code)
 	var judge := _button("Judge sign-in")
 	judge.pressed.connect(_judge_signin)
 	_signin.add_child(judge)
-	_gacha_draw = _button("Pull a card")
-	_gacha_draw.pressed.connect(_pull)
-	_gacha_draw.visible = false  # shown once the server says you're a holder with pulls left
-	v.add_child(_gacha_draw)
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	v.add_child(scroll)
-	_gacha_cards = GridContainer.new()
-	_gacha_cards.columns = 5
-	_gacha_cards.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_gacha_cards.add_theme_constant_override("h_separation", 6)
-	_gacha_cards.add_theme_constant_override("v_separation", 6)
-	scroll.add_child(_gacha_cards)
-	var row := HBoxContainer.new()
-	v.add_child(row)
-	row.add_child(_label("Bestow on", 12, CREAM))
+	# The five pull slots of this season.
+	_slots = HBoxContainer.new()
+	_slots.alignment = BoxContainer.ALIGNMENT_CENTER
+	_slots.add_theme_constant_override("separation", 8)
+	v.add_child(_slots)
+	v.add_child(HSeparator.new())
+	_offer_title = _label("", 15, GOLD)
+	_offer_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(_offer_title)
+	# The offered cards of the pull being looked at (or a big Pull button, or the countdown).
+	var center := CenterContainer.new()
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(center)
+	_offers = HBoxContainer.new()
+	_offers.add_theme_constant_override("separation", 12)
+	center.add_child(_offers)
+	_bestow_row = HBoxContainer.new()
+	_bestow_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_child(_bestow_row)
+	_bestow_row.add_child(_label("Bestow on ", 13, CREAM))
 	_gacha_target = OptionButton.new()
 	_gacha_target.fit_to_longest_item = false
 	_gacha_target.custom_minimum_size = Vector2(260, 0)
 	_gacha_target.clip_text = true
-	row.add_child(_gacha_target)
-	_gacha_btn = _button("Bestow")
+	_bestow_row.add_child(_gacha_target)
+	_gacha_btn = _button("  Choose & Bestow  ")
 	_gacha_btn.pressed.connect(_give)
-	row.add_child(_gacha_btn)
+	_bestow_row.add_child(_gacha_btn)
+	# Countdown to the next pull, refreshed every second while the window is open.
+	var t := Timer.new()
+	t.wait_time = 1.0
+	t.timeout.connect(_tick_countdown)
+	add_child(t)
+	t.start()
 
 
 func _toggle_gacha() -> void:
@@ -578,13 +600,43 @@ func _pull() -> void:
 
 
 func _give() -> void:
-	if _picked.is_empty() or _gacha_target.selected < 0:
-		_gacha_info.text = "Pick a card, then a Chog to bestow it on."
+	if _view < 0 or _choice < 0:
+		_gacha_info.text = "Pick one of the cards first."
+		sfx("error")
 		return
-	var r := await Api.post_json("/api/v2/gacha", {"action": "give", "index": int(_picked["index"]), "chogId": int(_gacha_target.get_item_metadata(_gacha_target.selected))})
-	_picked = {}
+	if _gacha_target.selected < 0:
+		_gacha_info.text = "Pick a Chog to bestow it on."
+		sfx("error")
+		return
+	var r := await Api.post_json("/api/v2/gacha", {"action": "choose", "pull": _view, "option": _choice, "chogId": int(_gacha_target.get_item_metadata(_gacha_target.selected))})
 	sfx("bestow" if int(r.get("status", 0)) == 200 else "error")
 	_render_gacha(r.get("data"), r.get("status", 0))
+
+
+## Milliseconds until the next pull unlocks (server clock), or -1 when none is left to unlock.
+func _next_in() -> int:
+	if _gacha_state.get("nextAt") == null:
+		return -1
+	var now_ms := int(Time.get_unix_time_from_system() * 1000.0) + _clock_skew
+	return maxi(0, int(_gacha_state["nextAt"]) - now_ms)
+
+
+func _fmt_ms(ms: int) -> String:
+	var s := ms / 1000
+	if s >= 3600:
+		return "%dh %02dm" % [s / 3600, (s / 60) % 60]
+	return "%dm %02ds" % [s / 60, s % 60]
+
+
+func _tick_countdown() -> void:
+	if not _gacha.visible or _wait_label == null or not is_instance_valid(_wait_label):
+		return
+	var ms := _next_in()
+	if ms == 0:
+		_wait_label = null
+		_render_gacha(await Api.get_json("/api/v2/gacha"))  # a new pull has risen
+	elif ms > 0:
+		_wait_label.text = "Next pull rises in %s" % _fmt_ms(ms)
 
 
 func _render_gacha(d, status := 200) -> void:
@@ -593,44 +645,67 @@ func _render_gacha(d, status := 200) -> void:
 		return
 	if d.has("error") and not d.has("config"):
 		_gacha_info.text = str(d["error"])
+		sfx("error")
 		return
 	_gacha_state = d
-	var cfg: Dictionary = d.get("config", {})
+	if d.has("now"):
+		_clock_skew = int(d["now"]) - int(Time.get_unix_time_from_system() * 1000.0)
+	var signed: bool = d.get("signedIn", false)
+	var holder: bool = d.get("holder", false)
+	var pulls: Array = d.get("pulls", [])
+	var total := int(d.get("pullsTotal", 5))
+	var risen := int(d.get("unlocked", 0))
+	_signin.visible = not signed
 	var info := ""
-	_signin.visible = not d.get("signedIn", false)
-	if not d.get("signedIn", false):
-		info = "Connect a wallet that holds a Chog to pull (judges: use your judge code). Stargazers can watch everything."
-	elif not d.get("holder", false):
+	if not signed:
+		info = "Constellations who hold a Chog get 5 Star Pulls each season, one every few hours. Each pull shows 4 cards: choose one and bestow it on your Chog.\nConnect a wallet that holds a Chog (judges: use your judge code). Stargazers can watch everything."
+	elif not holder:
 		info = "This wallet holds no Chog: you're a Stargazer (watch only)."
 	else:
-		var cards: Array = d.get("cards", [])
-		var bestowed := cards.filter(func(c): return c.get("used", false)).size()
-		info = "Season %d - %d of %d pulls left - each card can be bestowed once on a Chog you hold (%d bestowed)." % [
-			int(d.get("season", 0)), int(d.get("pullsLeft", 0)), int(cfg.get("pulls", 5)), bestowed]
+		info = "Season %d · %d of %d pulls risen · each pull: choose 1 of 4 cards for a Chog you hold" % [int(d.get("season", 0)), risen, total]
 	if d.has("message"):
 		info = str(d["message"]) + "\n" + info
 	_gacha_info.text = info
-	_gacha_draw.visible = d.get("holder", false) and int(d.get("pullsLeft", 0)) > 0
-	_gacha_draw.text = "Pull a card (%d left)" % int(d.get("pullsLeft", 0))
-	for ch in _gacha_cards.get_children():
+	# The pull to look at: the one just drawn, else the first one still waiting for a choice.
+	_view = int(d.get("drawn", -1))
+	if _view < 0:
+		for p in pulls:
+			if p.get("chosen") == null:
+				_view = int(p["index"])
+				break
+	_choice = -1
+	for ch in _slots.get_children():
 		ch.queue_free()
-	var drawn := int(d.get("drawn", -1))
-	for c in d.get("cards", []):
-		var card := _card(c)
-		_gacha_cards.add_child(card)
-		if int(c.get("index", -1)) == drawn:
-			# the card just pulled flips in
-			card.pivot_offset = Vector2(59, 56)
-			card.scale = Vector2(0.15, 0.15)
-			card.modulate = Color(2.0, 2.0, 1.4)
-			var tw := card.create_tween().set_parallel()
-			tw.tween_property(card, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tw.tween_property(card, "modulate", Color.WHITE, 0.8)
+	_slots.visible = signed and holder
+	for i in total:
+		_slots.add_child(_slot(i, pulls[i] if i < pulls.size() else null, i < risen))
+	for ch in _offers.get_children():
+		ch.queue_free()
+	_wait_label = null
+	_bestow_row.visible = false
+	_offer_title.text = ""
+	if signed and holder:
+		if _view >= 0 and _view < pulls.size():
+			_show_pull(pulls[_view], int(d.get("drawn", -1)) == _view)
+		elif pulls.size() < risen:
+			_offer_title.text = "A star is waiting for you"
+			var b := _button("  ★  PULL  ★  ")
+			b.add_theme_font_size_override("font_size", 22)
+			b.custom_minimum_size = Vector2(240, 70)
+			b.pressed.connect(_pull)
+			_offers.add_child(b)
+		elif pulls.size() >= total:
+			_offer_title.text = "All %d pulls used this season" % total
+			_offers.add_child(_label("A new season brings new stars.", 14, DIM))
+		else:
+			_offer_title.text = "Every choice is made"
+			_wait_label = _label("Next pull rises in %s" % _fmt_ms(_next_in()), 16, CREAM)
+			_offers.add_child(_wait_label)
 	_gacha_target.clear()
-	var owned: Array = d.get("owned", [])
-	for o in owned:
+	for o in d.get("owned", []):
 		_gacha_target.add_item("%s" % str(o["name"]))
 		_gacha_target.set_item_metadata(_gacha_target.item_count - 1, int(o["id"]))
+	var cfg: Dictionary = d.get("config", {})
 	if not cfg.get("ownOnly", true) and GameState.selected >= 0:
 		_gacha_target.add_item("Selected: Chog #%d" % GameState.selected)
 		_gacha_target.set_item_metadata(_gacha_target.item_count - 1, GameState.selected)
@@ -638,6 +713,68 @@ func _render_gacha(d, status := 200) -> void:
 		for i in _gacha_target.item_count:
 			if int(_gacha_target.get_item_metadata(i)) == GameState.selected:
 				_gacha_target.select(i)
+
+
+## One of the season's pull slots: done (gold), waiting for a choice (violet), ready (green) or locked (grey).
+func _slot(i: int, p, open: bool) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(138, 58)
+	b.focus_mode = Control.FOCUS_NONE
+	b.add_theme_font_size_override("font_size", 12)
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var col := Color(0.3, 0.3, 0.3)
+	var bg := Color(0.06, 0.08, 0.07, 0.9)
+	if p is Dictionary and p.get("chosen") != null:
+		var c: Dictionary = p["offers"][int(p["chosen"])]
+		b.text = "★ %s\n→ %s" % [str(c.get("name", "?")), str(p.get("chogName", ""))]
+		col = GOLD
+		bg = Color(0.12, 0.1, 0.04, 0.95)
+	elif p is Dictionary:
+		b.text = "★ Pull %d\nchoose a card!" % (i + 1)
+		col = Color("#c9a7ff")
+		bg = Color(0.1, 0.06, 0.16, 0.95)
+	elif open:
+		b.text = "☆ Pull %d\nready" % (i + 1)
+		col = Color("#7fc96b")
+	else:
+		b.text = "☆ Pull %d\nlocked" % (i + 1)
+	b.add_theme_color_override("font_color", CREAM if open or p != null else DIM)
+	b.add_theme_stylebox_override("normal", _box(bg, col, 3 if i == _view else 2))
+	b.add_theme_stylebox_override("hover", _box(bg.lightened(0.08), col.lightened(0.2), 3))
+	b.add_theme_stylebox_override("pressed", _box(bg.lightened(0.12), Color.WHITE, 3))
+	b.pressed.connect(func():
+		sfx("click")
+		if p is Dictionary:
+			_view = i
+			_choice = -1
+			for ch in _offers.get_children():
+				ch.queue_free()
+			_wait_label = null
+			_show_pull(p, false)
+		elif open:
+			_pull())
+	return b
+
+
+func _show_pull(p: Dictionary, flip: bool) -> void:
+	var chosen = p.get("chosen")
+	if chosen == null:
+		_offer_title.text = "Pull %d · choose one card" % (int(p["index"]) + 1)
+	else:
+		_offer_title.text = "Pull %d · bestowed on %s" % [int(p["index"]) + 1, str(p.get("chogName", ""))]
+	_bestow_row.visible = chosen == null
+	var offers: Array = p.get("offers", [])
+	for k in offers.size():
+		var card := _card(offers[k], k, chosen)
+		_offers.add_child(card)
+		if flip:
+			# the cards just pulled flip in one after another
+			card.pivot_offset = Vector2(80, 105)
+			card.scale = Vector2(0.1, 0.1)
+			card.modulate = Color(2.0, 2.0, 1.4, 0.0)
+			var tw := card.create_tween().set_parallel()
+			tw.tween_property(card, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_delay(k * 0.12)
+			tw.tween_property(card, "modulate", Color.WHITE, 0.7).set_delay(k * 0.12)
 
 
 ## Wallet sign-in from inside the web build: the browser wallet signs the same free message as the website
@@ -688,32 +825,66 @@ func _judge_signin() -> void:
 		_gacha_info.text = str(d.get("error", "Judge sign-in failed.")) if d is Dictionary else "Judge sign-in failed."
 
 
-func _card(c: Dictionary) -> Button:
+## An offered card: rank-coloured frame, kind, name, school or tags, and its description. Click to choose it.
+func _card(c: Dictionary, k: int, chosen) -> Button:
 	var kind := str(c.get("kind", "skill"))
 	var rank: String = str(c.get("rank", TIER_RANK[clampi(int(c.get("tier", 1)), 0, 6)]))
 	var col := Color(RANK_COL.get(rank, "#ffffff"))
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(118, 112)
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.custom_minimum_size = Vector2(160, 210)
 	b.focus_mode = Control.FOCUS_NONE
-	var tag := "SKILL" if kind == "skill" else "QUEST"
-	var sub := str(c.get("school", "")) if kind == "skill" else "/".join(PackedStringArray(c.get("tags", [])))
-	b.text = "%s · %s\n%s\n%s" % [tag, rank, str(c.get("name", "?")), sub]
+	b.toggle_mode = true
+	var dim: bool = chosen != null and int(chosen) != k
+	var bg := Color(0.05, 0.12, 0.08, 0.97) if kind == "skill" else Color(0.1, 0.08, 0.04, 0.97)
+	if dim:
+		bg = Color(0.08, 0.08, 0.08, 0.8)
+		col = Color(0.3, 0.3, 0.3)
+	b.add_theme_stylebox_override("normal", _box(bg, col, 3))
+	b.add_theme_stylebox_override("hover", _box(bg.lightened(0.08), col.lightened(0.25), 3))
+	b.add_theme_stylebox_override("pressed", _box(bg.lightened(0.14), Color.WHITE, 4))
+	b.add_theme_stylebox_override("hover_pressed", _box(bg.lightened(0.14), Color.WHITE, 4))
+	b.add_theme_stylebox_override("disabled", _box(bg, GOLD if (chosen != null and int(chosen) == k) else col, 3))
+	if chosen != null:
+		b.disabled = true
+	var v := VBoxContainer.new()
+	v.set_anchors_preset(Control.PRESET_FULL_RECT)
+	v.offset_left = 10
+	v.offset_right = -10
+	v.offset_top = 8
+	v.offset_bottom = -8
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_theme_constant_override("separation", 4)
+	b.add_child(v)
+	var top := HBoxContainer.new()
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(top)
+	var kl := _label("SKILL" if kind == "skill" else "QUEST", 11, Color("#9fd8ff") if kind == "skill" else Color("#ffb84d"))
+	kl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(kl)
+	top.add_child(_label(rank, 18, col))
+	var title := _label(str(c.get("name", "?")), 15, CREAM if not dim else DIM)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	v.add_child(title)
+	var sub := str(c.get("school", "")) if kind == "skill" else " / ".join(PackedStringArray(c.get("tags", [])))
+	v.add_child(_label(sub, 11, GOLD if not dim else DIM))
+	var desc := _label(str(c.get("desc", "")), 11, DIM)
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	desc.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	desc.custom_minimum_size = Vector2(140, 0)
+	v.add_child(desc)
+	if chosen != null and int(chosen) == k:
+		v.add_child(_label("★ CHOSEN", 12, GOLD))
+	for ch in v.get_children() + top.get_children():
+		(ch as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.tooltip_text = str(c.get("desc", ""))
-	b.add_theme_font_size_override("font_size", 12)
-	b.add_theme_color_override("font_color", CREAM)
-	var used: bool = c.get("used", false)
-	var bg := Color(0.05, 0.12, 0.08, 0.95) if not used else Color(0.1, 0.1, 0.1, 0.7)
-	b.add_theme_stylebox_override("normal", _box(bg, col if not used else Color(0.3, 0.3, 0.3), 3))
-	b.add_theme_stylebox_override("hover", _box(bg.lightened(0.08), col.lightened(0.2), 3))
-	b.add_theme_stylebox_override("pressed", _box(bg.lightened(0.15), Color.WHITE, 3))
-	b.disabled = used
-	if used:
-		b.text += "\n(bestowed)"
-	b.pressed.connect(func():
-		sfx("select")
-		_picked = {"index": int(c.get("index", -1))}
-		_gacha_info.text = "Chosen: %s \"%s\". Now pick a Chog and press Bestow." % [kind, str(c.get("name", ""))])
+	if chosen == null:
+		b.pressed.connect(func():
+			sfx("select")
+			_choice = k
+			for o in _offers.get_children():
+				(o as Button).set_pressed_no_signal(o == b)
+			_gacha_info.text = "Chosen: %s \"%s\". Pick a Chog and press Choose & Bestow." % [kind, str(c.get("name", ""))])
 	return b
 
 

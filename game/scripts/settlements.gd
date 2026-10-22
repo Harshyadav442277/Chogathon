@@ -445,7 +445,8 @@ func _label(text: String, size: int, color: Color, fixed: bool) -> Label3D:
 	l.outline_size = 10
 	l.outline_modulate = Color(0, 0, 0, 0.85)
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	l.no_depth_test = fixed
+	l.no_depth_test = true  # names are never hidden behind hills, trees or roofs
+	l.render_priority = 10 if fixed else 5
 	l.fixed_size = fixed
 	l.pixel_size = 0.0012 if fixed else 0.05
 	return l
