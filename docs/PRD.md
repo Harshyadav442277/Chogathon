@@ -6,7 +6,7 @@ Status: in progress (agreed 2026-10-21, see [MEMORY.md](MEMORY.md)). Full design
 
 | Field | Value |
 | :--- | :--- |
-| Name | Chog Hivemind: Monadia |
+| Name | ChogSekai (renamed from *Chog Hivemind: Monadia* on 2026-10-22) |
 | Target user | Chog Genesis holders, plus anyone curious (no wallet needed to watch, chat or drop rumors) |
 | What the user can do | Watch 1,969 AI Chogs live on a 3D fantasy continent; click any Chog to see its Status Window; holders whisper to their own Chog (it may obey, twist or ignore); anyone can drop rumors and chat with any Chog |
 | What stops working without the Chog NFT | Everything: each citizen *is* a token. Traits generate its personality and house, memories are keyed to the token ID, only the holder (checked with `ownerOf` on Monad) can whisper, and the society is exactly the collection |

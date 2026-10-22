@@ -180,7 +180,7 @@ func _build_banner() -> void:
 	p.add_child(v)
 	var top := HBoxContainer.new()
 	v.add_child(top)
-	top.add_child(_label("MONADIA", 17, GOLD))
+	top.add_child(_label("CHOGSEKAI", 17, GOLD))
 	_info = _label("", 11, DIM)
 	top.add_child(_info)
 	_phase = _rich(12, 300)

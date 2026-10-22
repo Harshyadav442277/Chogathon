@@ -21,7 +21,7 @@ async function main() {
     const crier = {
       id: 0, name: "The Hive Crier", house: "moonbeam", temperament: "narrator", voice: "town crier", job: "narrator",
       obsession: "the news", home: "hall", contrarian: false, nightOwl: false, tier: "—", loyalty: "loyal", homes: 1,
-      catchphrase: "hear ye, hive.", bio: "The voice of Chog Hivemind news.", traits: {}, activity: 0, activeHours: [],
+      catchphrase: "hear ye, hive.", bio: "The voice of ChogSekai news.", traits: {}, activity: 0, activeHours: [],
     };
     stmts.push({
       sql: `INSERT INTO chogs(id, name, image, traits, persona, house, location, activity, last_tick) VALUES(0, ?, NULL, '{}', ?, 'moonbeam', 'hall', 0, 999999999)`,

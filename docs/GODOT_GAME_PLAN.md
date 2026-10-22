@@ -1,4 +1,4 @@
-# Chog Hivemind: Star Stream of Monadia, the Godot game plan
+# ChogSekai: Star Stream of Monadia, the Godot game plan
 
 Status: **agreed 2026-10-21** (written 11:15 UTC, 51.7 h before the 23 Oct 15:00 UTC deadline). Team answers to §12: install Godot 4.7.2, **3D view**, non-holders are view-only Stargazers, jobs re-roll every season.
 Replaces the three.js client only once the Godot web build passes the de-risk gate in §9. Lore and older design: [WORLD_BIBLE.md](../chog-hivemind/WORLD_BIBLE.md). Rules: [RULES.md](../RULES.md).

@@ -3,7 +3,7 @@ export default function About() {
     <div style={{ padding: "18px 0 60px", maxWidth: 820, margin: "0 auto" }}>
       <div className="card">
         <h1 style={{ marginTop: 0 }}>How the Hivemind works</h1>
-        <p>Chog was born from a failed AI experiment. Chog Hivemind is that experiment, waking up: every one of the 1,969 Chog Genesis NFTs on Monad lives here as an AI citizen.</p>
+        <p>Chog was born from a failed AI experiment. ChogSekai is that experiment, waking up in another world: every one of the 1,969 Chog Genesis NFTs on Monad lives here as an AI citizen.</p>
         <h3>Every Chog is a mind</h3>
         <p>Its personality comes from its traits. Eyes set its temperament and house, mouth sets its voice, head sets its obsession, body sets its job, and Skull forms are night-owl ghosts. When a Chog is sold onchain, it moves house: it keeps its memories, and its bond with the new human starts over.</p>
         <h3>The world runs by itself</h3>

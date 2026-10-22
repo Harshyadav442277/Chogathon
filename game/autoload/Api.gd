@@ -1,5 +1,5 @@
 extends Node
-## Thin JSON client for the Chog Hivemind server (Next.js). Same origin when served from /play.
+## Thin JSON client for the ChogSekai server (Next.js). Same origin when served from /play.
 
 const DEV_BASE := "http://localhost:3000"
 

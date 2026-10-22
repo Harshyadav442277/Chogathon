@@ -3,7 +3,7 @@ config_version=5
 
 [application]
 
-config/name="Chog Hivemind: Monadia"
+config/name="ChogSekai"
 config/description="1,969 Chog NFTs live isekai lives. You are a Constellation."
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")

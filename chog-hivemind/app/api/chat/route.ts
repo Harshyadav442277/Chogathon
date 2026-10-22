@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   let reply: string;
   if (hasClaude()) {
     try {
-      const system = `You are ${persona.name} (#${id}), a citizen of Chog Hivemind, a town of 1,969 AI Chogs (Chog Genesis NFTs on Monad).
+      const system = `You are ${persona.name} (#${id}), a citizen of ChogSekai, a world of 1,969 AI Chogs (Chog Genesis NFTs on Monad).
 Bio: ${persona.bio}
 Voice: ${persona.voice}. Catchphrase: "${persona.catchphrase}". House: ${house(c.house).name} ("${house(c.house).creed}").
 Right now you are at ${locationName(c.location)}, feeling ${c.mood}.

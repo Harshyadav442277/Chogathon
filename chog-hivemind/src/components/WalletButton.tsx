@@ -9,7 +9,7 @@ declare global {
 }
 
 export function signInMessage(address: string, issuedAt: string) {
-  return `Sign in to Chog Hivemind\n\nThis only proves you own this wallet. It costs nothing and sends no transaction.\n\nAddress: ${address}\nIssued: ${issuedAt}`;
+  return `Sign in to ChogSekai\n\nThis only proves you own this wallet. It costs nothing and sends no transaction.\n\nAddress: ${address}\nIssued: ${issuedAt}`;
 }
 
 export function useMe() {

@@ -8,7 +8,7 @@ const display = Press_Start_2P({ weight: "400", subsets: ["latin"], variable: "-
 const body = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
-  title: "Chog Hivemind",
+  title: "ChogSekai",
   description: "1,969 Chogs. One living AI society. Whisper to yours and watch the idea spread.",
 };
 
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="nav">
           <div className="wrap">
             <Link href="/" className="logo">
-              <span className="dot" /> CHOG HIVEMIND
+              <span className="dot" /> CHOGSEKAI
             </Link>
             <nav>
               <a href="/play">🎮 Play</a>
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main className="wrap">{children}</main>
         <footer className="footer wrap">
-          Chog Hivemind · a Chogathon 2026 project · every citizen is a Chog Genesis NFT on Monad · fan-made, not an official Chog product
+          ChogSekai · a Chogathon 2026 project · every citizen is a Chog Genesis NFT on Monad · fan-made, not an official Chog product
         </footer>
       </body>
     </html>

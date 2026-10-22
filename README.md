@@ -1,6 +1,6 @@
 # Chogathon 2026
 
-Shared workspace for our Chogathon entry, **Chog Hivemind: Monadia**: every Chog Genesis NFT lives as an AI citizen on a 3D fantasy continent. The app is in [chog-hivemind/](chog-hivemind/); it runs locally and is not deployed yet. Setup: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#local-setup). Verified behavior: [docs/DEMO.md](docs/DEMO.md).
+Shared workspace for our Chogathon entry, **ChogSekai** (formerly *Chog Hivemind: Monadia*): an isekai god-sim where every Chog Genesis NFT lives as an agent on Monadia, a 3D fantasy continent. The app is in [chog-hivemind/](chog-hivemind/); it runs locally and is not deployed yet. Setup: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#local-setup). Verified behavior: [docs/DEMO.md](docs/DEMO.md).
 
 **Submission deadline: 23 October 2026, 15:00 UTC / 8:30 pm IST.** Registration closed on 11 October. Our team's registration status has not been verified. See the [official dashboard](https://chogathon.chog.xyz/dashboard) and [rules](RULES.md) before proceeding.
 
