@@ -37,6 +37,8 @@ var _gacha_btn: Button
 var _gacha_draw: Button
 var _gacha_state := {}
 var _picked := {}  # {"kind": "skill"|"quest", "ref": id}
+var _signin: HBoxContainer
+var _judge_code: LineEdit
 
 
 func _ready() -> void:
@@ -235,7 +237,7 @@ func _on_positions() -> void:
 func _build_buttons() -> void:
 	var h := HBoxContainer.new()
 	h.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	h.offset_left = -390
+	h.offset_left = -470
 	h.offset_right = -10
 	h.offset_top = 10
 	h.alignment = BoxContainer.ALIGNMENT_END
@@ -246,6 +248,18 @@ func _build_buttons() -> void:
 	var pull := _button("Daily Pull")
 	pull.pressed.connect(_toggle_gacha)
 	h.add_child(pull)
+	var song := _button("Music")
+	song.pressed.connect(func():
+		var m := get_parent().get("music") as AudioStreamPlayer
+		if m == null:
+			return
+		if not m.playing:
+			m.play()
+			song.text = "Music"
+		else:
+			m.stream_paused = not m.stream_paused
+			song.text = "Music (off)" if m.stream_paused else "Music")
+	h.add_child(song)
 	var hide := _button("Hide (H)")
 	hide.pressed.connect(func(): _root.visible = false)
 	h.add_child(hide)
@@ -453,6 +467,21 @@ func _build_gacha() -> void:
 	_gacha_info = _label("", 12, DIM)
 	_gacha_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	v.add_child(_gacha_info)
+	# Sign-in row (shown only when signed out): a wallet signature, or a judge code.
+	_signin = HBoxContainer.new()
+	_signin.visible = false
+	v.add_child(_signin)
+	var wallet := _button("Connect wallet")
+	wallet.pressed.connect(_connect_wallet)
+	_signin.add_child(wallet)
+	_judge_code = LineEdit.new()
+	_judge_code.placeholder_text = "judge code"
+	_judge_code.secret = true
+	_judge_code.custom_minimum_size = Vector2(180, 0)
+	_signin.add_child(_judge_code)
+	var judge := _button("Judge sign-in")
+	judge.pressed.connect(_judge_signin)
+	_signin.add_child(judge)
 	_gacha_draw = _button("Draw today's hand")
 	_gacha_draw.pressed.connect(_pull)
 	_gacha_draw.visible = false  # shown once the server says you're a holder without today's hand
@@ -512,8 +541,9 @@ func _render_gacha(d, status := 200) -> void:
 	_gacha_state = d
 	var cfg: Dictionary = d.get("config", {})
 	var info := ""
+	_signin.visible = not d.get("signedIn", false)
 	if not d.get("signedIn", false):
-		info = "Connect a wallet that holds a Chog (on the website, same page) to draw. Stargazers can watch everything."
+		info = "Connect a wallet that holds a Chog to draw (judges: use your judge code). Stargazers can watch everything."
 	elif not d.get("holder", false):
 		info = "This wallet holds no Chog: you're a Stargazer (watch only)."
 	else:
@@ -546,6 +576,53 @@ func _render_gacha(d, status := 200) -> void:
 		for i in _gacha_target.item_count:
 			if int(_gacha_target.get_item_metadata(i)) == GameState.selected:
 				_gacha_target.select(i)
+
+
+## Wallet sign-in from inside the web build: the browser wallet signs the same free message as the website
+## (no transaction), /api/auth/verify sets the session cookie, then the Daily Pull reloads.
+const SIGN_IN_JS := """
+(async () => {
+  window.__csAuth = 'pending';
+  try {
+    const eth = window.ethereum;
+    if (!eth) { window.__csAuth = 'error:No wallet found. Install MetaMask or Rabby, or use a judge code.'; return; }
+    const [address] = await eth.request({ method: 'eth_requestAccounts' });
+    const issuedAt = new Date().toISOString();
+    const message = 'Sign in to ChogSekai\\n\\nThis only proves you own this wallet. It costs nothing and sends no transaction.\\n\\nAddress: ' + address + '\\nIssued: ' + issuedAt;
+    const signature = await eth.request({ method: 'personal_sign', params: [message, address] });
+    const r = await fetch('/api/auth/verify', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ address, signature, issuedAt }) });
+    window.__csAuth = r.ok ? 'ok' : 'error:' + (((await r.json().catch(() => ({}))).error) || r.status);
+  } catch (e) { window.__csAuth = 'error:' + (e && e.message ? e.message : e); }
+})();
+"""
+
+
+func _connect_wallet() -> void:
+	if not OS.has_feature("web"):
+		_gacha_info.text = "Wallet sign-in works in the browser build (/play). In this window, use a judge code."
+		return
+	JavaScriptBridge.eval(SIGN_IN_JS, true)
+	_gacha_info.text = "Check your wallet: sign the message (free, no transaction)."
+	for i in 240:  # up to 2 minutes for the user to approve
+		await get_tree().create_timer(0.5).timeout
+		var st = JavaScriptBridge.eval("window.__csAuth", true)
+		if typeof(st) == TYPE_STRING and st != "pending":
+			if st == "ok":
+				_render_gacha(await Api.get_json("/api/v2/gacha"))
+			else:
+				_gacha_info.text = "Sign-in failed: " + str(st).trim_prefix("error:")
+			return
+	_gacha_info.text = "Sign-in timed out. Try again."
+
+
+func _judge_signin() -> void:
+	var r := await Api.post_json("/api/auth/judge", {"code": _judge_code.text.strip_edges()})
+	if int(r.get("status", 0)) == 200:
+		_judge_code.text = ""
+		_render_gacha(await Api.get_json("/api/v2/gacha"))
+	else:
+		var d = r.get("data")
+		_gacha_info.text = str(d.get("error", "Judge sign-in failed.")) if d is Dictionary else "Judge sign-in failed."
 
 
 func _card(kind: String, c: Dictionary) -> Button:

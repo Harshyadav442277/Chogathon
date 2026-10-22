@@ -7,9 +7,15 @@ import { WalletButton } from "@/components/WalletButton";
 const display = Press_Start_2P({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const body = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" });
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+const DESCRIPTION = "ChogSekai: an isekai god-sim where all 1,969 Chog Genesis NFTs live, work, quest and fight the Demon King. Watch every Chog live; holders draw skills and quests every day.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: "ChogSekai",
-  description: "1,969 Chogs. One living AI society. Whisper to yours and watch the idea spread.",
+  description: DESCRIPTION,
+  openGraph: { title: "ChogSekai", description: DESCRIPTION, images: [{ url: "/og.jpg", width: 1200, height: 630 }] },
+  twitter: { card: "summary_large_image", title: "ChogSekai", description: DESCRIPTION, images: ["/og.jpg"] },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

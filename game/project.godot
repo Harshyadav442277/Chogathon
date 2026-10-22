@@ -3,6 +3,8 @@ config_version=5
 
 [application]
 
+boot_splash/bg_color=Color(0.02, 0.03, 0.06, 1)
+
 config/name="ChogSekai"
 config/description="1,969 Chog NFTs live isekai lives. You are a Constellation."
 run/main_scene="res://scenes/Main.tscn"

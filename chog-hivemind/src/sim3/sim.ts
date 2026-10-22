@@ -207,7 +207,7 @@ function workplaceOf(a: Agent): number {
 }
 
 // ---------------------------------------------------------------------------------------------------------
-export async function simTick(tick: number, now = Date.now()): Promise<{ lines: number; phase: number; hero: number | null }> {
+export async function simTick(tick: number, now = Date.now()): Promise<{ lines: number; phase: number; hero: number | null; writes?: number }> {
   await ensureSimSchema();
   const season = Number(await getState("season", "0"));
   if (!season) return { lines: 0, phase: 0, hero: null };
@@ -253,7 +253,12 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
   const sig = emptySignals();
   let raidNow: NovelCtx["raid"] = null;
   let heroArchive: Agent | null = null;
-  const XM = xpMul();
+  // Real-time pacing: a late or skipped tick (GitHub Actions can lag) counts for the time that actually
+  // passed, within 0.5x..3x, so a 24-hour season keeps its rhythm.
+  const lastAt = Number(await getState("sim_last_at", "0"));
+  const pace = lastAt ? Math.min(3, Math.max(0.5, (now - lastAt) / (Number(process.env.SIM_TICK_SECONDS || 45) * 1000))) : 1;
+  const XM = xpMul() * pace;
+  const levelBefore = new Map(agents.map((a) => [a.id, a.level]));
   const before = new Map(agents.map((a) => [a.id, fresh.has(a.id) ? "" : rowKey(a)]));  // new agents always save
 
   // 1. Player gifts (skills and quests from Constellations), applied before anyone acts.
@@ -383,7 +388,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     if (a.quest) {
       const q = QUEST_BY_ID.get(a.quest);
       if (!q) { a.quest = null; continue; }
-      a.qprog += (1 + skillMatch(a.skills, q) + a.level * 0.04) * (0.8 + r() * 0.4);
+      a.qprog += (1 + skillMatch(a.skills, q) + a.level * 0.04) * (0.8 + r() * 0.4) * pace;
       const danger = q.boss || q.site === "dungeon" || q.kind === "hunt";
       if (danger) {
         const hurt = q.tier * 5 * (0.4 + r()) / (1 + defense(a));
@@ -494,23 +499,25 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
 
   // 8. Season end: once a Hero exists and the season clock is up, a new season re-rolls every job.
   if (st.hero && progress >= 1) {
-    await saveAll(agents, season, before);
+    await saveAll(agents, season, before, levelBefore);
     await writeHistory(hist, season, tick, now);
     await chapter(true);
+    await setState("sim_last_at", now);
     await batch(lines.map((l) => ({ sql: `INSERT INTO chronicle(season, tick, at, kind, chog, text) VALUES(?,?,?,?,?,?)`, args: [season, tick, now, l.kind, l.chog, l.text] })));
     await startSeason(season + 1);
     await setState("sim_state", "");
     return { lines: lines.length, phase: 4, hero: st.hero };
   }
 
-  await saveAll(agents, season, before);
+  const writes = await saveAll(agents, season, before, levelBefore);
   await writeHistory(hist, season, tick, now);
   await chapter(false);
+  await setState("sim_last_at", now);
   if (heroArchive) await archiveSeason(season, st, heroArchive, agents, now);
   await setState("sim_state", JSON.stringify(st));
   if (lines.length)
     await batch(lines.map((l) => ({ sql: `INSERT INTO chronicle(season, tick, at, kind, chog, text) VALUES(?,?,?,?,?,?)`, args: [season, tick, now, l.kind, l.chog, l.text] })));
-  return { lines: lines.length, phase: st.phase, hero: st.hero };
+  return { lines: lines.length, phase: st.phase, hero: st.hero, writes: writes + hist.length + lines.length };
 }
 
 /** Title tier for a level: a new title every 3 levels (titles in data/jobs.json). */
@@ -573,8 +580,9 @@ function startQuest(a: Agent, q: Quest, st: SeasonState, giver: string | null) {
 const rowKey = (a: Agent) => JSON.stringify([a.state, a.place, a.home, a.work, a.quest, a.qprog, a.qneed, a.qgiver, a.skills, a.hp, a.maxhp,
   a.level, a.xp, a.gold, a.story, a.kills, a.until, a.log, a.dmg]);
 
-/** Writes only the agents that changed this tick (most working Chogs don't), plus level changes to chog_season. */
-async function saveAll(agents: Agent[], season: number, before: Map<number, string>) {
+/** Writes only the agents that changed this tick (most working Chogs don't), plus level changes to
+ *  chog_season (the free database tier counts every row written). Returns the number of rows written. */
+async function saveAll(agents: Agent[], season: number, before: Map<number, string>, levelBefore: Map<number, number>) {
   const changed = agents.filter((a) => before.get(a.id) !== rowKey(a));
   const stmts = changed.map((a) => ({
     sql: `INSERT INTO agents(chog_id, season, state, place, home, work, quest, qprog, qneed, qgiver, skills, hp, maxhp, level, xp, gold, story, kills, until, log, dmg)
@@ -587,10 +595,11 @@ async function saveAll(agents: Agent[], season: number, before: Map<number, stri
       Math.max(0, Math.round(a.hp)), a.maxhp, a.level, a.xp, a.gold, a.story, a.kills, a.until, JSON.stringify(a.log), a.dmg],
   }));
   for (let i = 0; i < stmts.length; i += 500) await batch(stmts.slice(i, i + 500));
-  // Mirror level/HP/gold/story into the season table that older panels read.
-  const mirror = changed.map((a) => ({ sql: `UPDATE chog_season SET level = ?, xp = ?, gold = ?, hp = ?, story = ? WHERE chog_id = ? AND season = ?`,
+  // Mirror into the season table that older panels read, only when the level changed (titles and levels).
+  const mirror = changed.filter((a) => levelBefore.get(a.id) !== a.level).map((a) => ({ sql: `UPDATE chog_season SET level = ?, xp = ?, gold = ?, hp = ?, story = ? WHERE chog_id = ? AND season = ?`,
     args: [a.level, a.xp, a.gold, Math.max(0, Math.round(a.hp)), a.story, a.id, season] }));
   for (let i = 0; i < mirror.length; i += 500) await batch(mirror.slice(i, i + 500));
+  return changed.length + mirror.length;
 }
 
 async function writeHistory(hist: { chog: number; kind: string; other: number | null; ref: string | null; text: string }[], season: number, tick: number, now: number) {
