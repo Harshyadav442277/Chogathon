@@ -37,11 +37,14 @@ SCENES = [
     # segs: (raw start, raw end, seconds it should take on screen); the speed of each part follows from that.
     dict(id="fly", kind="game", dur=21.2, segs=[(3.4, 31.7, 21.2)], lines=[("s3a", 0.6), ("s3b", 13.36)]),
     dict(id="chog", kind="game", dur=23.3, segs=[(2.6, 11.2, 8.6), (11.2, 31.3, 14.7)], lines=[("s4a", 0.6), ("s4b", 17.92)]),
-    dict(id="pulls", kind="game", dur=23.2, segs=[(2.6, 31.0, 23.2)], lines=[("s5a", 0.6), ("s5b", 15.69), ("s5c", 19.01)]),
-    dict(id="chronicle", kind="game", dur=31.6, segs=[(2.6, 34.2, 31.6)], lines=[("s6a", 0.6), ("s6b", 17.34), ("s6c", 22.11), ("s6d", 26.13)]),
+    # pulls: raw moments from the director's marks (window 5.6, typing 8.1, signed in 11.1, pull 12.7, card 17.07, bestow 19.37, end 25.0)
+    # placed on the words: window after "NFT matters", sign-in under "only holders", the pull at "each pull offers", the bestow at "choose one".
+    dict(id="pulls", kind="game", dur=23.2, segs=[(2.6, 5.6, 2.0), (5.6, 8.1, 1.5), (8.1, 11.1, 3.5), (11.1, 12.7, 1.8), (12.7, 17.07, 3.7), (17.07, 19.37, 2.0), (19.37, 25.0, 5.6)],
+         lines=[("s5a", 0.6), ("s5b", 15.69), ("s5c", 19.01)]),
+    dict(id="chronicle", kind="game", dur=31.6, segs=[(2.6, 34.5, 31.6)], lines=[("s6a", 0.6), ("s6b", 17.34), ("s6c", 22.11), ("s6d", 26.13)]),
     dict(id="web", kind="mograph", dur=9.8, lines=[("sweb", 0.7)]),
-    dict(id="tech", kind="mograph", dur=13.1, lines=[("s7a", 0.5)]),
-    dict(id="outro", kind="mograph", dur=8.8, lines=[("s8a", 0.6)]),
+    dict(id="never", kind="mograph", dur=12.7, lines=[("s7a", 0.6)]),
+    dict(id="outro", kind="mograph", dur=9.6, lines=[("s8a", 0.6)]),
 ]
 starts, t = {}, 0.0
 for s in SCENES:
@@ -53,9 +56,9 @@ TOTAL = t
 def cues():
     S = starts
     c = [("riser", S["intro"] + 5.7, 0.55), ("boom", S["intro"] + 8.2, 0.8), ("shimmer", S["intro"] + 8.35, 0.5)]
-    for sid in ("concept", "fly", "chog", "pulls", "chronicle", "web", "tech", "outro"):
+    for sid in ("concept", "fly", "chog", "pulls", "chronicle", "web", "never", "outro"):
         c.append(("whoosh", S[sid] - 0.25, 0.5))
-    c += [("shimmer", S["concept"] + 14.4, 0.35), ("shimmer", S["concept"] + 17.9, 0.3), ("stinger", S["outro"] + 0.4, 0.6)]
+    c += [("shimmer", S["concept"] + 14.4, 0.35), ("shimmer", S["concept"] + 17.9, 0.3), ("stinger", S["outro"] + 2.15, 0.6), ("shimmer", S["outro"] + 2.8, 0.4)]
     c += [("tick", S["intro"] + 1.2 + i * 0.28, 0.35) for i in range(14)]
     return c
 
@@ -101,7 +104,7 @@ def clip(scene):
         r1 = min(r1, length)
         parts.append(f"[i{i}]trim=start={r0}:end={r1},setpts=(PTS-STARTPTS)/{(r1 - r0) / d:.5f},fps={FPS}[s{i}]")
         labels.append(f"[s{i}]")
-    chain = ";".join(parts) + ";" + "".join(labels) + f"concat=n={len(segs)}:v=1:a=0,scale=1920:1080:flags=lanczos,tpad=stop_mode=clone:stop_duration=3[g]"
+    chain = ";".join(parts) + ";" + "".join(labels) + f"concat=n={len(segs)}:v=1:a=0,scale=1920:1080:flags=lanczos,tpad=stop_mode=clone:stop_duration=5[g]"
     fade = f"fade=t=in:st=0:d=0.5,fade=t=out:st={dur - 0.5:.2f}:d=0.5"
     inputs = ["-i", avi]
     ovdir = os.path.join(B, "frames", "ov_" + sid)
@@ -115,8 +118,9 @@ def clip(scene):
     return out
 
 
-def build_video():
-    clips = [clip(s) for s in SCENES]
+def build_video(only=()):
+    """Builds the scene clips (only the named scenes if given; the others are reused) and the concatenated picture."""
+    clips = [clip(s) if (not only or s["id"] in only) else os.path.join(B, "clips", s["id"] + ".mp4") for s in SCENES]
     lst = os.path.join(B, "clips", "list.txt")
     open(lst, "w").write("".join(f"file '{c.replace(chr(92), '/')}'\n" for c in clips))
     run(["-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", os.path.join(B, "picture.mp4")])
@@ -228,12 +232,12 @@ def final():
     aud = os.path.join(B, "audio", "master.wav")
     srt = os.path.join(OUT, "ChogSekai_demo.srt")
     # captions need a relative path without a drive letter for the filter parser
-    style = "FontName=Segoe UI Semibold,FontSize=17,PrimaryColour=&H00F6EDCC,OutlineColour=&H00101810,BorderStyle=1,Outline=2.2,Shadow=0.6,MarginV=26,Alignment=2"
+    style = "FontName=Segoe UI Semibold,FontSize=10,PrimaryColour=&H00F6EDCC,OutlineColour=&H00101810,BorderStyle=1,Outline=1.0,Shadow=0.4,MarginV=9,Alignment=2"
     out = os.path.join(OUT, "ChogSekai_demo.mp4")
     cwd = os.getcwd()
     os.chdir(OUT)
     try:
-        run(["-i", pic, "-i", aud, "-vf", f"subtitles=ChogSekai_demo.srt:force_style='{style}'", "-c:v", "libx264", "-preset", "slow", "-crf", "18",
+        run(["-i", pic, "-i", aud, "-vf", f"subtitles=ChogSekai_demo.srt:force_style='{style}'", "-c:v", "libx264", "-preset", "medium", "-crf", "21",
              "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "192k", "-shortest", "ChogSekai_demo.mp4"])
     finally:
         os.chdir(cwd)
@@ -243,7 +247,7 @@ def final():
 if __name__ == "__main__":
     what = sys.argv[1] if len(sys.argv) > 1 else "all"
     if what in ("video", "all"):
-        build_video()
+        build_video(sys.argv[2:])
     if what in ("audio", "all"):
         mix_audio()
     if what in ("final", "all"):

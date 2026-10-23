@@ -13,7 +13,7 @@ Deadline: **23 October 2026, 15:00 UTC / 8:30 pm IST.** Use the [official dashbo
 | Description, maximum 8,000 characters | To fill |
 | Why the Chog NFT is essential | To fill |
 | Working app URL | To fill |
-| Demo video, maximum three minutes | To fill |
+| Demo video, maximum three minutes | Produced locally (2:51, 1080p, AI voices, captions): `video/out/ChogSekai_demo.mp4` with `ChogSekai_demo.srt`, see [DEMO_VIDEO.md](DEMO_VIDEO.md). Not yet uploaded: upload as unlisted YouTube or Google Drive "anyone with the link", then check it opens while signed out |
 | Banner | To add in assets/ |
 | Repository | https://github.com/Harshyadav442277/Chogathon |
 | Tech stack | To fill |

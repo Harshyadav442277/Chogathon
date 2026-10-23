@@ -73,7 +73,7 @@
       "id": "s3b",
       "scene": "fly",
       "actor": "narrator",
-      "text": "It is built in Godot and plays right in your browser. The Star Stream narrates it all as it happens."
+      "text": "It plays right in your browser. And the Star Stream narrates it all, as it happens."
     },
     {
       "id": "s4a",
@@ -137,15 +137,15 @@
     },
     {
       "id": "s7a",
-      "scene": "tech",
+      "scene": "never",
       "actor": "narrator",
-      "text": "Under the hood: a Godot web client, a Next.js world server, Turso, and a deterministic story engine. It runs on free tiers, day and night."
+      "text": "Eight story premises. Nearly two hundred story beats. A life story for every single Chog. No two seasons ever read alike."
     },
     {
       "id": "s8a",
       "scene": "outro",
       "actor": "narrator",
-      "text": "ChogSekai. Your Chog has a story. Go and see it."
+      "text": "ChogSekai. Be the star in their story."
     }
   ]
 }

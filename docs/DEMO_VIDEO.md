@@ -1,6 +1,6 @@
 # Demo video
 
-The submission video is produced by scripts in [`video/`](../video) from the real, deployed game. Nothing in it is mocked: the gameplay is the actual client talking to https://chogsekai.vercel.app, recorded frame by frame; the voices are AI text-to-speech; the motion design is HTML and GSAP rendered through Chrome. The organizer's limit is three minutes ([RULES.md](../RULES.md)); the cut is about 2:51.
+The submission video is produced by scripts in [`video/`](../video) from the real, deployed game. Nothing in it is mocked: the gameplay is the actual client talking to https://chogsekai.vercel.app, recorded frame by frame; the voices are AI text-to-speech; the motion design is HTML and GSAP rendered through Chrome. The organizer's limit is three minutes ([RULES.md](../RULES.md)); the cut is 2:51.
 
 | Part | How | Free service or tool |
 |---|---|---|
@@ -10,19 +10,19 @@ The submission video is produced by scripts in [`video/`](../video) from the rea
 | Music and effects | The game's original theme (synthesized in code) ducked under the voices; whooshes, riser, boom, shimmer and stinger synthesized in [`video/sfx.py`](../video/sfx.py); the game's own click and card sounds from the recordings | Python (numpy, scipy), no samples |
 | Edit and encode | Scenes, overlays, mix, captions and loudness (-16 LUFS) in [`video/assemble.py`](../video/assemble.py) | ffmpeg (via `imageio-ffmpeg`) |
 
-## Scenes (about 2:51)
+## Scenes (2:51)
 
 | Time | Scene | Shows | Voice |
 |---|---|---|---|
 | 0:00 | Intro | The crossroads, 1,969 counting up, the title | Narrator |
 | 0:17 | Concept | The NFT wall, a Chog becoming an agent, jobs every season, the season arc to a Hero, "you are a Constellation" | Guide |
-| 0:40 | World | A flight over the Hive Capital, Emberforge, Tidecry, Prism and the Hollow; Star Stream; plays in the browser | Narrator |
+| 0:40 | World | A flight over the Hive Capital, Emberforge, Tidecry, Prism and the Hollow; the Star Stream | Narrator |
 | 1:01 | A Chog | Status with the real NFT picture, then the Life Story window | Guide |
 | 1:24 | Star Pulls | Judge sign-in (the code is masked), a pull, four cards, choose one, bestow | Narrator, Peddler |
 | 1:47 | Chronicle | The eight premises, with Orrun, the Demon King and a child speaking | Guide, Orrun, King, Child |
 | 2:19 | One address | The real site in a browser window: loader, title screen, Enter Monadia, the world (captured from the live deployment) | Narrator |
-| 2:29 | Under the hood | Godot client, Next.js server, Turso, the tick sources, the story engine in numbers | Narrator |
-| 2:42 | End card | The URL and how holders and judges sign in | Narrator |
+| 2:29 | Never the same twice | 8 premises, 191 story beats, 1,969 life stories; "no two seasons read alike" | Narrator |
+| 2:42 | End card | "Be the star in their story.", the URL, how holders and judges sign in | Narrator |
 
 The voices are AI-generated and the end card says so.
 

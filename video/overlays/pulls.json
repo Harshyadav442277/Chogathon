@@ -3,9 +3,13 @@
  "items": [
   {
    "kind": "steps",
+   "style": {
+    "top": "40px",
+    "bottom": "auto"
+   },
    "t": [
-    2.25,
-    23.0
+    1.8,
+    22.95
    ],
    "items": [
     "Sign in",
@@ -15,19 +19,19 @@
    ],
    "active": [
     [
-     2.45,
+     2.0,
      0
     ],
     [
-     8.25,
+     8.8,
      1
     ],
     [
-     9.34,
+     9.93,
      2
     ],
     [
-     13.7,
+     14.5,
      3
     ]
    ]
@@ -74,7 +78,7 @@
    "kind": "lower",
    "t": [
     19.01,
-    23.59
+    22.95
    ],
    "title": "Applied on the next tick",
    "sub": "The skill or quest changes that Chog's story",

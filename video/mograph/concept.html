@@ -122,34 +122,35 @@
   const tl = gsap.timeline({ paused: true });
   const fade = (id, a, b) => { tl.to(id, { opacity: 1, duration: 0.5 }, a); tl.to(id, { opacity: 0, duration: 0.5 }, b - 0.5); };
   tl.set(".scene", { opacity: 0 });
-  // A
-  fade("#A", 0.0, 4.6);
-  tl.fromTo(tiles, { scale: 0, opacity: 0, rotate: -12 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.55, ease: "back.out(1.7)", stagger: { each: 0.035, from: "center", grid: [rows, cols] } }, 0.5);
-  tl.to(c, { v: 1969, duration: 3.2, ease: "power2.out", onUpdate: () => (document.getElementById("count").textContent = Math.round(c.v).toLocaleString("en-US")) }, 0.4);
-  tl.to(tiles, { y: -8, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: { each: 0.03, from: "random" } }, 1.6);
-  // B
-  fade("#B", 4.5, 8.9);
-  tl.fromTo("#B .head", { x: -80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 4.8);
-  tl.fromTo("#B .sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 5.4);
-  tl.fromTo("#B .chip", { y: 30, opacity: 0, scale: 0.7 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.18 }, 6.3);
-  tl.fromTo("#status", { x: 140, opacity: 0, rotateY: 35 }, { x: 0, opacity: 1, rotateY: 0, duration: 0.9, ease: "power3.out" }, 5.0);
-  tl.to(ty, { n: typeText.length, duration: 2.2, ease: "none", onUpdate: () => (typed.innerHTML = typeText.slice(0, Math.floor(ty.n)).replace(/\n/g, "<br>")) }, 5.8);
-  // C
-  fade("#C", 8.8, 12.1);
-  tl.fromTo("#C .head, #C .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 }, 9.0);
-  tl.fromTo("#C .tile", { scale: 0 }, { scale: 1, duration: 0.7, ease: "back.out(2)" }, 9.1);
+  // Timed to the words of the voice-over (scene time): "Each season, every Chog is summoned with a new job" 0.7-3.8,
+  // "Baker, blacksmith, healer, tank" 4.2-6.6, "A Demon King and four generals awaken" 7.1-9.8, "And the season ends when a Hero ... lands the final blow" 10.2-14.7.
+  // A: the NFT wall
+  fade("#A", 0.0, 2.5);
+  tl.fromTo(tiles, { scale: 0, opacity: 0, rotate: -12 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.5, ease: "back.out(1.7)", stagger: { each: 0.018, from: "center", grid: [rows, cols] } }, 0.2);
+  tl.to(c, { v: 1969, duration: 2.0, ease: "power2.out", onUpdate: () => (document.getElementById("count").textContent = Math.round(c.v).toLocaleString("en-US")) }, 0.1);
+  // B: an agent
+  fade("#B", 2.3, 4.5);
+  tl.fromTo("#B .head", { x: -80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 2.5);
+  tl.fromTo("#B .sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 2.9);
+  tl.fromTo("#B .chip", { y: 30, opacity: 0, scale: 0.7 }, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)", stagger: 0.12 }, 3.3);
+  tl.fromTo("#status", { x: 140, opacity: 0, rotateY: 35 }, { x: 0, opacity: 1, rotateY: 0, duration: 0.7, ease: "power3.out" }, 2.5);
+  tl.to(ty, { n: typeText.length, duration: 1.3, ease: "none", onUpdate: () => (typed.innerHTML = typeText.slice(0, Math.floor(ty.n)).replace(/\n/g, "<br>")) }, 3.0);
+  // C: jobs (orbit while "baker, blacksmith, healer, tank" is said)
+  fade("#C", 4.3, 7.5);
+  tl.fromTo("#C .head, #C .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }, 4.4);
+  tl.fromTo("#C .tile", { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 4.45);
   const orbit = { a: 0 };
-  tl.fromTo(orbit, { a: 0 }, { a: Math.PI * 1.2, duration: 3.4, ease: "none", onUpdate: () => {
+  tl.fromTo(orbit, { a: 0 }, { a: Math.PI * 1.0, duration: 3.2, ease: "none", onUpdate: () => {
     jobChips.forEach((chip, i) => { const ang = orbit.a + (i / jobs.length) * Math.PI * 2; const rx = 640, ry = 300;
       const x = 960 + Math.cos(ang) * rx, y = 540 + Math.sin(ang) * ry; chip.style.left = x - chip.offsetWidth / 2 + "px"; chip.style.top = y - 24 + "px";
-      const depth = (Math.sin(ang) + 1) / 2; chip.style.transform = `scale(${0.75 + depth * 0.35})`; chip.style.zIndex = Math.round(depth * 10); }); } }, 8.9);
-  tl.fromTo(jobChips, { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.07 }, 9.2);
-  // D
-  fade("#D", 11.9, 15.4);
-  tl.fromTo("#D .head, #D .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 }, 12.1);
-  tl.fromTo(stepEls, { opacity: 0, y: 40, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.8)", stagger: 0.4 }, 12.3);
-  tl.fromTo("#prog", { width: 0 }, { width: 1580, duration: 2.4, ease: "power1.inOut" }, 12.3);
-  tl.fromTo("#hero", { opacity: 0, scale: 0.6, letterSpacing: "0.5em" }, { opacity: 1, scale: 1, letterSpacing: "0.08em", duration: 0.8, ease: "back.out(1.7)" }, 14.2);
+      const depth = (Math.sin(ang) + 1) / 2; chip.style.transform = `scale(${0.75 + depth * 0.35})`; chip.style.zIndex = Math.round(depth * 10); }); } }, 4.3);
+  tl.fromTo(jobChips, { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.05 }, 4.5);
+  // D: the season, to the Hero
+  fade("#D", 7.2, 15.5);
+  tl.fromTo("#D .head, #D .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }, 7.4);
+  [7.6, 8.4, 9.0, 10.6, 11.5].forEach((t, i) => tl.fromTo(stepEls[i], { opacity: 0, y: 40, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.8)" }, t));
+  tl.fromTo("#prog", { width: 0 }, { width: 1580, duration: 4.2, ease: "power1.inOut" }, 7.7);
+  tl.fromTo("#hero", { opacity: 0, scale: 0.6, letterSpacing: "0.5em" }, { opacity: 1, scale: 1, letterSpacing: "0.08em", duration: 0.8, ease: "back.out(1.7)" }, 12.5);
   // E
   fade("#E", 15.2, 22.8);
   tl.fromTo("#you", { scale: 0, rotate: -90 }, { scale: 1, rotate: 0, duration: 0.9, ease: "back.out(1.7)" }, 15.5);

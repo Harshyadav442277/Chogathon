@@ -52,6 +52,9 @@ def to_scene(scene, raw):
 
 
 def save(scene, items):
+    dur = SC[scene]["dur"]
+    for it in items:  # keep every caption inside the scene
+        it["t"] = [round(min(it["t"][0], dur - 1.0), 2), round(min(it["t"][1], dur - 0.25), 2)]
     path = os.path.join(HERE, "overlays", scene + ".json")
     json.dump({"duration": SC[scene]["dur"], "items": items}, open(path, "w"), indent=1)
     print(scene, len(items), "overlay items")
@@ -65,11 +68,11 @@ arr = [to_scene("fly", m[k]) for k in ("cam_emberforge", "cam_tidecry", "cam_pri
 names = ["The Hive Capital", "Emberforge Peaks", "Tidecry Coast", "Prism Expanse", "The Hollow"]
 items = [dict(kind="lower", t=[0.9, 6.4], title="Monadia", sub="Ten regions, one living continent")]
 for i, nm in enumerate(names):
-    a = max(1.6, arr[i] - 3.2) if i else 2.4
-    items.append(dict(kind="region", t=[round(a, 2), round(min(arr[i] + 0.3, SC["fly"]["dur"] - 0.2), 2)], eyebrow=f"Region {i + 1}", text=nm))
+    a = max(1.6, arr[i] - 2.0) if i else 2.4
+    items.append(dict(kind="region", t=[round(a, 2), round(min(arr[i] + 0.7, SC["fly"]["dur"] - 0.25), 2)], eyebrow=f"Region {i + 1}", text=nm))
 t_browser = say("fly", "s3b", "plays") - 0.2
 t_stream = say("fly", "s3b", "Star") - 0.3
-items.append(dict(kind="lower", t=[round(t_browser, 2), round(t_browser + 4.2, 2)], title="Plays in your browser", sub="Godot 4.7 · WebAssembly · no install", style={"bottom": "250px"}))
+items.append(dict(kind="lower", t=[round(t_browser, 2), round(t_browser + 4.2, 2)], title="Plays in your browser", sub="No install, nothing to download", style={"bottom": "250px"}))
 items.append(dict(kind="callout", t=[round(t_stream, 2), round(t_stream + 5.2, 2)], title="Star Stream", sub="The world narrates itself, live", lx=640, ly=905, sx=640, sy=950, x=560, y=960))
 save("fly", items)
 
@@ -94,7 +97,7 @@ t_five = say("pulls", "s5a", "five") - 0.2
 a5, b5 = line_span("pulls", "s5b")
 a5c, b5c = line_span("pulls", "s5c")
 save("pulls", [
-    dict(kind="steps", t=[round(S("window_open") - 0.2, 2), round(SC["pulls"]["dur"] - 0.2, 2)], items=["Sign in", "Pull", "Choose 1 of 4", "Bestow"],
+    dict(kind="steps", style={"top": "40px", "bottom": "auto"}, t=[round(S("window_open") - 0.2, 2), round(SC["pulls"]["dur"] - 0.2, 2)], items=["Sign in", "Pull", "Choose 1 of 4", "Bestow"],
          active=[[round(S("window_open"), 2), 0], [round(S("pull_click"), 2), 1], [round(S("cards_flip"), 2), 2], [round(S("bestow_click"), 2), 3]]),
     dict(kind="badge", t=[round(t_holders, 2), round(t_holders + 4.0, 2)], text="NFT holders only", x=40, y=160, cls=""),
     dict(kind="badge", t=[round(t_five, 2), round(t_five + 4.2, 2)], text="5 pulls per season", x=40, y=230, cls="violet"),
