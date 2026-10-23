@@ -282,6 +282,46 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
   }
   if (gifts.length) await batch(gifts.map((g) => ({ sql: `UPDATE gifts SET status = 'done' WHERE id = ?`, args: [g.id] })));
 
+  // 1b. Fate: every two pull periods the stars touch each Chog once (a random skill, or a fitting quest), so Chogs
+  // nobody plays still grow a story. Each Chog has its own phase and is due when its boundary fell between the last
+  // tick and this one. Player gifts win: a Chog gifted within the period is skipped. Fate is not a gift (no gifts row),
+  // so sponsors, Star-Touched and the Hero's patrons are unchanged.
+  if (lastAt && !st.hero) {
+    const FP = seasonMs() * 0.4;
+    const phase = (a: Agent) => hash(`fate:${a.id}`) % FP;
+    const due = agents.filter((a) => !isDemon(a) && Math.floor((now - phase(a)) / FP) !== Math.floor((lastAt - phase(a)) / FP));
+    if (due.length) {
+      const gifted = new Set((await all<any>(`SELECT DISTINCT chog_id FROM gifts WHERE created_at > ?`, [now - FP])).map((g) => Number(g.chog_id)));
+      const RAR = [40, 28, 18, 10, 4];
+      let told = 0;
+      for (const a of due) {
+        if (gifted.has(a.id)) continue;
+        const fr = mulberry32(hash(`fate:${a.id}:${Math.floor(now / FP)}`));
+        const giveSkill = () => {
+          const pool = SKILLS.filter((k) => !a.skills.includes(k.id));
+          if (!pool.length || a.skills.length >= MAX_SKILLS) return false;
+          let t = fr() * pool.reduce((n, k) => n + (RAR[k.tier - 1] ?? 1), 0), k = pool[pool.length - 1];
+          for (const c of pool) if ((t -= RAR[c.tier - 1] ?? 1) <= 0) { k = c; break; }
+          a.skills.push(k.id);
+          remember(a, "fate_skill", `The stars stirred and left the skill "${k.name}".`, null, k.id);
+          if (told++ < 3) say("fate_skill", a, { skill: k.name });
+          return true;
+        };
+        const giveQuest = () => {
+          if (a.quest || a.until > tick) return false;
+          const q = chooseQuest(a, st, progress, fr);
+          if (!q) return false;
+          startQuest(a, q, st, null);
+          a.hp = Math.max(a.hp, Math.round(a.maxhp * 0.5));
+          remember(a, "fate_quest", `The stars stirred and set the quest "${q.name}".`, null, q.id);
+          if (told++ < 3) say("fate_quest", a, { quest: q.name, qkind: q.kind });
+          return true;
+        };
+        if (fr() < 0.5) { if (!giveSkill()) giveQuest(); } else if (!giveQuest()) giveSkill();
+      }
+    }
+  }
+
   // 2. Director: phase, last stand.
   const generalsUp = st.generals.filter((g) => !g.down).length;
   st.seals = 4 - generalsUp;

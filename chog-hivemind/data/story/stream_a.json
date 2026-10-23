@@ -138,6 +138,16 @@
       { "text": "“Two is better than one,” said {b}, falling in beside {a} for “{quest}”." },
       { "text": "{a} and {b} left {place} together for “{quest}”, already arguing about the route." }
     ],
+    "fate_skill": [
+      { "text": "[FATE] The stars stirred, and {a} woke knowing “{skill}”." },
+      { "text": "[FATE] Nobody asked for it, but “{skill}” found {a} anyway." },
+      { "text": "[FATE] {a} picked up “{skill}” the way one picks up a stray coin: by luck." }
+    ],
+    "fate_quest": [
+      { "text": "[FATE] The stars stirred and set {a} the quest “{quest}”." },
+      { "text": "[FATE] A quiet nudge from fate: {a} is off on “{quest}”." },
+      { "text": "[FATE] No god chose it, but “{quest}” came for {a}." }
+    ],
     "gift_skill": [
       { "text": "[CONSTELLATION] A star granted {a} the skill “{skill}”." },
       { "text": "[CONSTELLATION] “{skill}” was carved into {a}'s Status Window by a watching star." },
