@@ -152,42 +152,30 @@ def place(buf, x, at, gain=1.0):
 
 
 def mix_audio():
+    """Voices + the music bed (Aylex, "Guardians", ducked under speech) + the library sound effects from soundtrack.py."""
+    import soundtrack
     n = int((TOTAL + 1.0) * SR)
     voice = np.zeros((n, 2))
-    sfx_game = np.zeros((n, 2))
-    sfx_synth = np.zeros((n, 2))
-    # voices (the cast), slightly different pan so the characters feel apart
+    sfx = np.zeros((n, 2))
     pan = {"narrator": (1.0, 1.0), "guide": (1.0, 1.0), "orrun": (1.0, 0.8), "king": (0.85, 1.0), "peddler": (0.8, 1.0), "child": (1.0, 0.85)}
     for s in SCENES:
         for lid, off in s["lines"]:
             x = decode(os.path.join(B, "voice", lid + ".mp3"))
-            p = pan[TEXT[lid]["actor"]]
-            place(voice, x * np.array(p), starts[s["id"]] + off)
-    # the game's own sounds from the recordings (clicks, card flips, bestow), time-compressed like the picture
-    for s in SCENES:
-        if s["kind"] != "game":
-            continue
-        avi = os.path.join(B, "gameplay", s["id"] + ".avi")
-        length = probe(avi)
-        chunks = []
-        for (r0, r1, d) in s["segs"]:
-            r1 = min(r1, length)
-            chunks.append(decode(avi, ["-ss", str(r0), "-t", str(r1 - r0), "-af", atempo((r1 - r0) / d)])[: int(d * SR)])
-        x = np.concatenate(chunks)
-        place(sfx_game, x[: int(s["dur"] * SR)], starts[s["id"]], 0.8)
-    # synthesized cues
-    for name, at, g in cues():
-        place(sfx_synth, load_wav(os.path.join(B, "sfx", name + ".wav")), max(0, at), g)
-    # music: our original theme, looped, ducked under speech, faded at the ends
-    theme = load_wav(os.path.join(HERE, "..", "game", "assets", "music", "monadia_theme.wav"))
-    music = np.tile(theme, (int(np.ceil(n / len(theme))) + 1, 1))[:n]
+            place(voice, x * np.array(pan[TEXT[lid]["actor"]]), starts[s["id"]] + off)
+    cues = soundtrack.build_cues()
+    for x, at, gain_db in cues:
+        place(sfx, x, max(0.0, at), 10 ** (gain_db / 20) * 0.5)
+    print("sound effects placed:", len(cues))
+    # music bed: the track, ducked under speech, faded in and out
+    music = decode(os.path.join(HERE, "assets_audio", "guardians.mp3"))
+    music = music[:n] if len(music) >= n else np.concatenate([music, np.zeros((n - len(music), 2))])
     speech = np.abs(voice).max(axis=1)
-    env = uniform_filter1d((speech > 0.02).astype(float), size=int(0.5 * SR))
-    env = uniform_filter1d(env, size=int(0.35 * SR))
-    gain = 0.50 - 0.33 * np.clip(env * 1.6, 0, 1)
-    gain = gain * np.clip(np.arange(n) / (2.0 * SR), 0, 1) * np.clip((n - np.arange(n)) / (3.0 * SR), 0, 1)
+    env = uniform_filter1d((speech > 0.02).astype(float), size=int(0.45 * SR))
+    env = uniform_filter1d(env, size=int(0.30 * SR))
+    gain = 0.30 - 0.20 * np.clip(env * 1.6, 0, 1)             # about -10 dB in the gaps, -20 dB under speech (the track is mastered hot)
+    gain = gain * np.clip(np.arange(n) / (1.5 * SR), 0, 1) * np.clip((TOTAL + 0.6 - np.arange(n) / SR) / 3.5, 0, 1)
     music = music * gain[:, None]
-    master = voice * 1.0 + music + sfx_game * 0.9 + sfx_synth
+    master = voice * 1.0 + music + sfx
     master = np.tanh(master * 0.9) / np.tanh(0.9)
     master = master / np.max(np.abs(master)) * 0.95
     os.makedirs(os.path.join(B, "audio"), exist_ok=True)
@@ -237,8 +225,8 @@ def final():
     cwd = os.getcwd()
     os.chdir(OUT)
     try:
-        run(["-i", pic, "-i", aud, "-vf", f"subtitles=ChogSekai_demo.srt:force_style='{style}'", "-c:v", "libx264", "-preset", "medium", "-crf", "21",
-             "-pix_fmt", "yuv420p", "-profile:v", "high", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "192k", "-shortest", "ChogSekai_demo.mp4"])
+        run(["-i", pic, "-i", aud, "-vf", f"subtitles=ChogSekai_demo.srt:force_style='{style}',scale=in_range=pc:out_range=tv,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "21",
+             "-pix_fmt", "yuv420p", "-profile:v", "high", "-level", "4.1", "-color_range", "tv", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "192k", "-shortest", "ChogSekai_demo.mp4"])
     finally:
         os.chdir(cwd)
     print("out:", out, round(probe(out), 1), "s", round(os.path.getsize(out) / 1e6, 1), "MB")
