@@ -30,3 +30,11 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 *.tmp
+
+# Demo video build (scripts are committed under video/, outputs are not)
+video/build/
+video/out/
+video/node_modules/
+game/override.cfg
+video/mograph/assets/
+video/mograph/gsap.min.js

@@ -1,0 +1,90 @@
+{
+ "duration": 23.2,
+ "items": [
+  {
+   "kind": "steps",
+   "t": [
+    2.25,
+    23.0
+   ],
+   "items": [
+    "Sign in",
+    "Pull",
+    "Choose 1 of 4",
+    "Bestow"
+   ],
+   "active": [
+    [
+     2.45,
+     0
+    ],
+    [
+     8.25,
+     1
+    ],
+    [
+     9.34,
+     2
+    ],
+    [
+     13.7,
+     3
+    ]
+   ]
+  },
+  {
+   "kind": "badge",
+   "t": [
+    3.52,
+    7.52
+   ],
+   "text": "NFT holders only",
+   "x": 40,
+   "y": 160,
+   "cls": ""
+  },
+  {
+   "kind": "badge",
+   "t": [
+    5.32,
+    9.52
+   ],
+   "text": "5 pulls per season",
+   "x": 40,
+   "y": 230,
+   "cls": "violet"
+  },
+  {
+   "kind": "lower",
+   "t": [
+    15.79,
+    19.31
+   ],
+   "title": "The Peddler of Stars",
+   "sub": "\u201cThese are tools, not toys.\u201d",
+   "style": {
+    "left": "40px",
+    "top": "150px",
+    "bottom": "auto",
+    "minWidth": "0",
+    "maxWidth": "430px"
+   }
+  },
+  {
+   "kind": "lower",
+   "t": [
+    19.01,
+    23.59
+   ],
+   "title": "Applied on the next tick",
+   "sub": "The skill or quest changes that Chog's story",
+   "style": {
+    "left": "40px",
+    "top": "330px",
+    "bottom": "auto",
+    "minWidth": "0",
+    "maxWidth": "430px"
+   }
+  }
+ ]
+}

@@ -50,6 +50,9 @@ var _sfx := {}
 var _pic: TextureRect
 var _pics := {}  # chog id -> ImageTexture (NFT pictures, cached)
 var _now_playing: Label
+var _btn_novel: Button  # kept for the dev demo director (scripts/dev/demo_director.gd)
+var _btn_pull: Button
+var _btn_judge: Button
 var _signin: HBoxContainer
 var _judge_code: LineEdit
 
@@ -297,9 +300,11 @@ func _build_buttons() -> void:
 	h.alignment = BoxContainer.ALIGNMENT_END
 	_root.add_child(h)
 	var chron := _button("Chronicle")
+	_btn_novel = chron
 	chron.pressed.connect(_toggle_novel)
 	h.add_child(chron)
 	var pull := _button("Star Pulls")
+	_btn_pull = pull
 	pull.pressed.connect(_toggle_gacha)
 	h.add_child(pull)
 	var song := _button("Music")
@@ -655,6 +660,7 @@ func _build_gacha() -> void:
 	_judge_code.text_submitted.connect(func(_t): _judge_signin())
 	_signin.add_child(_judge_code)
 	var judge := _button("Judge sign-in")
+	_btn_judge = judge
 	judge.pressed.connect(_judge_signin)
 	_signin.add_child(judge)
 	# The five pull slots of this season.

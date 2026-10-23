@@ -1,0 +1,151 @@
+{
+  "title": "ChogSekai demo (target about 2:50, organizer maximum 3:00)",
+  "voices": {
+    "narrator": {
+      "voice": "en-GB-RyanNeural",
+      "rate": "-3%",
+      "pitch": "+0Hz",
+      "volume": "+0%"
+    },
+    "guide": {
+      "voice": "en-US-AvaNeural",
+      "rate": "+2%",
+      "pitch": "+0Hz",
+      "volume": "+0%"
+    },
+    "orrun": {
+      "voice": "en-US-GuyNeural",
+      "rate": "-12%",
+      "pitch": "-6Hz",
+      "volume": "+0%"
+    },
+    "king": {
+      "voice": "en-GB-ThomasNeural",
+      "rate": "-14%",
+      "pitch": "-10Hz",
+      "volume": "+0%"
+    },
+    "peddler": {
+      "voice": "en-AU-NatashaNeural",
+      "rate": "-6%",
+      "pitch": "+3Hz",
+      "volume": "+0%"
+    },
+    "child": {
+      "voice": "en-US-AnaNeural",
+      "rate": "+4%",
+      "pitch": "+0Hz",
+      "volume": "+0%"
+    }
+  },
+  "lines": [
+    {
+      "id": "s1a",
+      "scene": "intro",
+      "actor": "narrator",
+      "text": "One thousand, nine hundred and sixty-nine Chogs woke at a crossroads, beneath a lantern that nobody had lit."
+    },
+    {
+      "id": "s1b",
+      "scene": "intro",
+      "actor": "narrator",
+      "text": "This is ChogSekai: an isekai god-sim where every Chog Genesis NFT is a living character, in a world that never stops."
+    },
+    {
+      "id": "s2a",
+      "scene": "concept",
+      "actor": "guide",
+      "text": "Each season, every Chog is summoned with a new job. Baker, blacksmith, healer, tank. A Demon King and four generals awaken. And the season ends when a Hero, who could be anyone, lands the final blow."
+    },
+    {
+      "id": "s2b",
+      "scene": "concept",
+      "actor": "guide",
+      "text": "You are a Constellation: a god who can only nudge your own Chogs. Skills, quests, blessings."
+    },
+    {
+      "id": "s3a",
+      "scene": "fly",
+      "actor": "narrator",
+      "text": "Monadia is a living, three-dimensional continent. Ten regions, hundreds of buildings, and nearly two thousand Chogs working, questing and defending their towns, live."
+    },
+    {
+      "id": "s3b",
+      "scene": "fly",
+      "actor": "narrator",
+      "text": "It is built in Godot and plays right in your browser. The Star Stream narrates it all as it happens."
+    },
+    {
+      "id": "s4a",
+      "scene": "chog",
+      "actor": "guide",
+      "text": "Click any Chog and you meet a person. Their real NFT, their traits, their job and their skills. Open the life story: a temperament, a childhood, a dream, a fear, bonds, rumours, and past lives from earlier seasons."
+    },
+    {
+      "id": "s4b",
+      "scene": "chog",
+      "actor": "guide",
+      "text": "A story graph writes it from the Chog's own history, so no two read alike."
+    },
+    {
+      "id": "s5a",
+      "scene": "pulls",
+      "actor": "narrator",
+      "text": "Here is where the NFT matters. Only holders get Star Pulls: five a season, rising through the day. Each pull offers four skills and quests. Choose one, and bestow it on a Chog you own."
+    },
+    {
+      "id": "s5b",
+      "scene": "pulls",
+      "actor": "peddler",
+      "text": "These are tools, not toys."
+    },
+    {
+      "id": "s5c",
+      "scene": "pulls",
+      "actor": "narrator",
+      "text": "On the next tick, it changes their story."
+    },
+    {
+      "id": "s6a",
+      "scene": "chronicle",
+      "actor": "guide",
+      "text": "Every season is a different novel. A lantern winter. A Chog who remembers every ending. The war from the demon castle. A nobody who founds a nation. The Maligned. The locked gate. The worst party in Monadia. The hidden quest."
+    },
+    {
+      "id": "s6b",
+      "scene": "chronicle",
+      "actor": "orrun",
+      "text": "I was here before the Hush, and I will be here after it."
+    },
+    {
+      "id": "s6c",
+      "scene": "chronicle",
+      "actor": "king",
+      "text": "Again. Always again."
+    },
+    {
+      "id": "s6d",
+      "scene": "chronicle",
+      "actor": "child",
+      "text": "I'm going to be the Hero. I'll bring biscuits."
+    },
+    {
+      "id": "sweb",
+      "scene": "web",
+      "actor": "narrator",
+      "text": "And all of it lives at one address. Open it in any browser: no install, and nothing to connect just to watch."
+    },
+    {
+      "id": "s7a",
+      "scene": "tech",
+      "actor": "narrator",
+      "text": "Under the hood: a Godot web client, a Next.js world server, Turso, and a deterministic story engine. It runs on free tiers, day and night."
+    },
+    {
+      "id": "s8a",
+      "scene": "outro",
+      "actor": "narrator",
+      "text": "ChogSekai. Your Chog has a story. Go and see it."
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+ "duration": 31.6,
+ "items": [
+  {
+   "kind": "arc",
+   "t": [
+    2.89,
+    4.33
+   ],
+   "eyebrow": "Premise 1 of 8",
+   "title": "The Lantern at the Crossroads",
+   "sub": "A lantern door, a long winter, a prophecy, and a guardian who returns.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    4.38,
+    6.93
+   ],
+   "eyebrow": "Premise 2 of 8",
+   "title": "The Morning That Kept Returning",
+   "sub": "One Chog remembers every ending, and has to convince everyone else.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    6.98,
+    9.03
+   ],
+   "eyebrow": "Premise 3 of 8",
+   "title": "The Quiet Throne",
+   "sub": "The war seen from the black glass castle, where the Demon King runs a very orderly realm.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    9.08,
+    11.24
+   ],
+   "eyebrow": "Premise 4 of 8",
+   "title": "The Small Thing That Grew",
+   "sub": "A nobody founds a town, then a nation, then something nobody planned.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    11.29,
+    12.4
+   ],
+   "eyebrow": "Premise 5 of 8",
+   "title": "The Maligned",
+   "sub": "A rumour turns a good Chog into the villain, and the long road back.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    12.45,
+    13.55
+   ],
+   "eyebrow": "Premise 6 of 8",
+   "title": "The Gate That Would Not Open",
+   "sub": "Status Windows, guild ranks and a locked world: everyone plays by the rules or dies by them.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    13.6,
+    15.46
+   ],
+   "eyebrow": "Premise 7 of 8",
+   "title": "The Worst Party in Monadia",
+   "sub": "A comedy of errors that somehow saves the world.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "arc",
+   "t": [
+    15.51,
+    17.24
+   ],
+   "eyebrow": "Premise 8 of 8",
+   "title": "The Hidden Quest",
+   "sub": "The stars hand one nobody a quest log, and everything it asks of them.",
+   "cls": "narrow"
+  },
+  {
+   "kind": "lower",
+   "t": [
+    17.24,
+    22.21
+   ],
+   "title": "Orrun, the Lynx",
+   "sub": "The Lantern at the Crossroads",
+   "style": {
+    "left": "40px",
+    "bottom": "90px",
+    "maxWidth": "430px",
+    "minWidth": "0"
+   }
+  },
+  {
+   "kind": "lower",
+   "t": [
+    22.01,
+    26.23
+   ],
+   "title": "The Demon King",
+   "sub": "The Quiet Throne",
+   "style": {
+    "left": "40px",
+    "bottom": "90px",
+    "maxWidth": "430px",
+    "minWidth": "0"
+   }
+  },
+  {
+   "kind": "lower",
+   "t": [
+    26.03,
+    31.19
+   ],
+   "title": "A child on a wall",
+   "sub": "Every season, a new Hero",
+   "style": {
+    "left": "40px",
+    "bottom": "90px",
+    "maxWidth": "430px",
+    "minWidth": "0"
+   }
+  }
+ ]
+}

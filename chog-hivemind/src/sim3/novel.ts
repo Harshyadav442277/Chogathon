@@ -62,13 +62,13 @@ async function previousUsed(season: number): Promise<Record<string, number>> {
 
 type Trig = (t: string) => Promise<boolean>;
 
-function triggers(ctx: NovelCtx): Trig {
+function triggers(ctx: NovelCtx, fresh: boolean): Trig {
   const { st } = ctx;
   const cache = new Map<string, Promise<boolean>>();
   const any = (sql: string) => all<any>(sql, [ctx.season]).then((r) => r.length > 0).catch(() => false);
   const count = (sql: string) => all<any>(sql, [ctx.season]).then((r) => Number(r[0]?.n ?? 0)).catch(() => 0);
   const calc = async (t: string): Promise<boolean> => {
-    if (t === "season_start") return ctx.seasonStart || ctx.progress < 0.3;  // early beats are still told if the engine started mid-season
+    if (t === "season_start") return ctx.seasonStart || ctx.progress < 0.3 || fresh;  // the opening is always told, even if the story starts late
     if (t === "season_end") return ctx.seasonEnd;
     if (t === "first_raid") return !!ctx.raid || Object.values(st.raids ?? {}).some((r) => r.held + r.lost > 0);
     if (t === "phase_2") return st.phase >= 2;
@@ -134,7 +134,7 @@ export async function writeChapters(ctx: NovelCtx): Promise<string[]> {
   const flags = new Set(data.flags);
   const slotTaken = new Set<string>();
   for (const id of seen) { const s = NODE_BY_ID.get(id)!.node.slot; if (s) slotTaken.add(s); }
-  const trig = triggers(ctx);
+  const trig = triggers(ctx, seen.size === 0);
   const armOk = (n: StoryNode) => !n.arc || (Array.isArray(n.arc) ? n.arc.includes(arc) : n.arc === arc);
 
   /** Beats that are possible right now by trigger, edges, slot and chance (no facts needed yet). */

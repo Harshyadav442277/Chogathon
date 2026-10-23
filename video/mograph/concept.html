@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>concept</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { background: radial-gradient(ellipse at 50% 40%, #12301f 0%, #08160e 55%, #040b07 100%); }
+  canvas { position:absolute; inset:0; }
+  .scene { position:absolute; inset:0; opacity:0; }
+  .tile { position:absolute; width:132px; height:132px; border-radius:16px; border:3px solid var(--gold); overflow:hidden; background:#10241a; box-shadow:0 6px 18px rgba(0,0,0,.5); }
+  .tile img { width:100%; height:100%; object-fit:cover; display:block; }
+  .big { font-size:150px; font-weight:900; color:var(--gold-soft); line-height:1; }
+  .head { font-size:64px; font-weight:700; color:var(--cream); }
+  .sub { font-size:34px; color:var(--dim); font-weight:500; }
+  .hearts { font-size:34px; color:#ff5d6c; letter-spacing:.1em; }
+  .stat { display:inline-block; margin:5px 8px 5px 0; padding:6px 14px; border-radius:8px; background:rgba(255,255,255,.07); font-weight:600; font-size:24px; color:var(--cream); }
+  .job { position:absolute; }
+  .node { position:absolute; width:210px; text-align:center; }
+  .node .ic { width:110px; height:110px; margin:0 auto 12px; border-radius:50%; border:3px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:46px; background:rgba(10,28,18,.95); }
+  .node .lb { font-size:27px; font-weight:700; }
+  .node .ds { font-size:21px; color:var(--dim); margin-top:4px; }
+  .beam { position:absolute; height:4px; transform-origin:0 50%; background:linear-gradient(90deg, rgba(255,230,150,.9), rgba(255,230,150,.1)); border-radius:2px; }
+  .card { position:absolute; width:300px; border-radius:16px; border:3px solid var(--gold); background:#0d2217; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.55); }
+  .card img { width:300px; height:300px; object-fit:cover; display:block; }
+  .card .nm { padding:12px 16px; font-weight:700; font-size:26px; }
+  .gift { position:absolute; padding:10px 22px; font-weight:700; font-size:28px; border-radius:12px; border:2px solid var(--violet); background:rgba(26,12,48,.95); color:#e6d4ff; white-space:nowrap; }
+</style></head>
+<body><div class="stage">
+  <canvas id="stars" width="1920" height="1080"></canvas>
+
+  <!-- A: the NFT wall -->
+  <div class="scene" id="A">
+    <div class="abs eyebrow" style="left:0;width:1920px;text-align:center;top:46px">Monad &middot; Chog Genesis</div>
+    <div class="abs serif big glow" id="count" style="left:0;width:1920px;text-align:center;top:96px">0</div>
+    <div class="abs sub" style="left:0;width:1920px;text-align:center;top:260px;font-size:40px;color:var(--cream)">NFTs. Every one a character.</div>
+    <div id="wall"></div>
+  </div>
+
+  <!-- B: an agent -->
+  <div class="scene" id="B">
+    <div class="abs head serif" style="left:120px;top:230px;width:900px">Every Chog becomes<br><span style="color:var(--gold-soft)">an AI agent</span></div>
+    <div class="abs sub" style="left:120px;top:450px;width:820px;font-size:38px;line-height:1.5">They wander. They work. They quest, party up, raid and defend their towns. All by themselves, all the time.</div>
+    <div class="abs" style="left:120px;top:720px">
+      <span class="chip">Work</span> <span class="chip sky">Quest</span> <span class="chip violet">Party</span> <span class="chip" style="border-color:var(--ember)">Raid</span>
+    </div>
+    <div class="abs panel" id="status" style="left:1070px;top:230px;width:700px;padding:30px">
+      <div style="display:flex;gap:26px">
+        <img src="../../chog-hivemind/public/chogs/681.webp" style="width:210px;height:210px;border-radius:14px;border:3px solid var(--gold);object-fit:cover">
+        <div>
+          <div class="serif" style="font-size:44px;font-weight:700;color:var(--cream)">Nova the Loud</div>
+          <div style="font-size:28px;color:var(--gold);margin:6px 0 10px">Shopkeeper &middot; Lv 1</div>
+          <div class="hearts">&#9829;&#9829;&#9829;&#9829;&#9829;&#9829;&#9829;&#9829;</div>
+        </div>
+      </div>
+      <div style="margin-top:20px"><span class="stat">STR 6</span><span class="stat">VIT 3</span><span class="stat">AGI 7</span><span class="stat">INT 3</span><span class="stat">WIS 4</span><span class="stat">LUK 4</span></div>
+      <div id="typed" style="margin-top:18px;font-size:26px;line-height:1.55;color:var(--dim);height:120px"></div>
+    </div>
+  </div>
+
+  <!-- C: jobs -->
+  <div class="scene" id="C">
+    <div class="abs head serif glow" style="left:0;width:1920px;text-align:center;top:70px">A new job <span style="color:var(--gold-soft)">every season</span></div>
+    <div class="abs sub" style="left:0;width:1920px;text-align:center;top:162px">36 jobs: shops, army, forges, farms, temples &mdash; and adventurers</div>
+    <div class="tile" style="left:885px;top:465px;width:150px;height:150px;border-radius:50%;border-width:4px"><img src="../../chog-hivemind/public/chogs/173.webp"></div>
+    <div id="jobs"></div>
+  </div>
+
+  <!-- D: the season -->
+  <div class="scene" id="D">
+    <div class="abs head serif glow" style="left:0;width:1920px;text-align:center;top:90px">One season. <span style="color:var(--gold-soft)">One Demon King.</span></div>
+    <div class="abs sub" style="left:0;width:1920px;text-align:center;top:184px">It ends when a Hero lands the final blow, and the Hero can be any Chog</div>
+    <div class="abs" style="left:170px;top:481px;width:1580px;height:8px;background:rgba(255,255,255,.12);border-radius:4px"></div>
+    <div class="abs" id="prog" style="left:170px;top:481px;width:0;height:8px;background:linear-gradient(90deg,var(--gold),#ffe28a);border-radius:4px;box-shadow:0 0 22px var(--gold)"></div>
+    <div id="steps"></div>
+    <div class="abs serif glow" id="hero" style="left:0;width:1920px;text-align:center;top:780px;font-size:92px;font-weight:900;color:var(--gold-soft)">HERO OF THE SEASON</div>
+  </div>
+
+  <!-- E: you are a constellation -->
+  <div class="scene" id="E">
+    <div class="abs" id="you" style="left:870px;top:290px;width:180px;height:180px">
+      <svg viewBox="-100 -100 200 200" width="180" height="180"><g id="starsvg"><polygon points="0,-90 22,-28 88,-28 35,12 55,78 0,38 -55,78 -35,12 -88,-28 -22,-28" fill="#ffe28a" stroke="#fff6d0" stroke-width="3"/></g></svg>
+    </div>
+    <div class="abs head serif glow" style="left:0;width:1920px;text-align:center;top:70px">You are a <span style="color:var(--gold-soft)">Constellation</span></div>
+    <div class="abs sub" style="left:0;width:1920px;text-align:center;top:168px;font-size:36px">A god who can only nudge <b style="color:var(--cream)">your own</b> Chogs</div>
+    <div id="cards"></div>
+  </div>
+</div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>
+  const ids = [681,173,875,1007,1420,2,19,33,57,88,101,140,177,203,260,299,321,350,402,444,481,520,555,600,641,700,733,780,812,860,901,950,1010,1060,1100,1160,1213,1260,1320,1370];
+  // A: wall
+  const wall = document.getElementById("wall"), tiles = [];
+  const cols = 10, rows = 4, gap = 18, W = 132, x0 = (1920 - (cols * W + (cols - 1) * gap)) / 2, y0 = 345;
+  ids.slice(0, cols * rows).forEach((id, i) => {
+    const t = document.createElement("div"); t.className = "tile";
+    t.style.left = x0 + (i % cols) * (W + gap) + "px"; t.style.top = y0 + Math.floor(i / cols) * (W + gap) + "px";
+    t.innerHTML = `<img src="../../chog-hivemind/public/chogs/${id}.webp">`; wall.appendChild(t); tiles.push(t);
+  });
+  // C: jobs orbit
+  const jobsEl = document.getElementById("jobs");
+  const jobs = ["Baker","Blacksmith","Healer","Tank","Bard","Farmer","Alchemist","Courier","Priest","Librarian","Innkeeper","Soldier"];
+  const jobChips = jobs.map((j, i) => { const c = document.createElement("div"); c.className = "chip " + (i % 3 == 1 ? "violet" : i % 3 == 2 ? "sky" : ""); c.style.position = "absolute"; c.textContent = j; c.style.fontSize = "30px"; jobsEl.appendChild(c); return c; });
+  // D: season steps
+  const stepsEl = document.getElementById("steps");
+  const steps = [["&#10024;","Summoning","Jobs assigned"],["&#9876;","Raids","Demons hit towns"],["&#128302;","4 Seals","Generals fall"],["&#127775;","Last Stand","Stars burn bright"],["&#128081;","The Hero","Final blow"]];
+  const stepEls = steps.map((s, i) => { const n = document.createElement("div"); n.className = "node"; n.style.left = 170 + i * 395 - 105 + "px"; n.style.top = "426px";
+    n.innerHTML = `<div class="ic">${s[0]}</div><div class="lb">${s[1]}</div><div class="ds">${s[2]}</div>`; stepsEl.appendChild(n); return n; });
+  // E: cards + beams
+  const cardsEl = document.getElementById("cards");
+  const mine = [[173,"Nova the Loud","Quest"],[681,"Your Chog","Skill"],[875,"Another of yours","Blessing"]];
+  const cardEls = mine.map((m, i) => { const c = document.createElement("div"); c.className = "card"; c.style.left = 330 + i * 520 + "px"; c.style.top = "650px";
+    c.innerHTML = `<img src="../../chog-hivemind/public/chogs/${m[0]}.webp" style="height:230px"><div class="nm">${m[1]}</div>`; cardsEl.appendChild(c); return c; });
+  const beams = mine.map((m, i) => { const b = document.createElement("div"); b.className = "beam"; cardsEl.appendChild(b);
+    const sx = 960, sy = 400, ex = 330 + i * 520 + 150, ey = 650, len = Math.hypot(ex - sx, ey - sy);
+    b.style.left = sx + "px"; b.style.top = sy + "px"; b.style.width = len + "px"; b.style.transform = `rotate(${Math.atan2(ey - sy, ex - sx)}rad) scaleX(0)`; b.dataset.rot = Math.atan2(ey - sy, ex - sx); return b; });
+  const gifts = mine.map((m, i) => { const g = document.createElement("div"); g.className = "gift"; g.textContent = m[2]; g.style.left = 330 + i * 520 + 90 + "px"; g.style.top = "585px"; cardsEl.appendChild(g); return g; });
+
+  const stars = window.makeStars(document.getElementById("stars"), { count: 320 });
+  window.drawers.push(stars);
+
+  const c = { v: 0 }, typed = document.getElementById("typed");
+  const typeText = "Quest: Forge Guild Blades\nSkills: Haggle, Brace\nStory 0 · Kills 0 · Rupees 21";
+  const ty = { n: 0 };
+  const tl = gsap.timeline({ paused: true });
+  const fade = (id, a, b) => { tl.to(id, { opacity: 1, duration: 0.5 }, a); tl.to(id, { opacity: 0, duration: 0.5 }, b - 0.5); };
+  tl.set(".scene", { opacity: 0 });
+  // A
+  fade("#A", 0.0, 4.6);
+  tl.fromTo(tiles, { scale: 0, opacity: 0, rotate: -12 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.55, ease: "back.out(1.7)", stagger: { each: 0.035, from: "center", grid: [rows, cols] } }, 0.5);
+  tl.to(c, { v: 1969, duration: 3.2, ease: "power2.out", onUpdate: () => (document.getElementById("count").textContent = Math.round(c.v).toLocaleString("en-US")) }, 0.4);
+  tl.to(tiles, { y: -8, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: { each: 0.03, from: "random" } }, 1.6);
+  // B
+  fade("#B", 4.5, 8.9);
+  tl.fromTo("#B .head", { x: -80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 4.8);
+  tl.fromTo("#B .sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 5.4);
+  tl.fromTo("#B .chip", { y: 30, opacity: 0, scale: 0.7 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.18 }, 6.3);
+  tl.fromTo("#status", { x: 140, opacity: 0, rotateY: 35 }, { x: 0, opacity: 1, rotateY: 0, duration: 0.9, ease: "power3.out" }, 5.0);
+  tl.to(ty, { n: typeText.length, duration: 2.2, ease: "none", onUpdate: () => (typed.innerHTML = typeText.slice(0, Math.floor(ty.n)).replace(/\n/g, "<br>")) }, 5.8);
+  // C
+  fade("#C", 8.8, 12.1);
+  tl.fromTo("#C .head, #C .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 }, 9.0);
+  tl.fromTo("#C .tile", { scale: 0 }, { scale: 1, duration: 0.7, ease: "back.out(2)" }, 9.1);
+  const orbit = { a: 0 };
+  tl.fromTo(orbit, { a: 0 }, { a: Math.PI * 1.2, duration: 3.4, ease: "none", onUpdate: () => {
+    jobChips.forEach((chip, i) => { const ang = orbit.a + (i / jobs.length) * Math.PI * 2; const rx = 640, ry = 300;
+      const x = 960 + Math.cos(ang) * rx, y = 540 + Math.sin(ang) * ry; chip.style.left = x - chip.offsetWidth / 2 + "px"; chip.style.top = y - 24 + "px";
+      const depth = (Math.sin(ang) + 1) / 2; chip.style.transform = `scale(${0.75 + depth * 0.35})`; chip.style.zIndex = Math.round(depth * 10); }); } }, 8.9);
+  tl.fromTo(jobChips, { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.07 }, 9.2);
+  // D
+  fade("#D", 11.9, 15.4);
+  tl.fromTo("#D .head, #D .sub", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 }, 12.1);
+  tl.fromTo(stepEls, { opacity: 0, y: 40, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.8)", stagger: 0.4 }, 12.3);
+  tl.fromTo("#prog", { width: 0 }, { width: 1580, duration: 2.4, ease: "power1.inOut" }, 12.3);
+  tl.fromTo("#hero", { opacity: 0, scale: 0.6, letterSpacing: "0.5em" }, { opacity: 1, scale: 1, letterSpacing: "0.08em", duration: 0.8, ease: "back.out(1.7)" }, 14.2);
+  // E
+  fade("#E", 15.2, 22.8);
+  tl.fromTo("#you", { scale: 0, rotate: -90 }, { scale: 1, rotate: 0, duration: 0.9, ease: "back.out(1.7)" }, 15.5);
+  tl.to("#starsvg", { rotate: 360, duration: 8, ease: "none", transformOrigin: "50% 50%" }, 15.5);
+  tl.fromTo("#E .head, #E .sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.2 }, 16.2);
+  beams.forEach((b, i) => tl.to(b, { duration: 0.8, ease: "power2.out", onUpdate() { const k = this.progress(); b.style.transform = `rotate(${b.dataset.rot}rad) scaleX(${k})`; } }, 17.6 + i * 0.35));
+  tl.fromTo(cardEls, { y: 120, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.6)", stagger: 0.35 }, 17.9);
+  tl.fromTo(gifts, { y: -30, opacity: 0, scale: 0.6 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", stagger: 0.35 }, 19.3);
+  tl.to(gifts, { y: -10, duration: 0.8, yoyo: true, repeat: 3, ease: "sine.inOut", stagger: 0.2 }, 20.2);
+  tl.to({}, { duration: 0.01 }, 22.8);
+  window.tl = tl;
+</script></body></html>

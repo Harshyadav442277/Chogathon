@@ -1,0 +1,86 @@
+{
+ "duration": 21.2,
+ "items": [
+  {
+   "kind": "lower",
+   "t": [
+    0.9,
+    6.4
+   ],
+   "title": "Monadia",
+   "sub": "Ten regions, one living continent"
+  },
+  {
+   "kind": "region",
+   "t": [
+    2.4,
+    4.87
+   ],
+   "eyebrow": "Region 1",
+   "text": "The Hive Capital"
+  },
+  {
+   "kind": "region",
+   "t": [
+    5.49,
+    8.99
+   ],
+   "eyebrow": "Region 2",
+   "text": "Emberforge Peaks"
+  },
+  {
+   "kind": "region",
+   "t": [
+    9.61,
+    13.11
+   ],
+   "eyebrow": "Region 3",
+   "text": "Tidecry Coast"
+  },
+  {
+   "kind": "region",
+   "t": [
+    13.73,
+    17.23
+   ],
+   "eyebrow": "Region 4",
+   "text": "Prism Expanse"
+  },
+  {
+   "kind": "region",
+   "t": [
+    17.48,
+    20.98
+   ],
+   "eyebrow": "Region 5",
+   "text": "The Hollow"
+  },
+  {
+   "kind": "lower",
+   "t": [
+    14.45,
+    18.65
+   ],
+   "title": "Plays in your browser",
+   "sub": "Godot 4.7 \u00b7 WebAssembly \u00b7 no install",
+   "style": {
+    "bottom": "250px"
+   }
+  },
+  {
+   "kind": "callout",
+   "t": [
+    16.96,
+    22.16
+   ],
+   "title": "Star Stream",
+   "sub": "The world narrates itself, live",
+   "lx": 640,
+   "ly": 905,
+   "sx": 640,
+   "sy": 950,
+   "x": 560,
+   "y": 960
+  }
+ ]
+}

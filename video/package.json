@@ -1,0 +1,1 @@
+{"name":"chogsekai-video","private":true,"version":"0.0.1","description":"Motion graphics for the ChogSekai demo video (HTML + GSAP rendered through Chrome)","dependencies":{"gsap":"^3.15.0","playwright-core":"^1.64.1"}}

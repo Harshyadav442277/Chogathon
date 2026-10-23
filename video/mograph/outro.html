@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>outro</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .bg { position:absolute; inset:-80px; background:url(assets/title.jpg) center/cover; filter:blur(10px) brightness(.4) saturate(1.2); }
+  canvas { position:absolute; inset:0; }
+  #logo { top:190px; left:0; width:1920px; text-align:center; font-size:230px; font-weight:900; color:var(--gold-soft); line-height:1; }
+  #line { top:470px; left:0; width:1920px; text-align:center; font-size:60px; font-weight:600; letter-spacing:.06em; }
+  #url { top:600px; left:50%; transform:translateX(-50%); padding:22px 56px; border:4px solid var(--gold); border-radius:18px; background:rgba(8,22,14,.9); font-size:72px; font-weight:700; letter-spacing:.03em; color:var(--cream); white-space:nowrap; }
+  #how { top:760px; left:0; width:1920px; text-align:center; font-size:34px; color:var(--cream); line-height:1.6; }
+  #credits { top:960px; left:0; width:1920px; text-align:center; font-size:23px; color:var(--dim); letter-spacing:.04em; }
+</style></head>
+<body><div class="stage">
+  <div class="bg"></div>
+  <canvas id="stars" width="1920" height="1080"></canvas>
+  <div class="abs serif glow" id="logo">ChogSekai</div>
+  <div class="abs serif" id="line">Your Chog has a story. Go and see it.</div>
+  <div class="abs" id="url"><span id="u"></span></div>
+  <div class="abs" id="how">Holders: connect your wallet and use your Star Pulls<br>Judges: the sign-in code is in the submission form</div>
+  <div class="abs" id="credits">Chogathon 2026 &middot; Voices: Microsoft neural text-to-speech (AI) &middot; Music: original theme, synthesized in code &middot; Built with Godot, Next.js, Turso</div>
+  <div class="vignette"></div>
+  <div class="abs" id="fade" style="inset:0;background:#000"></div>
+</div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>
+  window.drawers.push(window.makeStars(document.getElementById("stars"), { count: 220, seed: 21 }));
+  const url = "chogsekai.vercel.app", u = document.getElementById("u"), o = { n: 0 };
+  const tl = gsap.timeline({ paused: true });
+  tl.set(["#logo", "#line", "#url", "#how", "#credits"], { opacity: 0 });
+  tl.fromTo("#fade", { opacity: 1 }, { opacity: 0, duration: 0.9 }, 0);
+  tl.fromTo("#logo", { scale: 0.8, opacity: 0, filter: "blur(18px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.2, ease: "power3.out" }, 0.2);
+  tl.fromTo("#line", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "power2.out" }, 1.5);
+  tl.fromTo("#url", { y: 40, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.6)" }, 2.8);
+  tl.to(o, { n: url.length, duration: 1.3, ease: "none", onUpdate: () => (u.textContent = url.slice(0, Math.floor(o.n))) }, 3.0);
+  tl.fromTo("#how", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 4.6);
+  tl.fromTo("#credits", { opacity: 0 }, { opacity: 1, duration: 0.9 }, 5.6);
+  tl.to("#fade", { opacity: 1, duration: 1.0 }, 7.8);
+  tl.to({}, { duration: 0.01 }, 8.8);
+  window.tl = tl;
+</script></body></html>

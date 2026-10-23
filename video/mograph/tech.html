@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>tech</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { background: radial-gradient(ellipse at 50% 35%, #12301f 0%, #08160e 60%, #040b07 100%); }
+  canvas { position:absolute; inset:0; }
+  .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(227,189,85,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(227,189,85,.05) 1px, transparent 1px); background-size:60px 60px; }
+  .node { position:absolute; width:500px; height:290px; padding:30px 34px; }
+  .node .tag { font-size:20px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); font-weight:600; }
+  .node h3 { font-family:"Cinzel",serif; font-size:46px; margin:10px 0 14px; color:var(--cream); }
+  .node p { font-size:27px; line-height:1.45; color:var(--dim); }
+  .line { position:absolute; height:5px; background:linear-gradient(90deg, rgba(227,189,85,.9), rgba(159,216,255,.9)); border-radius:3px; transform-origin:0 50%; }
+  .pk { position:absolute; width:20px; height:20px; border-radius:50%; background:#fff6d0; box-shadow:0 0 18px 6px rgba(255,230,150,.9); }
+  .lbl { position:absolute; font-size:24px; font-weight:600; color:var(--sky); letter-spacing:.04em; }
+  .stat { text-align:center; }
+  .stat b { display:block; font-family:"Cinzel",serif; font-size:84px; color:var(--gold-soft); line-height:1; }
+  .stat span { font-size:24px; color:var(--dim); letter-spacing:.06em; }
+</style></head>
+<body><div class="stage">
+  <div class="grid"></div><canvas id="stars" width="1920" height="1080"></canvas>
+  <div class="abs eyebrow" id="eb" style="left:0;width:1920px;text-align:center;top:52px">Under the hood</div>
+  <div class="abs serif glow" id="hd" style="left:0;width:1920px;text-align:center;top:96px;font-size:66px;font-weight:700">Built to run for free, day and night</div>
+
+  <div class="node panel" id="n1" style="left:110px;top:240px"><div class="tag">Client</div><h3>Godot 4.7</h3><p>GDScript, WebAssembly, runs in your browser. Thousands of Chogs on a few draw calls.</p></div>
+  <div class="node panel" id="n2" style="left:710px;top:240px"><div class="tag">World server</div><h3>Next.js 15</h3><p>Simulation brain, APIs and wallet sign-in. Deployed on Vercel.</p></div>
+  <div class="node panel" id="n3" style="left:1310px;top:240px"><div class="tag">Database</div><h3>Turso libSQL</h3><p>1,962 agents, histories, story state, Star Pulls.</p></div>
+  <div class="line" id="l1" style="left:610px;top:385px;width:100px"></div>
+  <div class="line" id="l2" style="left:1210px;top:385px;width:100px"></div>
+  <div class="lbl" id="t1" style="left:588px;top:330px">HTTPS</div>
+  <div class="lbl" id="t2" style="left:1198px;top:330px">SQL</div>
+  <div class="pk" id="p1"></div><div class="pk" id="p2"></div><div class="pk" id="p1b"></div><div class="pk" id="p2b"></div>
+
+  <div class="abs panel" id="tick" style="left:110px;top:580px;width:1700px;height:130px;padding:26px 40px;display:flex;align-items:center;gap:30px">
+    <div class="serif" style="font-size:38px;font-weight:700;color:var(--gold-soft);width:560px;white-space:nowrap">World tick every 10 min</div>
+    <span class="chip">GitHub Actions</span><span class="chip sky">cron-job.org</span><span class="chip violet">Self-tick while you watch</span>
+  </div>
+
+  <div class="abs" id="stats" style="left:110px;top:760px;width:1700px;display:flex;justify-content:space-between">
+    <div class="stat"><b data-to="8">0</b><span>story premises</span></div>
+    <div class="stat"><b data-to="191">0</b><span>chronicle beats</span></div>
+    <div class="stat"><b data-to="71">0</b><span>life-story nodes</span></div>
+    <div class="stat"><b data-to="239">0</b><span>Star Stream lines</span></div>
+    <div class="stat"><b data-to="0">0</b><span>AI calls to run it</span></div>
+  </div>
+  <div class="abs serif glow" id="tag" style="left:0;width:1920px;text-align:center;top:960px;font-size:46px;font-weight:700;color:var(--gold-soft)">Deterministic. Seeded. Free tiers.</div>
+</div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>
+  window.drawers.push(window.makeStars(document.getElementById("stars"), { count: 200, seed: 11 }));
+  const tl = gsap.timeline({ paused: true });
+  tl.set(["#eb", "#hd", "#n1", "#n2", "#n3", "#l1", "#l2", "#t1", "#t2", "#p1", "#p2", "#p1b", "#p2b", "#tick", "#stats .stat", "#tag"], { opacity: 0 });
+  tl.fromTo("#eb", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 0.1);
+  tl.fromTo("#hd", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.3);
+  tl.fromTo("#n1", { y: 60, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.5)" }, 1.1);
+  tl.fromTo("#l1", { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 2.0);
+  tl.to("#t1", { opacity: 1, duration: 0.4 }, 2.2);
+  tl.fromTo("#n2", { y: 60, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.5)" }, 2.3);
+  tl.fromTo("#l2", { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 3.4);
+  tl.to("#t2", { opacity: 1, duration: 0.4 }, 3.6);
+  tl.fromTo("#n3", { y: 60, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.5)" }, 3.7);
+  // packets travelling along the arrows
+  const packet = (id, x0, x1, y, start, rep) => {
+    tl.set(id, { opacity: 1, left: x0, top: y }, start);
+    tl.fromTo(id, { left: x0 }, { left: x1, duration: 0.9, ease: "none", repeat: rep, repeatDelay: 0.25 }, start);
+  };
+  packet("#p1", 620, 700, 377, 4.4, 5); packet("#p1b", 700, 620, 377, 4.8, 5);
+  packet("#p2", 1220, 1300, 377, 4.6, 5); packet("#p2b", 1300, 1220, 377, 5.0, 5);
+  tl.fromTo("#tick", { x: -120, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 5.4);
+  tl.fromTo("#tick .chip", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2)", stagger: 0.25 }, 6.0);
+  tl.fromTo("#stats .stat", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", stagger: 0.18 }, 7.6);
+  document.querySelectorAll("#stats b").forEach((b, i) => {
+    const o = { v: 0 }, to = Number(b.dataset.to);
+    tl.to(o, { v: to, duration: 1.4, ease: "power2.out", onUpdate: () => (b.textContent = Math.round(o.v)) }, 7.7 + i * 0.18);
+  });
+  tl.fromTo("#tag", { y: 30, opacity: 0, letterSpacing: "0.3em" }, { y: 0, opacity: 1, letterSpacing: "0.04em", duration: 0.9, ease: "power2.out" }, 10.3);
+  tl.to({}, { duration: 0.01 }, 13.1);
+  window.tl = tl;
+</script></body></html>

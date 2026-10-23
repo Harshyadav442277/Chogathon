@@ -136,7 +136,8 @@ export function tidy(s: string): string {
     .replace(/\n[ \t]+/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim()
-    .replace(/(^|[.!?]["”)]?\s+|\n)([a-z])/g, (_, pre: string, ch: string) => pre + ch.toUpperCase());
+    // Not after a closing quote: “...,” said Ana and “...?” said Ana keep their lower-case speech tags.
+    .replace(/(^|[.!?]\s+|\n)([a-z])/g, (_, pre: string, ch: string) => pre + ch.toUpperCase());
 }
 
 // ---- Lint helpers (scripts/story-lint.ts) ----------------------------------------------------------------
