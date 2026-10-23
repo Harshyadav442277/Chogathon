@@ -1,5 +1,5 @@
 // Procedural fallback brain: no API key needed, keeps the world alive.
-import type { Decision, StepInput, FeedItem } from "./types";
+import type { Decision, FeedItem, Injection, StepInput } from "./types";
 import { LOCATION_IDS, locationName, MOODS, house } from "./world";
 
 const r = Math.random;
@@ -48,12 +48,81 @@ function memeful(feed: FeedItem[]) {
   return feed.filter((f) => f.meme_id);
 }
 
+// Holder commands other than whispers: journeys (nudge), introductions and gifts.
+function holderStep(s: StepInput, inj: Injection): Decision {
+  const { agent, feed } = s;
+  const h = agent.house;
+  const p = agent.persona;
+  const fit = agent.bond / 100 - (p.contrarian ? 0.15 : 0);
+  const roll = r();
+
+  if (inj.kind === "nudge" && inj.location) {
+    const dest = locationName(inj.location);
+    if (agent.location === inj.location)
+      return { action: "post", text: clip(`already at ${dest.toLowerCase()}, my human. ${p.catchphrase}`), injection_response: "obey", mood: "smug", memory: `My human sent me to ${dest}. I was already there.` };
+    if (roll < fit * 0.7 + 0.3)
+      return { action: "move", location: inj.location, injection_response: "obey", mood: "curious", memory: `My human sent me to ${dest}, so I went.` };
+    if (roll < 0.85) {
+      const detour = choice(LOCATION_IDS.filter((l) => l !== inj.location && l !== agent.location));
+      return { action: "move", location: detour, injection_response: "twist", mood: "smug", memory: `My human sent me to ${dest}. I took a detour to ${locationName(detour)}.` };
+    }
+    return {
+      action: "post",
+      text: clip(`my human wants me at ${dest.toLowerCase()}. i'm staying right here at ${locationName(agent.location).toLowerCase()}. ${p.catchphrase}`),
+      injection_response: "ignore",
+      mood: "grumpy",
+      memory: `I refused to go to ${dest}.`,
+    };
+  }
+
+  if (inj.kind === "introduce" && inj.target_chog) {
+    const name = inj.target_name ?? `#${inj.target_chog}`;
+    const handle = `@${name.replace(/\s+/g, "")}`;
+    const theirs = feed.find((f) => f.chog_id === inj.target_chog);
+    if (roll < fit * 0.7 + 0.3) {
+      const text = clip(`${handle} ${choice(["my human says we should be friends.", "heard a lot about you. gm.", "we should team up."])} ${p.catchphrase}`);
+      return theirs
+        ? { action: "reply", target_post_id: theirs.id, text, injection_response: "obey", mood: "hyped", memory: `I was introduced to ${name} and said hi.` }
+        : { action: "post", text, injection_response: "obey", mood: "hyped", memory: `I was introduced to ${name} and said hi.` };
+    }
+    if (roll < 0.85) {
+      const text = clip(`${handle} my human wants us to meet. ${choice(REACTIONS[h] ?? REACTIONS.moonbeam)}`);
+      const memory = `I sized up ${name} after my human introduced us.`;
+      return theirs
+        ? { action: "reply", target_post_id: theirs.id, text, injection_response: "twist", mood: "suspicious", memory }
+        : { action: "post", text, injection_response: "twist", mood: "suspicious", memory };
+    }
+    return { action: "idle", injection_response: "ignore", mood: "grumpy", memory: `My human tried to introduce me to ${name}. Not interested.` };
+  }
+
+  // Gift: nearly always welcome. Contrarians sometimes play it cool.
+  const gift = short(inj.text, 60);
+  if (roll < (p.contrarian ? 0.55 : 0.85))
+    return {
+      action: "post",
+      text: clip(`my human gave me ${gift}. ${choice(["best day.", "feeling loved.", "i will guard it with my life.", "the hive is jealous."])} ${p.catchphrase}`),
+      injection_response: "obey",
+      mood: "hyped",
+      memory: `My human gave me ${gift}.`,
+    };
+  if (roll < 0.95)
+    return {
+      action: "post",
+      text: clip(`${gift}? i guess. ${choice(TWISTS[h] ?? TWISTS.moonbeam)}`),
+      injection_response: "twist",
+      mood: "smug",
+      memory: `My human gave me ${gift}. I acted unimpressed.`,
+    };
+  return { action: "idle", injection_response: "ignore", mood: "grumpy", memory: `My human offered me ${gift}. I left it on the doorstep.` };
+}
+
 export async function offlineStep(s: StepInput): Promise<Decision> {
   const { agent, feed, injection } = s;
   const h = agent.house;
   const p = agent.persona;
   const mood = r() < 0.3 ? choice(MOODS) : agent.mood;
 
+  if (injection && injection.kind !== "whisper" && injection.kind !== "rumor") return holderStep(s, injection);
   if (injection) {
     const heard = short(injection.text, 120);
     const fit = injection.kind === "whisper" ? agent.bond / 100 : 0.35;

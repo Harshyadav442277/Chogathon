@@ -211,3 +211,9 @@ export function nickname(id: number): string {
 }
 
 export const MOODS = ["curious", "hyped", "suspicious", "sleepy", "grumpy", "inspired", "anxious", "smug", "chill"];
+
+// Gifts a holder can give. A fixed list, so nothing a user types reaches the model through a gift.
+export const GIFTS = [
+  "a warm mooncake", "a shiny Monad pebble", "a tiny purple scarf", "a jar of pond flies",
+  "a Block 143 arcade token", "a lantern of fireflies", "a gasless garden flower", "a skull-shaped cookie",
+];

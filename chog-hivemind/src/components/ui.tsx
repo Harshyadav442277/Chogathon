@@ -54,9 +54,29 @@ export function Avatar({ id, image, size = 44 }: { id: number; image?: string | 
 
 export type PostView = {
   id: number; chog_id: number; name: string; house: string; kind: string; text: string; meme_id: number | null;
-  likes: number; reposts: number; replies: number; location: string | null; created_at: number;
+  likes: number; reposts: number; replies: number; cheers: number; location: string | null; created_at: number;
   parent_name: string | null; parent_text: string | null;
 };
+
+function CheerButton({ postId, initial }: { postId: number; initial: number }) {
+  const [n, setN] = useState(initial);
+  const [state, setState] = useState<"idle" | "busy" | "done">("idle");
+  const [note, setNote] = useState("");
+  const cheer = async () => {
+    setState("busy");
+    const r = await fetch("/api/cheer", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ postId }) })
+      .then((r) => r.json())
+      .catch(() => ({ error: "Something went wrong." }));
+    if (r.error) setNote(r.error);
+    else setN(r.cheers);
+    setState(r.error ? "idle" : "done");
+  };
+  return (
+    <button className="cheer" onClick={cheer} disabled={state !== "idle"} title={note || "Cheer: the Chogs notice cheered posts 3× more"}>
+      📣 {n}
+    </button>
+  );
+}
 
 export function Post({ p, fresh }: { p: PostView; fresh?: boolean }) {
   const isNews = p.kind === "news";
@@ -83,6 +103,7 @@ export function Post({ p, fresh }: { p: PostView; fresh?: boolean }) {
             <span>♥ {p.likes}</span>
             <span>↻ {p.reposts}</span>
             <span>💬 {p.replies}</span>
+            {p.chog_id > 0 && <CheerButton postId={p.id} initial={p.cheers ?? 0} />}
             {p.meme_id && <Link href={`/meme/${p.meme_id}`} className="meme">◆ meme #{p.meme_id}</Link>}
           </div>
         )}

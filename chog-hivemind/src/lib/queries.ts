@@ -3,7 +3,7 @@ import { JOB_BY_ID } from "../sim2/season";
 
 export type PostView = {
   id: number; chog_id: number; name: string; house: string; kind: string; text: string; meme_id: number | null;
-  likes: number; reposts: number; replies: number; tick: number; location: string | null; created_at: number;
+  likes: number; reposts: number; replies: number; cheers: number; tick: number; location: string | null; created_at: number;
   parent_id: number | null; parent_name: string | null; parent_text: string | null;
 };
 
@@ -12,7 +12,7 @@ const num = (v: any) => (v == null ? null : Number(v));
 function toPost(r: any): PostView {
   return {
     id: Number(r.id), chog_id: Number(r.chog_id), name: r.name, house: r.house, kind: r.kind, text: r.text,
-    meme_id: num(r.meme_id), likes: Number(r.likes), reposts: Number(r.reposts), replies: Number(r.replies),
+    meme_id: num(r.meme_id), likes: Number(r.likes), reposts: Number(r.reposts), replies: Number(r.replies), cheers: Number(r.cheers ?? 0),
     tick: Number(r.tick), location: r.location, created_at: Number(r.created_at),
     parent_id: num(r.parent_id), parent_name: r.parent_name ?? null, parent_text: r.parent_text ?? null,
   };
@@ -89,11 +89,11 @@ export async function currentQuestionAndEvent() {
 export async function chogDetail(id: number) {
   const c = await one<any>(`SELECT * FROM chogs WHERE id = ? AND id > 0`, [id]);
   if (!c) return null;
-  const [memories, posts, memes, whispers, followers, following, rank] = await Promise.all([
+  const [memories, posts, memes, commands, followers, following, rank] = await Promise.all([
     all<any>(`SELECT text, importance, tick FROM memories WHERE chog_id = ? ORDER BY id DESC LIMIT 12`, [id]),
     feed({ chog: id, limit: 25 }),
     all<any>(`SELECT id, text, adopters, origin_kind FROM memes WHERE origin_chog = ? ORDER BY adopters DESC LIMIT 8`, [id]),
-    all<any>(`SELECT id, text, status, response, created_at FROM injections WHERE chog_id = ? AND kind='whisper' ORDER BY id DESC LIMIT 6`, [id]),
+    all<any>(`SELECT id, kind, text, status, response, created_at FROM injections WHERE chog_id = ? AND kind IN ('whisper','nudge','introduce','gift') ORDER BY id DESC LIMIT 8`, [id]),
     one<any>(`SELECT COUNT(*) n FROM follows WHERE dst = ?`, [id]),
     one<any>(`SELECT COUNT(*) n FROM follows WHERE src = ?`, [id]),
     one<any>(`SELECT COUNT(*) + 1 n FROM chogs WHERE influence > ? AND id > 0`, [c.influence]),
@@ -107,7 +107,7 @@ export async function chogDetail(id: number) {
     memories: memories.map((m) => ({ text: m.text, importance: Number(m.importance), tick: Number(m.tick) })),
     feed: posts,
     memes: memes.map((m) => ({ id: Number(m.id), text: m.text, adopters: Number(m.adopters), origin_kind: m.origin_kind })),
-    whispers: whispers.map((w) => ({ id: Number(w.id), text: w.text, status: w.status, response: w.response, created_at: Number(w.created_at) })),
+    commands: commands.map((w) => ({ id: Number(w.id), kind: w.kind, text: w.text, status: w.status, response: w.response, created_at: Number(w.created_at) })),
     followers: Number(followers?.n ?? 0), following: Number(following?.n ?? 0), rank: Number(rank?.n ?? 0),
   };
 }

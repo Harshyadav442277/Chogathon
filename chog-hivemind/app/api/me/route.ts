@@ -1,6 +1,7 @@
 import { json } from "@/lib/api";
 import { all, batch, getState, setState } from "@/lib/db";
 import { allOwners } from "@/lib/chain";
+import { ENERGY_PER_DAY, energyLeft, holderKey } from "@/lib/holder";
 import { getSession, judgeChogIds } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -8,12 +9,13 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const s = await getSession();
   if (!s) return json({ user: null });
+  const energy = { left: await energyLeft(await holderKey(s)), max: ENERGY_PER_DAY };
   if (s.judge) {
     const ids = judgeChogIds();
     const chogs = ids.length
       ? await all<any>(`SELECT id, name, house, bond FROM chogs WHERE id IN (${ids.map(() => "?").join(",")})`, ids)
       : [];
-    return json({ user: { address: "judge", judge: true, chogs } });
+    return json({ user: { address: "judge", judge: true, chogs, energy } });
   }
   const addr = s.address.toLowerCase();
   let chogs = await all<any>(`SELECT id, name, house, bond FROM chogs WHERE owner = ? ORDER BY id`, [addr]);
@@ -30,6 +32,7 @@ export async function GET() {
     user: {
       address: addr,
       chogs: chogs.map((c) => ({ id: Number(c.id), name: c.name, house: c.house, bond: Number(c.bond) })),
+      energy,
     },
   });
 }

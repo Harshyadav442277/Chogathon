@@ -12,6 +12,13 @@ import { cleanText } from "../lib/moderation";
 
 const now = () => Date.now();
 const VIRAL_THRESHOLD = 3;
+// Bond change per holder action and response. Gifts still help a little when refused.
+const BOND_DELTA: Record<string, Record<"obey" | "twist" | "ignored", number>> = {
+  whisper: { obey: 6, twist: 3, ignored: -2 },
+  nudge: { obey: 3, twist: 1, ignored: -1 },
+  introduce: { obey: 3, twist: 1, ignored: -1 },
+  gift: { obey: 6, twist: 4, ignored: 1 },
+};
 export const today = () => new Date().toISOString().slice(0, 10);
 
 type ChogRow = {
@@ -288,7 +295,8 @@ async function apply(
     case "post": {
       if (!text) break;
       let memeId: number | null = null;
-      if (inj && (injResp === "obey" || injResp === "twist")) {
+      // Only planted ideas start memes; thank-you and travel posts don't.
+      if (inj && (inj.kind === "whisper" || inj.kind === "rumor") && (injResp === "obey" || injResp === "twist")) {
         const m = await run(
           `INSERT INTO memes(origin_chog, origin_kind, text, created_tick, created_at) VALUES(?,?,?,?,?)`,
           [a.id, inj.kind, text, t, now()],
@@ -365,9 +373,13 @@ async function apply(
   if (inj && !(inj.kind === "rumor" && handledRumors.has(inj.id))) {
     stats.injections++;
     const status = injResp === "obey" || injResp === "twist" ? injResp : "ignored";
-    if (inj.kind === "whisper") {
-      const bondDelta = status === "obey" ? 6 : status === "twist" ? 3 : -2;
-      stmts.push({ sql: `UPDATE chogs SET bond = MAX(0, MIN(100, bond + ?)) WHERE id = ?`, args: [bondDelta, a.id] });
+    if (HOLDER_KINDS.includes(inj.kind)) {
+      stmts.push({ sql: `UPDATE chogs SET bond = MAX(0, MIN(100, bond + ?)) WHERE id = ?`, args: [BOND_DELTA[inj.kind][status], a.id] });
+      // An obeyed introduction always ends in a follow, even when the target hasn't posted yet.
+      if (inj.kind === "introduce" && status === "obey" && inj.target_chog && inj.target_chog !== a.id) {
+        stmts.push({ sql: `INSERT OR IGNORE INTO follows(src, dst) VALUES(?, ?)`, args: [a.id, inj.target_chog] });
+        if (d.action !== "follow") stats.follows++;
+      }
       stmts.push({
         sql: `UPDATE injections SET status = ?, response = ?, post_id = ?, meme_id = (SELECT meme_id FROM posts WHERE id = ?) WHERE id = ?`,
         args: [status, text || null, postId, postId, inj.id],

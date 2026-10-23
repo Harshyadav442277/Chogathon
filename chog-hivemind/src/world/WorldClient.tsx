@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ChatBox, WhisperBox } from "@/components/Boxes";
+import { CareBox, ChatBox } from "@/components/Boxes";
 import { useMe } from "@/components/WalletButton";
 import { getWorld, HOUSE_COLORS, HOUSE_NAMES, setWorld, useWorld, type Positions } from "./store";
 import { WorldScene } from "./scene/WorldScene";
@@ -120,7 +120,7 @@ function StatusWindow({ id, world }: { id: number; world: World }) {
             </div>
           )}
           <Link className="btn small" href={`/chog/${id}`} style={{ display: "inline-block", marginTop: 10 }}>Open full profile →</Link>
-          <div style={{ marginTop: 10 }}><WhisperBox chogId={id} name={c.name} /></div>
+          <div style={{ marginTop: 10 }}><CareBox chogId={id} name={c.name} /></div>
           <ChatBox chogId={id} name={c.name} />
         </>
       )}

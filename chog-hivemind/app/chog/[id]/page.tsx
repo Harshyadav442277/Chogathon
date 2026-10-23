@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { chogDetail } from "@/lib/queries";
 import { Avatar, HouseBadge, LOC_NAMES, Post } from "@/components/ui";
-import { ChatBox, WhisperBox } from "@/components/Boxes";
+import { CareBox, ChatBox } from "@/components/Boxes";
 import { house } from "@/sim/world";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 const STATUS: Record<string, string> = { pending: "⏳ waiting for the next tick", obey: "✅ obeyed", twist: "🌀 twisted it", ignored: "🙅 ignored you" };
+const KIND_ICON: Record<string, string> = { whisper: "💭", nudge: "🧭", introduce: "🤝", gift: "🎁" };
 
 export default async function ChogPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -78,13 +79,13 @@ export default async function ChogPage({ params }: { params: Promise<{ id: strin
       </div>
 
       <div>
-        <WhisperBox chogId={c.id} name={c.name} />
-        {c.whispers.length > 0 && (
+        <CareBox chogId={c.id} name={c.name} />
+        {c.commands.length > 0 && (
           <div className="card">
-            <h3>Whisper log</h3>
-            {c.whispers.map((w) => (
+            <h3>Holder log</h3>
+            {c.commands.map((w) => (
               <div key={w.id} className="small" style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
-                <div>“{w.text}”</div>
+                <div>{KIND_ICON[w.kind] ?? ""} {w.kind === "whisper" ? `“${w.text}”` : w.text}</div>
                 <div className="tiny muted">{STATUS[w.status] ?? w.status}{w.response ? ` → “${w.response}”` : ""}</div>
               </div>
             ))}
