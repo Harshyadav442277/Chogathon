@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    { "id": "past.hero", "section": "past", "slot": "p", "weight": 6, "requires": "p_hero", "variants": [
+      { "text": "Season {p_season}: as {p_jobA}, {a} became the Hero, the one who ended it. Level {p_level}, {p_quests} quests behind them, and a green dawn." },
+      { "text": "Season {p_season}: {p_jobA} who walked into the throne room and came out the Hero of the age. Level {p_level}. It is still sung in the capital." } ] },
+    { "id": "past.slayer", "section": "past", "slot": "p", "weight": 4, "requires": "p_slays>=1 && !p_hero", "variants": [
+      { "text": "Season {p_season}: as {p_jobA}, {a} broke a seal and shook the Demon King's castle, at level {p_level}." },
+      { "text": "Season {p_season}: {p_jobA} of some renown, one of the ones who brought down a Demon General." } ] },
+    { "id": "past.demon", "section": "past", "slot": "p", "weight": 3, "requires": "p_demon", "variants": [
+      { "text": "Season {p_season}: {p_jobA} in the black glass, serving the Demon King with a polite scowl for a whole season." },
+      { "text": "Season {p_season}: on the demon side, as {p_jobA}. Not as bad as it sounds. Better soup, worse weather." } ] },
+    { "id": "past.busy", "section": "past", "slot": "p", "weight": 2, "requires": "p_quests>=12", "variants": [
+      { "text": "Season {p_season}: {p_jobA}, tireless, with {p_quests} quests to their name at level {p_level}." },
+      { "text": "Season {p_season}: a very busy season as {p_jobA}: {p_quests} quests, a bad winter, a good friend." } ] },
+    { "id": "past.fall", "section": "past", "slot": "p", "weight": 2, "requires": "p_fails>=3", "variants": [
+      { "text": "Season {p_season}: {p_jobA}, who fell often and rose each time: {p_fails} trips to the temple, level {p_level}." } ] },
+    { "id": "past.quiet", "section": "past", "slot": "p", "weight": 1, "variants": [
+      { "text": "Season {p_season}: a quiet life as {p_jobA}, at level {p_level}. Not every season is a song." },
+      { "text": "Season {p_season}: {p_jobA}. Ordinary days, good bread, a few friends. It was enough." } ] }
+  ]
+}

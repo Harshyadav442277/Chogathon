@@ -1,0 +1,207 @@
+{
+  "grammar": {
+    "s_verb_move": ["set off for", "headed for", "struck out for", "took the road to", "made for", "went looking for trouble at", "packed a lunch and left for"],
+    "s_sky": ["under a low grey sky", "in the thin morning light", "with the dew still on the grass", "as the wind picked up", "while the bells rang noon", "in a flurry of leaves"],
+    "s_cheer": ["Nice work.", "Well done.", "Not bad at all.", "A good day's work.", "The guild clerk looked impressed, for a clerk.", "Somebody bought a round."],
+    "s_wince": ["It hurt.", "That will bruise.", "The healers were ready.", "It could have gone worse.", "There was a great deal of groaning."],
+    "s_thing_gather": ["a basket of herbs", "an armful of reeds", "a sack of river-clay", "a pail of wild berries", "a bundle of rare moss"],
+    "s_thing_craft": ["a good strong hinge", "a neat set of buckles", "a bolt of sturdy cloth", "a cask of something pungent", "a finely balanced knife"],
+    "s_beast": ["a wolf with opinions", "three suspicious slimes", "a bad-tempered boar", "an ogre with a cold", "a very large rat", "a swarm of angry bees", "a hungry marsh-troll"],
+    "s_place_wild": ["the reeds", "the river bend", "the high pass", "the old quarry", "the hollow oak", "the broken bridge", "the mossy ford"]
+  },
+  "events": {
+    "quest_start": [
+      { "text": "{a} took “{quest}” from the guild board and set off for {place}." },
+      { "text": "{a} pinned “{quest}” to their pack and headed to {place}." },
+      { "text": "“Someone has to do it,” said {a}, accepting “{quest}”." },
+      { "text": "{a} read “{quest}” twice, shrugged, and <s_verb_move> {place}." },
+      { "text": "“{quest}.” {a} said it aloud once, to see how it sounded, then <s_verb_move> {place}." },
+      { "text": "With a sigh and a stamped form, {a} <s_verb_move> {place} to see about “{quest}”." },
+      { "if": "qkind=gather", "text": "{a} took a basket and <s_verb_move> {place}, in search of <s_thing_gather>." },
+      { "if": "qkind=gather", "text": "“Herbs don't pick themselves,” said {a}, and left for {place}." },
+      { "if": "qkind=craft", "text": "{a} rolled up their sleeves and began “{quest}” in {place}." },
+      { "if": "qkind=craft", "text": "The workshop at {place} smelled of sawdust as {a} set about “{quest}”." },
+      { "if": "qkind=hunt", "text": "{a} sharpened a blade and <s_verb_move> {place}, hoping to meet <s_beast>." },
+      { "if": "qkind=hunt", "text": "Word at the guild: “{quest}.” {a} was already at the door." },
+      { "if": "qkind=escort", "text": "{a} found the traveller at {place}, took the pack, and began “{quest}”." },
+      { "if": "qkind=escort", "text": "“Stay close,” said {a} to the nervous client, setting off on “{quest}”." },
+      { "if": "qkind=explore", "text": "{a} took a map, a lantern and a bad feeling and <s_verb_move> {place}." },
+      { "if": "qkind=explore", "text": "“What's the worst that could be down there?” said {a}, <s_verb_move> {place}." },
+      { "if": "qkind=cleanse", "text": "{a} took salt, a bucket and a very stern expression to {place}." },
+      { "if": "qkind=cleanse", "text": "“Haunted again?” said {a}, accepting “{quest}” with a sigh." },
+      { "if": "qkind=boss", "text": "A hush fell as {a} signed up for “{quest}”. Somebody offered them a biscuit." },
+      { "if": "qkind=boss", "text": "{a} tightened every strap they owned and took “{quest}”." },
+      { "if": "track=adventurer", "text": "{a}, never one to wait for trouble, took “{quest}” before the ink had dried." }
+    ],
+    "quest_done": [
+      { "text": "{a} completed “{quest}” at {place}. (+{n} XP)" },
+      { "text": "“{quest}”: done. {a} returns from {place} a little stronger. (+{n} XP)" },
+      { "text": "The guild stamps “{quest}” complete. {a} earned {n} XP." },
+      { "text": "{a} came back from {place} with “{quest}” done. <s_cheer> (+{n} XP)" },
+      { "text": "“{quest}” is closed. {a} dusted off their coat and asked about lunch. (+{n} XP)" },
+      { "text": "{a} laid the proof of “{quest}” on the guild counter. <s_cheer>" },
+      { "if": "qkind=gather", "text": "{a} returned from {place} with <s_thing_gather>. “{quest}” is done. (+{n} XP)" },
+      { "if": "qkind=craft", "text": "{a} finished “{quest}” and set down <s_thing_craft> with some pride. (+{n} XP)" },
+      { "if": "qkind=hunt", "text": "{a} came back from {place} with a dented helmet and a satisfied look. “{quest}” is done. (+{n} XP)" },
+      { "if": "qkind=hunt", "text": "<s_beast> troubles {place} no more. {a} has finished “{quest}”. (+{n} XP)" },
+      { "if": "qkind=escort", "text": "{a} delivered the client safely to the other side of {place}. “{quest}” is done. (+{n} XP)" },
+      { "if": "qkind=explore", "text": "{a} mapped every corner of {place}, and came out with only one mild curse. “{quest}” is done. (+{n} XP)" },
+      { "if": "qkind=cleanse", "text": "The ghosts of {place} have been politely shown the door by {a}. “{quest}” is done. (+{n} XP)" },
+      { "if": "qkind=boss", "text": "{a} stood their ground in {place} and lived to tell it. “{quest}” is done. (+{n} XP)" }
+    ],
+    "quest_fail": [
+      { "text": "{a} was knocked out during “{quest}” and carried back to the temple." },
+      { "text": "“{quest}” was too much for {a} today. They'll be back." },
+      { "text": "{a} went down hard on “{quest}”. The healers were already running. <s_wince>" },
+      { "text": "“{quest}” won this round. {a} is resting at the temple." },
+      { "text": "{a} limped back from “{quest}” on a borrowed stretcher. <s_wince>" },
+      { "if": "qkind=hunt", "text": "<s_beast> turned out to be rather more than {a} had bargained for. {a} was carried back." },
+      { "if": "qkind=explore", "text": "{a} found out what was at the bottom of the hole. It was not friendly." },
+      { "if": "qkind=boss", "text": "{a} gave “{quest}” everything they had, and it was not quite enough. They are resting." }
+    ],
+    "level_up": [
+      { "text": "{a} reached level {n}!" },
+      { "text": "Level {n}! {a} feels the stars watching." },
+      { "text": "{a} levelled up to {n}." },
+      { "text": "{a} stood a little taller today: level {n}." },
+      { "text": "Something clicked, and {a} felt it. Level {n}." },
+      { "if": "track=craft", "text": "{a} felt the work come easier today: level {n}." },
+      { "if": "track=service", "text": "{a} has been noticed by half the town: level {n}." },
+      { "if": "track=land", "text": "{a} stood up from the furrow and felt stronger than ever: level {n}." },
+      { "if": "track=civic", "text": "{a} has been promoted, in a sense: level {n}." },
+      { "if": "track=adventurer", "text": "{a}'s Status Window blinked: level {n}." }
+    ],
+    "boss_hit": [
+      { "text": "{a} struck {boss} for {n} damage!" },
+      { "text": "{a} landed a blow on {boss} ({n} damage)." },
+      { "text": "{boss} roars as {a} hits for {n}." },
+      { "text": "{a} ducked, rolled and struck {boss}: {n} damage." },
+      { "text": "A clean hit! {a} costs {boss} {n}." }
+    ],
+    "general_down": [
+      { "text": "[SEAL BROKEN] {boss} has fallen to {a}! {n} of 4 seals are broken." },
+      { "text": "[SEAL BROKEN] {a} defeated {boss}. The Demon King's castle trembles ({n}/4 seals)." },
+      { "text": "[SEAL BROKEN] {boss} falls, and the seal with them. {a} stands in the dust. ({n}/4)" }
+    ],
+    "march": [{ "text": "[SCENARIO] All four seals are broken. The march on the Demon King's castle begins!" }],
+    "hero": [
+      { "text": "[HERO] {a} the {job} landed the final blow. The Demon King is defeated! {a} is the Hero of Season {n}." },
+      { "text": "[HERO] It is over. {a}, {job}, brought down the Demon King. Hero of Season {n}!" }
+    ],
+    "last_stand": [{ "text": "[SCENARIO] Last Stand: the stars burn bright. Every blow against the Demon King now strikes three times as hard." }],
+    "raid_start": [
+      { "text": "[RAID] {n} demons pour out of the dark toward {place}!" },
+      { "text": "[RAID] Imps and dark knights are raiding {place} ({n} attackers)!" },
+      { "text": "[RAID] The bells of {place} are ringing: {n} raiders at the gate!" },
+      { "text": "[RAID] A column of {n} demons marches on {place}." }
+    ],
+    "raid_won": [
+      { "text": "[RAID] {place} held! {a} and the defenders drove the demons back." },
+      { "text": "[RAID] The demons broke against {place}'s defenders. {a} fought bravely." },
+      { "text": "[RAID] {a} took the wall at {place} and did not give it up. The raiders fled." }
+    ],
+    "raid_lost": [
+      { "text": "[RAID] {place} was overrun. {n} defenders were hurt; the demons withdrew with loot." },
+      { "text": "[RAID] Smoke over {place}: the demons won this night ({n} hurt)." }
+    ],
+    "train": [
+      { "text": "{a} and {b} sparred in {place}." },
+      { "text": "{b} showed {a} a few tricks in {place}." },
+      { "text": "{a} trained with {b} until sunset." },
+      { "text": "{a} and {b} swapped stances in {place}, and bruises." },
+      { "text": "{b} knocked {a} flat in the yard at {place}, then helped them up. “Again?” said {b}." }
+    ],
+    "trade": [
+      { "text": "{a} traded with {b} in {place}." },
+      { "text": "{a} sold {b} a sturdy pack." },
+      { "text": "{b} and {a} haggled loudly in {place}." },
+      { "text": "{a} and {b} shook hands on a bargain in {place}; both went away certain they'd won." },
+      { "text": "{b} swapped a spare lantern for a jar of {a}'s jam, and called it fair." }
+    ],
+    "gossip": [
+      { "text": "{a} told {b}: “I heard {boss} is getting stronger.”" },
+      { "text": "{a} and {b} argued about who will become the Hero." },
+      { "text": "{b} whispered to {a} about a secret path into the dungeon." },
+      { "text": "{a} and {b} compared notes on the weather, the war and a certain innkeeper's soup." },
+      { "text": "“Did you hear?” said {a}. {b} had not. Neither, quite, had {a}, but the story was good." },
+      { "text": "{b} told {a} a story about {boss} that was almost certainly not true." }
+    ],
+    "heal": [
+      { "text": "{a} healed {b}'s wounds." },
+      { "text": "{a} patched {b} up in {place}." },
+      { "text": "{a} sat with {b} in {place} until the shaking stopped." },
+      { "text": "{a} wrapped {b}'s arm in clean linen, and said nothing about the state of it." }
+    ],
+    "party": [
+      { "text": "{b} joined {a} on “{quest}”." },
+      { "text": "{a} and {b} formed a party for “{quest}”." },
+      { "text": "“Two is better than one,” said {b}, falling in beside {a} for “{quest}”." },
+      { "text": "{a} and {b} left {place} together for “{quest}”, already arguing about the route." }
+    ],
+    "fate_skill": [
+      { "text": "[FATE] The stars stirred, and {a} woke knowing “{skill}”." },
+      { "text": "[FATE] Nobody asked for it, but “{skill}” found {a} anyway." },
+      { "text": "[FATE] {a} picked up “{skill}” the way one picks up a stray coin: by luck." }
+    ],
+    "fate_quest": [
+      { "text": "[FATE] The stars stirred and set {a} the quest “{quest}”." },
+      { "text": "[FATE] A quiet nudge from fate: {a} is off on “{quest}”." },
+      { "text": "[FATE] No god chose it, but “{quest}” came for {a}." }
+    ],
+    "gift_skill": [
+      { "text": "[CONSTELLATION] A star granted {a} the skill “{skill}”." },
+      { "text": "[CONSTELLATION] “{skill}” was carved into {a}'s Status Window by a watching star." },
+      { "text": "[CONSTELLATION] {a} felt a warmth in their hands: a new skill, “{skill}”, from the sky." }
+    ],
+    "gift_quest": [
+      { "text": "[CONSTELLATION] A star gave {a} the quest “{quest}”." },
+      { "text": "[CONSTELLATION] {a} received a scenario from the stars: “{quest}”." },
+      { "text": "[CONSTELLATION] A line of gold text appeared before {a}: “{quest}”. They set off." }
+    ],
+    "season": [{ "text": "[SCENARIO] Season {n} begins. 1,969 Chogs are summoned to Monadia, and somewhere a Demon King awakens." }],
+
+    "rivals_open": [
+      { "text": "[THREAD] {a} and {b} have sparred again, and neither will admit the other is better. A rivalry is born." },
+      { "text": "[THREAD] {a} and {b} have sparred twice now, and neither will admit the other is better. A rivalry is born." },
+      { "text": "[THREAD] Every evening {a} finds {b} at the training ground. They call it practice. Everyone else calls it a rivalry." }
+    ],
+    "rivals_grow": [
+      { "text": "[THREAD] {a} and {b} keep score in chalk on the guild wall. The tally is suspiciously even." },
+      { "text": "[THREAD] Bout after bout, argument after argument. {a} and {b} now train only to beat each other." }
+    ],
+    "rivals_payoff": [
+      { "text": "[THREAD] When {a} brought down {boss}, the first to cheer was {b}. Some rivalries end in a friendship." },
+      { "text": "[THREAD] {a} struck down {boss}. Somewhere, {b} sighed, smiled, and started training harder." }
+    ],
+    "nemesis_open": [
+      { "text": "[THREAD] {boss} has knocked {a} out twice. {a} wakes in the temple with one name on their lips." },
+      { "text": "[THREAD] Twice beaten by {boss}. {a} does not sleep that night. A nemesis is chosen." }
+    ],
+    "nemesis_return": [
+      { "text": "[THREAD] {a} is back in front of {boss}. This time, they don't flinch." },
+      { "text": "[THREAD] Scarred but standing, {a} returns to face {boss} again." }
+    ],
+    "nemesis_payoff": [
+      { "text": "[THREAD] Revenge. {a}, beaten twice by {boss}, is the one who finally ends it." },
+      { "text": "[THREAD] The third time, {a} won. {boss} will haunt no one again." }
+    ],
+    "siege_open": [
+      { "text": "[THREAD] {place} has been raided {n} times. Its people start building walls out of anything they can find." },
+      { "text": "[THREAD] Smoke over {place} again. The town is under siege, and everyone knows it." }
+    ],
+    "siege_payoff": [
+      { "text": "[THREAD] Raid after raid, held. {place} is no longer a target; it is a fortress. {a} stood first on the wall." }
+    ],
+    "sponsor_open": [
+      { "text": "[THREAD] A star has chosen {a}. Others will be watching what they do with it." },
+      { "text": "[THREAD] {a} looks up at the night sky and feels, for the first time, that someone up there is watching." }
+    ],
+    "sponsor_step": [{ "text": "[THREAD] {a} finished the task the stars set. The Constellation is pleased." }],
+    "sponsor_payoff": [{ "text": "[THREAD] The star that chose {a} was right: {a} brought down {boss}." }],
+    "underdog_open": [
+      { "text": "[THREAD] Nobody expected {a} among the Hero candidates. {a} didn't either." },
+      { "text": "[THREAD] Not a knight, not a mage. Yet {a} now stands among the five most talked-about Chogs in Monadia." }
+    ],
+    "underdog_payoff": [{ "text": "[THREAD] The underdog did it. {a}, who was never meant to be a hero, brought down {boss}." }]
+  }
+}

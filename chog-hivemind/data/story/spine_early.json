@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "guild_opens", "trigger": "quests_25", "slot": "call", "title": "The Guild Opens",
+      "variants": [
+        { "text": "<dawn>, the guild hall of Monadia opened its doors, and the boards inside filled with notices. <board_notice> said one. <board_notice> said another. None of it was the stuff of songs, and all of it needed doing.\n\nThe first to turn in a stamped quest was {firstQuester}, the {firstQuesterJob}, with proof of “{firstQuest}” from all the way out at {firstQuestPlace}. {firstQuester} was <wound_line>. <guild_clerk> brought the stamp down so hard that the inkwell jumped.\n\nBy nightfall {questsDone} quests had been turned in. In the hall, strangers shared soup, maps and opinions about the proper way to fight a slime. [[cand1|One name kept coming up more than the others, and it was {cand1}.]] <hope_line>" },
+        { "text": "Nobody remembers who first said that the guild was open; it simply was, the way a river is simply there. By the time {firstQuester} limped in from {firstQuestPlace} with “{firstQuest}” done, a queue had grown around the counter, and <guild_clerk> was stamping with the weary joy of someone who has finally been given something to stamp.\n\n“Next,” said the clerk, and the next one stepped forward, and the next. {questsDone} quests were counted by the end of the day. {firstQuester}, the {firstQuesterJob}, was bought a bowl of soup by three different strangers, and did not argue.\n\n<proverb> It was on a scrap of paper above the board, in somebody's careful hand, and by evening it had been copied onto half the walls in town." },
+        { "text": "There is a kind of courage that does not look like courage at all. It looks like getting up in the morning and going to work.\n\nThe first stamped quest of the season belonged to {firstQuester}, who had carried “{firstQuest}” all the way back from {firstQuestPlace} in the <weather>. <guild_clerk> examined the proof for a long time, found nothing wrong with it, and was visibly disappointed.\n\nAfter that the floodgates opened. Quests came in by the dozen: {questsDone} by closing. Smiths worked late, healers lit their first candles of the season, and somewhere a baker discovered that the bread had risen, which felt, in the circumstances, like a sign." }
+      ]
+    },
+    {
+      "id": "first_party", "trigger": "party_first", "after": [], "title": "Two for the Road",
+      "variants": [
+        { "text": "It is one thing to be brave on your own. It is another thing, and a better one, to be brave with somebody.\n\n{partyA} had been reading the notice for “{partyQuest}” for a long time, putting it back and reading it again, when {partyB} came and stood alongside and read it too.\n\n“It says two would be better than one,” said {partyB}.\n\n“It doesn't say that,” said {partyA}.\n\n“It would, if it were honest,” said {partyB}, and took the notice off the board.\n\nThey set out together, and argued for the first mile about which road to take, and for the second about whose fault it was they had taken the wrong one, and by the third mile they had stopped arguing and started talking, which is how most friendships worth having begin." },
+        { "text": "{partyA} had never joined a party before. {partyB} had joined so many that they had a drawer for the badges.\n\n“The trick,” said {partyB}, as they walked on, “is to decide in advance who is going to be sensible.”\n\n“Who?” said {partyA}.\n\n“It rotates,” said {partyB}. “You're first. Good luck.”\n\n“Quest” was “{partyQuest}”, and by the end of it {partyA} had been sensible for six hours, and was exhausted, and was already looking forward to the next one. <hope_line>" },
+        { "text": "<dusk>, {partyA} and {partyB} were seen leaving the guild hall together, bickering about maps. They were bound for “{partyQuest}”, which neither of them was qualified for, and which both of them privately thought was a poor idea. Neither said so. That, the old folk will tell you, is how every legendary party begins: two Chogs too proud to be the first to turn back.\n\nBehind them, the guild clerk made a small tick in a very small ledger, under a column headed *Pairs, Doomed*. It was a column that had, so far, a surprisingly short list of entries." }
+      ]
+    },
+    {
+      "id": "first_ko", "trigger": "ko_first", "title": "The Temple of Small Lights",
+      "variants": [
+        { "text": "Not every quest ends well. That is something the old songs leave out, and they are wrong to.\n\n{firstFallen} was carried back from “{firstFallenQuest}” on a stretcher made of two spears and somebody's coat, and laid down among the candles of <temple_scene>. The healers who work in such places never ask how you were hurt. They only ask where.\n\n“Will I be all right?” asked {firstFallen}, in the small hours.\n\n“You will be all right,” said the healer, “and then you will go out and do something foolish again, and come back, and I will light more candles. That is how it works. That is how it has always worked.”\n\nBy morning {firstFallen} was sitting up and asking for breakfast, which, as every healer knows, is the surest sign of all." },
+        { "text": "{firstFallen} did not remember falling. They remembered a smell of smoke, a thud, and a voice saying, very calmly, “I've got you,” and after that there was only the ceiling of <temple_scene>.\n\nA healer sat beside them through the night, lighting one candle after another. Outside, <weather> pressed against the windows. Inside, the candles made a small, stubborn country of light.\n\n“I failed ‘{firstFallenQuest}’,” said {firstFallen}, when they could speak.\n\n“You came back from it,” said the healer. “Failing is a thing you can do twice. Not coming back, only once. Rest.”\n\n<proverb>" },
+        { "text": "They say a Chog's first knock-out is a christening. {firstFallen}'s was a loud one: “{firstFallenQuest}” had gone sideways, a roof had gone down, and a very large thing with a very small temper had gone for the ankles.\n\nAt the temple, a healer cut away a sleeve and shook their head. “A shame about the coat. It was a good coat.” They bandaged the rest of the hero and brought a cup of broth, and {firstFallen} laughed so hard they had to be told, severely, to stop.\n\nIt was the first of many temple nights that season. It would not be the worst. But nobody forgets their first." }
+      ]
+    },
+    {
+      "id": "raid_held", "trigger": "first_raid", "slot": "raid1", "requires": "raid_held", "weight": 1, "title": "Smoke on the Horizon",
+      "variants": [
+        { "text": "The first raid came at dusk, the way the old songs said it would, though nobody had believed the old songs until then.\n\n{raidSize} demons came out of the grey toward {raidTown}: <demon_pack>. <dread_line> The town bell was too stiff to ring, so the townsfolk banged pots instead, which is less dignified but works just as well.\n\n{raidOutcome}\n\nIn the morning there was a new notice on every guild board in Monadia, in letters large enough for the imps themselves to read: DEFEND YOUR TOWNS. Nobody needed to be told that the story had changed." },
+        { "text": "{raidTown} was not ready. Nobody ever is. But <elder> had said all week that something was coming, and for once somebody had listened, so there were buckets on the roofs, ladders by the gates, and a very large pot of soup on a very large fire.\n\nThe demons arrived <dusk>: <demon_pack>. For an hour it was <battle_sound>. Then {raidDefender|someone brave} took a ladder, a bucket and a very bad temper, and went up on the wall, and the rest of the town followed, and the raiders broke and ran.\n\nIt was a small victory, but it was the first, and the whole region heard of it by morning." }
+      ]
+    },
+    {
+      "id": "raid_lost", "trigger": "first_raid", "slot": "raid1", "requires": "!raid_held", "weight": 1, "title": "The Night {raidTown} Burned",
+      "variants": [
+        { "text": "The first raid was a bad one.\n\n{raidSize} demons came out of the dark toward {raidTown}: <demon_pack>. <dread_line> The defenders were too few and too new, and the raiders knew it. By midnight the gates were down, and by morning the sky above the town was the colour of an old bruise.\n\nNobody died. That was the small mercy, and the temples were full of the hurt. But the guild board that morning was written over in bigger letters, and those who read it did not argue: DEFEND YOUR TOWNS.\n\n{raidTown} would be rebuilt. It would also, those who watched it burn said quietly, be remembered." },
+        { "text": "“We were not ready,” said {raidDefender|a farmer with a pitchfork}, afterwards, to anybody who would listen, and then, more quietly, “and we should have been.”\n\n{raidTown} had been raided at dusk by <demon_pack>, and the walls, which looked sturdy, had turned out to be mostly paint. The demons had taken what they wanted, laughed, and gone home.\n\nIn the grey morning the townsfolk sat in the ruined market and began, without anyone telling them to, to count what was left. Then somebody picked up a hammer. By noon the market was full of hammers, and the first stone was set in a new wall. <proverb>" }
+      ]
+    },
+    {
+      "id": "level_five", "trigger": "level_5", "title": "The First to Stand a Step Higher",
+      "variants": [
+        { "text": "{levelFive} was the first in all Monadia to reach the fifth level of their calling, and the news ran through the guild halls faster than the soup.\n\nIt was a small thing, a number on a Status Window, but it meant that {levelFive}, the {levelFiveJob}, could do things that the rest could not yet do, and the rest knew it, and the rest began, secretly, to practise harder.\n\n<hope_line> {levelFive} was embarrassed, and bought a round, and the room was somehow lighter for it." },
+        { "text": "The number was five. {levelFive} had been checking it every morning for a week, in a mirror, like a spot. When it finally changed, the {levelFiveJob} sat down on a sack of flour and stared at it.\n\n“Is that all?” whispered a passing child.\n\n“That,” said {levelFive}, after a long moment, “is a great deal.” And it was: for the rest of the season, strangers would point at {levelFive} in the street, and say, quite quietly, “That's the one.”" }
+      ]
+    },
+    {
+      "id": "generals_wake", "trigger": "phase_2", "title": "The Generals Wake",
+      "variants": [
+        { "text": "On the second grey dawn the ground shook in four places at once, and every Chog in Monadia felt it in their teeth.\n\nIn {r1}, {g1} stepped out of the dungeon mouth and looked up at <weather> as if it owed them money. In {r2}, {g2} came out of the dark and stood listening. In {r3}, {g3} walked out of a thousand mirrors at once and smiled a thousand smiles, none of them kind. And in {r4}, {g4} began to sing a lullaby that nobody could ever remember afterwards, though everyone who heard it slept badly for a week.\n\nThe Demon Generals were awake, and each of them sat upon a seal. The boards changed that morning. New notices appeared at the very top, in red ink that would not freeze or fade: FACE {g1}. BREAK THE SEAL OF {r2}. Most Chogs read them, swallowed hard, and went back to the slime quests, which is nothing to be ashamed of." },
+        { "text": "Nobody saw it happen. People simply woke up, and there were four more names on the guild's list of Things To Be Afraid Of.\n\n{g1} of {r1}. {g2} of {r2}. {g3} of {r3}. {g4} of {r4}.\n\nThe four had been asleep, the old ones said, since before the first Chog came to Monadia, and had woken up cross. The seals they sat upon hummed like hives. <omen> was reported in the capital that night, and again in the morning, and the guild clerk, who had never been known to hurry, hurried.\n\nBut a few Chogs stood in front of those names for a long time, very still, the way you stand at the edge of cold water before you jump." },
+        { "text": "It was <dusk> when the first rumours arrived, brought by couriers who looked as though they had run all the way. The Demon Generals were awake: {g1}, {g2}, {g3}, {g4}.\n\n“Awake?” said somebody, in <inn_scene>. “What do you mean, awake? They've been awake for ages.”\n\n“They've been *dozing*,” said the courier. “It's different. Now they've got their boots on.”\n\n<curse> was no longer a weather. It was a plan, with names. And in <inn_scene>, a Chog put down their cup, looked out at the dark, and wondered how many of them would be around to see how it ended." }
+      ]
+    },
+    {
+      "id": "rival_spark", "trigger": "rival_first", "title": "A Rivalry Is Born",
+      "variants": [
+        { "text": "Nobody could say who started it. {rivalA} and {rivalB} had sparred at the training yard, and then sparred again, and by the third bout neither would admit the other was better.\n\n“Lucky,” said {rivalA}.\n\n“Ha,” said {rivalB}.\n\nBy the end of the week they were keeping score in chalk on the guild wall, and by the end of the month the whole town had picked sides. They would swear they were not friends. They were each other's favourite enemy, which is better." },
+        { "text": "There is a kind of friendship that dresses as a quarrel. {rivalA} and {rivalB} had it badly.\n\nThey raced to the same quests, arrived at the same inns, and argued over whose turn it was to be right. “I did not follow you,” said {rivalA}, to a crowd, to {rivalB}, who had followed them. The crowd was delighted. The bard took notes.\n\nIt was good for both of them. You do not climb a wall alone if somebody is watching you from the other side." }
+      ]
+    },
+    {
+      "id": "nemesis_first", "trigger": "nemesis_first", "title": "A Name Spoken in the Dark",
+      "variants": [
+        { "text": "Some enemies you choose. Some choose you.\n\n{nemesisA} had gone into the dungeon twice to face {nemesisBoss}, and twice had been carried out again to wake in <temple_scene>. The second time, {nemesisA} did not ask for breakfast. {nemesisA} lay very still and looked at the ceiling, and the healers, who had seen that look before, left a candle burning by the bed and did not say anything at all.\n\nIn the night {nemesisA} said a name out loud, once, to the dark: {nemesisBoss}. It was not said in fear. It was said the way you write something down so that you will not forget it." },
+        { "text": "{nemesisBoss} had a way of finding {nemesisA}. It was not a plan, exactly. It was a feeling, a certain tilt of the dungeon corridors, a sense that the next turning would always, somehow, be the one.\n\nTwice, now, {nemesisA} had been laid low. Twice, {nemesisA} had sat in the temple and listened to the other patients tell of the things they had fought and escaped from. “Never mind,” said one. “It happens to everyone.”\n\n“No,” said {nemesisA}, softly. “It happens to me.”\n\nThat was how it began: not with a vow, but with a very specific kind of stubborn, which is the one that wins." }
+      ]
+    },
+    {
+      "id": "underdog", "trigger": "underdog_first", "title": "Not a Knight",
+      "variants": [
+        { "text": "{underdog} was the {underdogJob}, and the {underdogJob} is not the sort of calling that ends up in songs.\n\nBut {underdog} kept turning up. At the guild hall at dawn. At the town wall when the demons came. At the temple, helping carry the stretchers. On the long road between the dungeons, with a pack that was always heavier than it needed to be because {underdog} carried something extra for somebody else.\n\nAnd one morning the bards looked at their lists and found {underdog} on them, near the top, among the knights and mages and sword-saints, and nobody could quite remember when that had happened.\n\n“Not a knight,” said one bard, scratching their head.\n\n“No,” said <elder>, passing with a tray. “That is the whole point.”" },
+        { "text": "Nobody expected {underdog} among the hero candidates. {underdog} did not expect it either.\n\nThe {underdogJob} had been going about their business, minding their trade, nodding at passers-by, when somebody said, in the market, “Have you heard? They're saying {underdog} could be the one.”\n\n“The one *what*?” said {underdog}.\n\n“Don't be modest,” said the market. “It doesn't suit you.”\n\nIt did suit {underdog}, in fact, very well. That was the problem, and also the charm." }
+      ]
+    },
+    {
+      "id": "siege_first", "trigger": "siege_first", "title": "The Walls of {siegeTown}",
+      "variants": [
+        { "text": "The demons came back to {siegeTown} again, and again, and again.\n\nNobody knew why the Demon King hated that town in particular. Perhaps there was no reason. Perhaps {siegeTown} had held once, at the beginning, and {king} was not used to being refused. Whatever the cause, the raids kept coming, and the people of {siegeTown} grew tired, and then angry, and then, which is the most dangerous thing of all for a besieger, clever.\n\nThey built walls out of anything they could find: old carts, barrels of frozen fish, the bakery's spare ovens. They taught their children to bang the pots. They put candles in every window. When the next raid came, the demons found a town that was waiting for them." },
+        { "text": "{siegeTown} had become a legend, as unwillingly as a town can become anything.\n\nEvery few days the demons came: <demon_pack>. Every few days the people of {siegeTown} came out and politely, firmly, sent them home. <sound_town>. <smell_street>. The children of {siegeTown} invented a game called Raid, in which half of them are demons and half defenders. The defenders always win. That is the rule." }
+      ]
+    },
+    {
+      "id": "road_long", "trigger": "quests_100", "title": "The Long Road",
+      "variants": [
+        { "text": "There is a part of every journey that the songs skip, because it is long and cold and nothing much happens in it. That part is where most of the courage is.\n\nFor days the people of Monadia worked under <weather>. They carried letters between towns. They forged blades in smithies where the fire was the only warm thing for a mile. They baked, and fished, and dug in the hard fields, and walked the long roads with their maps folded small inside their coats. One hundred quests turned into two hundred, and by the time anybody thought to count, {questsDone} quests had been turned in.\n\nThe bards had started to keep lists. At the top were {cand1}, {cand2} and {cand3}. [[rivalA|And in the training yards everybody was talking about {rivalA} and {rivalB}, who had fought {rivalCount} times and still refused to call it a rivalry.]]" },
+        { "text": "A hundred quests. It was the sort of round number that makes people look up from their work.\n\nSomebody in the capital chalked it on a board: 100. Somebody beneath it wrote: *and the winter is not done.* By night, someone else had written: *so don't stop.*\n\nThe bards sang about {cand1}, {cand2} and {cand3}, who by then were not just names but a sort of weather, the kind of Chogs you spoke of before you'd finished your sentence. <hope_line> It was not a victory. It was something better: a habit." }
+      ]
+    },
+    {
+      "id": "quests_300", "trigger": "quests_300", "title": "Three Hundred Little Victories",
+      "variants": [
+        { "text": "Three hundred quests. Somebody had counted. It had been {firstQuester}, the {firstQuesterJob}, who, being first in the season, felt a certain duty to keep the tally.\n\n“Three hundred,” said {firstQuester}, in <inn_scene>, to nobody in particular. “And what have we got to show for it?”\n\n“Soup,” said a Chog beside them. “Better roads. A little hope. Fewer slimes.”\n\n“That's all?”\n\n“That's everything,” said the other, with great calm." },
+        { "text": "At the three hundredth quest the guild hall rang its bell, which it had not done all season. The sound was cracked and rusty and splendid. <sound_town>. In the market, people looked up and smiled, though they could not have said why." }
+      ]
+    },
+    {
+      "id": "quests_600", "trigger": "quests_600", "title": "A Great Number, Quietly",
+      "variants": [
+        { "text": "Six hundred. Nobody threw a feast; they were too busy. But <guild_clerk> took down the old ledger and began a new one, and wrote on its first page, in a neat clerk's hand: *We are still here.*\n\nThat was the entire speech." }
+      ]
+    }
+  ]
+}

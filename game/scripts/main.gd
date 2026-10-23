@@ -51,6 +51,14 @@ func _ready() -> void:
 		title.woke.connect(music.title)
 		title.entered.connect(music.start)
 		add_child(title)
+	for arg in OS.get_cmdline_user_args():  # dev: a scripted tour for the demo video (scripts/dev/demo_director.gd)
+		if arg.begins_with("--demo="):
+			var director := DemoDirector.new()
+			director.main = self
+			director.hud = hud
+			director.rig = rig
+			add_child(director)
+			director.run.call_deferred(arg.trim_prefix("--demo="))
 	GameState.selection_changed.connect(_on_selected)
 	if not GameState.positions.is_empty():
 		GameState.positions_updated.emit()

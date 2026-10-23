@@ -1,0 +1,12 @@
+{
+  "arcs": [
+    { "id": "lantern", "title": "The Lantern at the Crossroads", "blurb": "A lantern door, a long winter, a prophecy, and a guardian who returns.", "weight": 1 },
+    { "id": "returner", "title": "The Morning That Kept Returning", "blurb": "One Chog remembers every ending, and has to convince everyone else.", "weight": 1 },
+    { "id": "overlord", "title": "The Quiet Throne", "blurb": "The war seen from the black glass castle, where the Demon King runs a very orderly realm.", "weight": 1 },
+    { "id": "slime", "title": "The Small Thing That Grew", "blurb": "A nobody founds a town, then a nation, then something nobody planned.", "weight": 1 },
+    { "id": "shield", "title": "The Maligned", "blurb": "A rumour turns a good Chog into the villain, and the long road back.", "weight": 1 },
+    { "id": "gate", "title": "The Gate That Would Not Open", "blurb": "Status Windows, guild ranks and a locked world: everyone plays by the rules or dies by them.", "weight": 1 },
+    { "id": "misfits", "title": "The Worst Party in Monadia", "blurb": "A comedy of errors that somehow saves the world.", "weight": 1 },
+    { "id": "hidden", "title": "The Hidden Quest", "blurb": "The stars hand one nobody a quest log, and everything it asks of them.", "weight": 1 }
+  ]
+}

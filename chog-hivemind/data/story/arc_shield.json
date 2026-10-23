@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "shield.premise", "arc": "shield", "trigger": "season_start", "slot": "premise", "title": "A Good Name",
+      "variants": [
+        { "text": "It begins with a good name, because the saddest stories always do.\n\n{w1} was the {w1job}, newly summoned, newly cheerful, a Chog with the kind of face that makes shopkeepers give you the larger half. In the first week they helped three strangers across the ford at {townA}, found a lost child's boot, and shared their lunch with a very small imp that turned out, on closer inspection, to be a perfectly ordinary dog.\n\n“You're going to go far,” said {w2}, who had travelled with {w1} from the crossroads, and meant it.\n\n{w1} laughed. “I just want to be useful.”\n\nIt was the last time, for a long while, that anyone in Monadia would use the word *good* in the same sentence as {w1}'s name." },
+        { "text": "The slip said {w1job}. {w1} was content with that. {w1} was content, in fact, with almost everything: the long road, the bad inn, the stew that tasted of other stews.\n\nThis is not as common a quality as you might think. Most Chogs, on their first morning in Monadia, were looking about for the exit. {w1} was looking about for who might need a hand.\n\nIt was this, the old bards say, that was the problem. People who help are loved. And what is loved is a target." }
+      ]
+    },
+    {
+      "id": "shield.accused", "arc": "shield", "trigger": "season_start", "after": ["shield.premise"], "title": "The Lie",
+      "variants": [
+        { "text": "It was {w2} who said it.\n\nNobody knew why. Perhaps {w2} had been paid; perhaps frightened; perhaps jealous. Perhaps it was only that a lie, once it is told to the right ear at the right moment, grows legs of its own. Whatever the reason, in the middle of the market of {townA}, on a bright and ordinary morning, {w2} stood up and said:\n\n“{w1} stole the guild's lantern oil. And not only that: {w1} has been passing word to the cultists.”\n\nIt was not true. {w1} had never so much as stolen a biscuit. But there was a silence in the market, and in it, somewhere, a shutter closed.\n\n“I didn't,” said {w1}.\n\nNobody answered. The silence grew. And that was the moment, as {w1} would think afterwards, that their season really began." },
+        { "text": "The handbill was nailed to every post in {townA}. It was well written, in a neat clerk's hand: *WARNING. A Chog named {w1}, {w1job} by trade, has been seen meeting with servants of the Demon King. Do not trust them. Do not lend them tools, bread or shelter.*\n\n{w1} read it standing in the street. They read it twice. Then they looked around at a street in which, one by one, each door that had been open to them was quietly closing.\n\n“It isn't true,” said {w1}, aloud.\n\nA child looked out of a window, wide-eyed, and was pulled back by a hand." }
+      ]
+    },
+    {
+      "id": "shield.outcast", "arc": "shield", "trigger": "quests_25", "after": ["shield.accused"], "title": "Doors That Close",
+      "variants": [
+        { "text": "There is a particular loneliness in a town where everyone is polite.\n\nNobody threw stones at {w1}. Nobody shouted. The innkeeper said, with real regret, that the rooms were all full. The guild clerk stamped {w1}'s quests with great correctness and without once meeting their eye. The healer at the temple said “Of course” and was very gentle, and looked over {w1}'s shoulder as she said it.\n\nIt rained that night. {w1} slept in a stable. In the morning there was a loaf of bread on the step with no note, and {w1} sat on the step and wept into it, because somebody had broken the rule.\n\nThe giver of the bread, it would turn out later, was {j_baker}." },
+        { "text": "{w1} did the quests anyway.\n\nThat was the strangest part. Nobody wanted {w1} in their party, so {w1} went alone, with a pack and a shield of borrowed wood. {w1} fought slimes and hauled water and carried letters for the people who did not thank them. {firstQuester} the {firstQuesterJob}, who had been first in the guild, stopped {w1} once on the road and said: “For what it's worth, I don't think you did it.”\n\n“Why not?” said {w1}.\n\n“You look too tired,” said {firstQuester}. “Liars are never that tired.”" }
+      ]
+    },
+    {
+      "id": "shield.friend", "arc": "shield", "trigger": "progress_10", "after": ["shield.accused"], "slot": "ally", "sets": ["friend"], "title": "The Innkeeper's Back Room",
+      "variants": [
+        { "text": "{j_innkeeper} did not believe it for a moment.\n\n“I know a liar,” said the innkeeper, on a wet night, pulling {w1} in by the sleeve and shutting the door. “I've served a hundred of them. They drink faster. They don't tip. And they never, ever apologise to the dog.” She jerked a thumb. {w1}, who had apologised to the dog on the way in, looked down. The dog looked up.\n\n“Sit,” said {j_innkeeper}. “There's a room at the back. Nobody ever looks in it. You can sleep there, if you don't mind the barrels.”\n\n“Why?” whispered {w1}.\n\n“Because it's my inn,” said {j_innkeeper}, “and I decide who sleeps in it.”" },
+        { "text": "{j_healer} found {w1} in the temple yard at midnight, binding their own arm.\n\n“Let me,” said {j_healer}, not asking.\n\n“They'll see you.”\n\n“Let them.” {j_healer}'s hands were quick and warm. “My grandmother used to say you can tell what someone is by what they do when no one is watching. You, I'm told, are a thief. Yet here you are, bleeding on my steps, saying sorry for the mess.” She tied off the bandage. “I'm not convinced.”" }
+      ]
+    },
+    {
+      "id": "shield.rumour", "arc": "shield", "trigger": "progress_20", "after": ["shield.accused"], "title": "Who Is Telling It?",
+      "variants": [
+        { "text": "The rumour had a texture, {w1} noticed, if you held it to the light.\n\nIt came to {townA} on a Tuesday and to {townB} on a Thursday, and wherever it went it had the same shape, the same phrases, the same little flourish at the end. *A Chog named {w1}.* *Cultists.* *Lantern oil.* It sounded like something written. It sounded, {w1} thought, like something *rehearsed.*\n\nSo they began to follow it. Backwards, from town to town, through innkeepers and carters and gossips, until they found the first mouth. It belonged to a pleasant, forgettable stranger in a hooded coat, with a silver box in one hand.\n\n“Ah,” said {j_cultist}, for it was they, caught between two fence posts. “You've found me. Well done. It took the others ages.”" },
+        { "text": "“Why me?” said {w1}.\n\n{j_cultist} shrugged. They were tied to a chair in the back room of the inn, and appeared, on the whole, remarkably at ease. “You were nice,” said the cultist. “It's easier to ruin a nice person. They don't expect it. Also, you were on the road, which saves a lot of paperwork.”\n\n“That's all?”\n\n“That's all. Nothing personal. The Demon King likes the Heroes' morale low, and a good scandal does more than a siege.” They smiled, a thin, wan, almost apologetic smile. “It's usually very effective.”\n\n“Not this time,” said {w1}. “Because I'm going to show them.”" }
+      ]
+    },
+    {
+      "id": "shield.proof", "arc": "shield", "trigger": "progress_30", "after": ["shield.rumour"], "slot": "twist", "sets": ["proof"], "weight": 2, "title": "The Proof",
+      "variants": [
+        { "text": "The cultist's letters were found in a hollow oak at the edge of {townA}, in a neat, anxious hand: orders, payments, a list of names with {w1}'s at the top.\n\n{w1} did not take them to the guild. {w1} took them to {w2}.\n\nThe two of them sat across a scarred table in the quiet back room, with the lantern burning low, and {w1} put the papers down between them.\n\n“I know who paid you,” said {w1}, gently. “I know why. I'm not going to ask you to say it.”\n\n{w2} looked at the letters. For a long time they said nothing. Then they put their head in their hands and said, in a muffled voice: “I'm sorry. I'm so sorry. I didn't think it would be like this.”\n\n“No,” said {w1}. “Nobody does.”" }
+      ]
+    },
+    {
+      "id": "shield.trial", "arc": "shield", "trigger": "progress_30", "after": ["shield.rumour"], "slot": "twist", "sets": ["trial"], "weight": 1, "title": "The Trial at {townA}",
+      "variants": [
+        { "text": "They tried {w1} in the market square of {townA}, because it was the only hall large enough.\n\n{cand1} spoke for the prosecution, with obvious distaste. {w2} gave evidence, and could not look at the dock. A hundred townsfolk stood in the rain, watching. Then {j_innkeeper} stood up at the back and said: “Let them speak.”\n\n{w1} did, simply, for a quarter of an hour. They did not shout. They did not weep. They told it as it was: the road, the help, the bread. And at the end they said, “I can't prove I didn't. But I can ask you to look at what I did.”\n\nThe square was quiet. Then, very slowly, one hat came off. Then another. It was not an acquittal. It was something better: the beginning of a doubt." }
+      ]
+    },
+    {
+      "id": "shield.low", "arc": "shield", "trigger": "progress_55", "after": ["shield.accused"], "title": "The Lowest Night",
+      "variants": [
+        { "text": "{w1} had stopped counting nights.\n\nThe truth had been told, in part. {w2} had confessed. The handbills had been taken down. But rumour is a wet thing, hard to wring out, and long after the facts were known, there were still doors that opened a little slower for {w1} than for others. A little more thought. A little more care.\n\nOn the fifty-fifth part of the season, in a roadside shrine in the rain, {w1} sat alone and wondered aloud whether any of it had been worth it.\n\n“You do know,” said a gruff voice from the doorway, “that you saved my town.”\n\n{j_soldier}, the soldier, was standing there, soaked, dripping, awkward as a heron. “I came to say thank you. It took me a while. I'm not good at it.” They held out a flask. “It's terrible. Drink it anyway.”" }
+      ]
+    },
+    {
+      "id": "shield.turn", "arc": "shield", "trigger": "progress_60", "after": ["shield.low"], "title": "The Street That Opened",
+      "variants": [
+        { "text": "A year of loneliness can be undone in an afternoon.\n\nIt began with a single door, in {townA}. The baker's. It opened, and {j_baker} stepped out into the street and called, loud and clear, “{w1}! Over here! There's a bun with your name on it!”\n\nAnd then the next door opened. And the next. People came out into the street, slowly, shyly, with the faces of people who have been ashamed for a long time and aren't sure how to stop. Nobody made a speech. They simply came and stood, in a long untidy line, and each of them held something: a loaf, a blanket, a coin, a flower.\n\n“We were wrong,” said the baker. “We were all wrong. It won't ever be enough. But we're here.”\n\n{w1} stood in the middle of the street, in the rain, and did not say anything for a long time." }
+      ]
+    },
+    {
+      "id": "shield.march", "arc": "shield", "trigger": "phase_3", "title": "The Shield Goes South",
+      "variants": [
+        { "text": "{w1} walked at the head of the column, because nobody could think of a reason they shouldn't.\n\nBehind them marched the whole of Monadia: soldiers and farmers, bakers and bards, even the innkeeper, who had left the dog in charge. They did not cheer. They did not sing. They simply walked, steadily, in the thin spring light, towards the black glass. Somewhere in the columns, {w2} had a pack twice their size, a quiet face, and the look of someone paying a debt with every step.\n\n“You don't have to carry that,” said {w1}.\n\n“Yes,” said {w2}. “I do. But thank you.”" }
+      ]
+    },
+    {
+      "id": "shield.final", "arc": "shield", "trigger": "hero", "after": ["shield.march"], "title": "The Shield Holds",
+      "variants": [
+        { "text": "In the throne room, {king} spoke to {w1}, only to {w1}, in a voice like a closing door.\n\n“They called you a thief,” said the Demon King. “A traitor. They shut their doors on you. I could have given you everything, and I would not have asked for a thing in return. You could have simply let them burn.”\n\n“I know,” said {w1}.\n\n“Why didn't you?”\n\n{w1} lifted the plain wooden shield they had carried for a whole season. It was battered, scorched, and held together with string. “Because it's not about them,” said {w1}. “It's about what I'd be.”\n\nThat was when {hero} struck, and the black glass broke, and the shield, which had held all season, held one last time." }
+      ]
+    },
+    {
+      "id": "shield.ending", "arc": "shield", "trigger": "season_end", "after": ["shield.final"], "title": "Epilogue: A Good Name",
+      "variants": [
+        { "text": "In the end, {w1} was given a name.\n\nIt was not the one in the handbills, nor the one on the slip of paper. It was a plain old bard's name, one the children chose: *the Shield*. Because that was what {w1} had been: a shield for everyone, including the ones who had thrown the stones.\n\nThere is a corner in the market of {townA} where a wooden shield hangs on a hook. It is battered and scorched, held together with string. A small brass plate beneath it says: *To those who kept going.* On the side, in smaller letters, a later hand has added: *and to those who were sorry.*" }
+      ]
+    }
+  ]
+}

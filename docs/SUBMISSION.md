@@ -15,8 +15,8 @@ Every claim below is backed by [DEMO.md](DEMO.md). Before pasting, re-check anyt
 | Description, maximum 8,000 characters | See [Description](#description) below |
 | Why the Chog NFT is essential | See [Why the Chog NFT is essential](#why-the-chog-nft-is-essential) below |
 | Working app URL | https://chogsekai.vercel.app/play |
-| Demo video, maximum three minutes | **To record**; outline in [Video outline](#video-outline) |
-| Banner | **To add** in `assets/` (the key art is the obvious choice; its source and rights need confirming first) |
+| Demo video, maximum three minutes | Produced locally (2:51, 1080p, AI voices, captions): `video/out/ChogSekai_demo.mp4` with `ChogSekai_demo.srt`, see [DEMO_VIDEO.md](DEMO_VIDEO.md). Not yet uploaded: upload as unlisted YouTube or Google Drive "anyone with the link", then check it opens while signed out |
+| Banner | **To add** in `assets/`; source in `video/mograph/banner.html` (rendered by `video/shot_banner.mjs`). Confirm the key art may be published |
 | Repository | https://github.com/Harshyadav442277/Chogathon |
 | Tech stack | See [Tech stack](#tech-stack) below |
 | Pre-existing work and attribution | See [Existing work and attribution](#existing-work-and-attribution) below |
@@ -81,7 +81,7 @@ Length: about 2,400 characters, well under the 8,000 limit.
 **(check)** The judge Chog ids in Vercel (`JUDGE_CHOG_IDS`; DEPLOY.md lists 173, 681, 875, 1007, 1420).
 ## Video outline
 
-Max 3 minutes; upload unlisted to YouTube or Drive (anyone with the link, Viewer) and open it while signed out.
+The produced cut is described in [DEMO_VIDEO.md](DEMO_VIDEO.md); this outline was the first plan. Max 3 minutes; upload unlisted to YouTube or Drive (anyone with the link, Viewer) and open it while signed out.
 
 1. 0:00–0:20: key art, title, "every Chog Genesis NFT lives in this world".
 2. 0:20–0:50: the continent from above, then zoom into a town: Chogs working in their outfits, a party at the guild.

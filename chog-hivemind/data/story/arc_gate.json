@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "gate.premise", "arc": "gate", "trigger": "season_start", "slot": "premise", "title": "The Window Opens",
+      "variants": [
+        { "text": "The first thing that happened was the window.\n\nIt opened in the air in front of {w1}, a pale rectangle of light with grey text on it, and the text said:\n\n*NAME: {w1}. CLASS: {w1job}. LEVEL: 1. HP: 100/100.*\n\nBeneath that, a row of small grey boxes, most of them empty. Beneath *that*, a line of text in a different colour: *WELCOME TO MONADIA. YOU CANNOT LEAVE UNTIL THE GATE OPENS. THE GATE OPENS WHEN THE FINAL BOSS FALLS.*\n\n“Final boss,” said {w2}, beside them, staring at an identical window. “They've made it a *game*.”\n\n“It's not a game,” said {w3}, quite quietly, “if you can't log out.”\n\nAbove them, in the sky, a great grey door shimmered into being, ringed with chains, and the chains were counting down." },
+        { "text": "It is hard to describe the sound of a world locking.\n\nIt was a sort of *thunk*, in the bones, as if a vast key had turned in a vast door somewhere above the clouds. {w1} felt it in their teeth. Then the windows opened, tens of thousands of them, all across the sky, and each one said the same thing in the same flat grey type:\n\n*YOU ARE IN MONADIA. THE GATE IS CLOSED.*\n\n*THE GATE WILL OPEN WHEN {king} FALLS.*\n\n*YOU HAVE ONE LIFE. USE IT WELL. (THE TEMPLES WILL RETURN YOU, BUT NOT ALWAYS UNCHANGED.)*\n\n{w1} the {w1job} read it three times. Beside them, {w2} said, in a small voice: “Does this mean no more going home?”\n\n“Not yet,” said {w1}, and wished they sounded surer." }
+      ]
+    },
+    {
+      "id": "gate.rules", "arc": "gate", "trigger": "season_start", "after": ["gate.premise"], "title": "The Rules, As Written",
+      "variants": [
+        { "text": "They did not trust the rules at first. It is hard to trust rules that appear in the air.\n\nBut the rules were consistent, which in the long run was more useful than being kind. There were ranks: F, E, D, C, B, A, S. There were levels, and every level cost a little more experience than the last. There were skills, to a maximum of six per Chog, and it mattered which six. There were quests, graded by difficulty, each with a clear reward and a clear risk. There were bosses, which could be fought, and a final boss, which could not be fought yet.\n\n“It's actually,” said {w2}, after studying the thing for an hour, “rather fair.”\n\n“Fair,” said {w3}, “is not the same as kind.”\n\n“No,” agreed {w2}. “But it's a start.”" },
+        { "text": "*RULE 1: A CHOG MAY HOLD SIX SKILLS.*\n*RULE 2: A CHOG WHO FALLS IS RETURNED TO THE TEMPLE.*\n*RULE 3: A BOSS DOES NOT FALL BEFORE ITS TIME.*\n*RULE 4: THE GATE OPENS ONLY FOR A HERO.*\n\n{w1} read the fourth rule a number of times. “Only for a hero,” said {w1}. “What counts as a hero?”\n\nThe window thought for a moment. *THE ONE WHO DEFEATS THE FINAL BOSS.*\n\n“And if nobody does?”\n\nThe window did not answer. Above it, in the sky, the chains on the great grey door gave a small, patient clink." }
+      ]
+    },
+    {
+      "id": "gate.table", "arc": "gate", "trigger": "progress_10", "after": ["gate.rules"], "slot": "ally", "sets": ["table"], "title": "The Round Table of Guildmasters",
+      "variants": [
+        { "text": "The first thing the Chogs did, once they understood the rules, was to organise.\n\nIt was {cand1}'s idea, and then {cand2}'s, and then everyone else's, so that by the end of the second week there was a long round table in the capital, and at it sat the masters of every craft: {j_blacksmith} for the smiths, {j_alchemist} for the potion-makers, {j_librarian} for the lore, {j_merchant} for the trade, {j_healer} for the temples. And at the head of it, not by election but by default, sat {cand1} the {cand1job}.\n\n“Rules,” said {cand1}. “First: nobody fights alone. Second: nobody starves. Third: any Chog who wants to climb a floor gets a party.”\n\n“And fourth?” said {j_merchant}.\n\n“Fourth,” said {cand1}, “we do not become like the ones who made this.”" }
+      ]
+    },
+    {
+      "id": "gate.lone", "arc": "gate", "trigger": "progress_10", "after": ["gate.rules"], "slot": "ally", "sets": ["lone"], "title": "The Solo Climber",
+      "variants": [
+        { "text": "Some people do not like tables.\n\n{cand1} the {cand1job} went up the first dungeon alone, at dawn, without telling anyone, and came back two days later at level four with a coat in tatters and a face like a clenched fist. They did not say how. Within the week, {cand1} had cleared a floor nobody else had even found, and been offered fourteen places in fourteen parties, all of which they declined.\n\n“Why?” asked {cand2}.\n\n“Because if I lose,” said {cand1}, “I only lose myself.”\n\nIt was, {cand2} thought, one of the loneliest things they had ever heard anyone say. And also, undeniably, one of the most effective." }
+      ]
+    },
+    {
+      "id": "gate.floor", "arc": "gate", "trigger": "progress_20", "after": ["gate.rules"], "title": "The First Floor",
+      "variants": [
+        { "text": "The first dungeon was easy, they said, and then people started dying in it.\n\nNot permanently, thank the temples, but enough to learn. A party of six went in with confidence and came out in four with a story: a corridor that rearranged itself, a hall of mirrors, a boss with a name like a cough. The next party went in with a map. The third party went in with the map and a note from the second, and came out whole, and sold the improved map to the fourth.\n\nBy the end of the month there was a guild shop, in a corner of the capital, selling maps at a fair price. It was called *Second Attempt*.\n\n“We're learning,” said {j_librarian}, drily. “That's the thing about rules. You can always find the shape of them, if you fall into them often enough.”" },
+        { "text": "{w1} fell off the edge of a floor, which the window had not mentioned was possible.\n\n*FALL DAMAGE: 18. HP: 82/100.*\n\n“Not bad,” muttered {w1}, picking themselves up. “The rules are consistent, at least.”\n\nThere was something deeply comforting in it, in the end. Back home, a fall might do anything. Here, a fall did eighteen. You could plan around eighteen. You could be brave around eighteen, which is a different thing from being brave around the unknown, and a good deal easier." }
+      ]
+    },
+    {
+      "id": "gate.exploit", "arc": "gate", "trigger": "progress_30", "after": ["gate.rules"], "slot": "twist", "sets": ["exploit"], "weight": 2, "title": "The Loophole",
+      "variants": [
+        { "text": "It was {j_librarian} who found it, in the third week, in the small print.\n\n“Rule four,” said the librarian, tapping the air where the window floated. “*The gate opens only for a hero.* But look at the grammar. It doesn't say the hero must be one person.”\n\nThere was a silence round the table.\n\n“It says *a* hero,” said {cand1}, slowly. “Not *the*.”\n\n“Exactly. Which means that a party... a guild... a *nation*... could do it together.”\n\nIt was the most important sentence of the season. Within the week, the Round Table had issued a single order: *everyone climbs.*" },
+        { "text": "{w1} found the loophole by accident, while trying to buy a pie.\n\nThe window offered a menu: pie, 5 coins. And below it, in grey, a small, strange line: *SKILL SLOT AVAILABLE: 7.* Nobody had a seventh slot. The rules said six. {w1} stared at the line, and then, very carefully, tried to take a pie with it.\n\nThe pie appeared. And {w1}'s Status Window blinked, and shuffled, and then added, at the bottom, in a hurry, as if hoping nobody would notice: *SKILL: IMPROVISE.*\n\n“Right,” whispered {w1}. “So the rules have a seam.”" }
+      ]
+    },
+    {
+      "id": "gate.death", "arc": "gate", "trigger": "progress_30", "after": ["gate.rules"], "slot": "twist", "sets": ["costly"], "weight": 1, "requires": "firstFallen", "title": "Rule Two, Enforced",
+      "variants": [
+        { "text": "It was said the temples would return them. And they did, until one day they did not.\n\n{firstFallen} went down in a dungeon in the thirtieth part of the season and the Return did not come. The temple bells did not ring. The candle on the altar guttered and went out. When the healers finally reached the place, there was only a pile of equipment, and a Status Window, flickering, which read: *RETURN DELAYED.*\n\nIt came back, in the end, an hour later, with a gasp, and a scrabbling of paws. But the hour had cost them all something. Everyone in Monadia now knew that Rule Two had an asterisk, and nobody knew how big it was.\n\n“Don't go alone,” said the healers, afterwards, to anyone who would listen. “Please. Not alone.”" }
+      ]
+    },
+    {
+      "id": "gate.warden", "arc": "gate", "trigger": "progress_55", "after": ["gate.rules"], "title": "The Voice in the Window",
+      "variants": [
+        { "text": "At the fifty-fifth part of the season, every Status Window in Monadia lit up at once, and the grey text changed.\n\n*I SEE YOU HAVE FOUND THE SEAM,* it said. *I HAD HOPED YOU WOULD NOT.*\n\nThe whole country went quiet.\n\n*I AM NOT THE ONE WHO MADE THE RULES,* said the voice. *I AM THE ONE WHO KEEPS THEM. DO NOT MISTAKE THE TWO. THE GATE IS CLOSED BECAUSE I WAS ORDERED TO CLOSE IT. I HAVE NOT BEEN ORDERED TO LIKE IT.*\n\nThen, after a pause, almost shyly: *IF A HERO WERE TO REACH THE BLACK THRONE, I WOULD NOT STAND IN THE WAY.*\n\n“It's lonely,” whispered {w1}, to the sky. “The thing that keeps the rules is lonely.”" }
+      ]
+    },
+    {
+      "id": "gate.crack", "arc": "gate", "trigger": "progress_60", "after": ["gate.warden"], "title": "A Crack of Light",
+      "variants": [
+        { "text": "The great grey door in the sky had been counting down since the first day. At the sixtieth part, it stopped.\n\nA crack opened along the top of it, a single bright seam, and through it, for the first time, light came in: ordinary, yellow, afternoon light, as from a window in a house a long way away. It lay across the black hill for an hour. People stood in it and shut their eyes. Somebody, somewhere, wept.\n\n“Nine more,” said {cand1}, quietly. “Nine more, and that door is open.”\n\nThey did not need to say what the nine were. They were seals, and bosses, and a Demon King. But after so long in the grey, even the idea of the light was enough." }
+      ]
+    },
+    {
+      "id": "gate.march", "arc": "gate", "trigger": "phase_3", "title": "The Last Floor",
+      "variants": [
+        { "text": "The last floor was not a dungeon. It was the black hill, and the castle on it, and the long road between.\n\nMonadia climbed it all together: parties of six, then of twelve, then of a hundred, shield by shield, in a slow glittering spiral. The windows overhead had stopped showing numbers. They showed names: every Chog's name, all of them, climbing.\n\nAt the top, the throne room doors stood open. In the dim hall beyond, the final boss waited, as the rules said it would, because rules, once they are written, must be obeyed even by the ones who wish they hadn't been." }
+      ]
+    },
+    {
+      "id": "gate.final", "arc": "gate", "trigger": "hero", "after": ["gate.march"], "title": "Gate Open",
+      "variants": [
+        { "text": "The final boss fell to {hero}.\n\nIt was not dramatic. A single, clean, level-{heroLevel} strike, and a sound like a great lock turning the other way. Then, all over the continent, in every Status Window, the grey letters changed:\n\n*{king}: DEFEATED.*\n*HERO: {hero}.*\n*THE GATE IS OPEN.*\n\nIn the sky the great door swung wide. Daylight poured through, strange and bright, smelling faintly of somebody's kitchen. A great sigh went up from the Chogs of Monadia, who had been holding their breath for a season.\n\n“Now,” said {w1}, wiping their eyes. “Where were we?”" }
+      ]
+    },
+    {
+      "id": "gate.ending", "arc": "gate", "trigger": "season_end", "after": ["gate.final"], "title": "Epilogue: The Door Left Ajar",
+      "variants": [
+        { "text": "In the end, not all of them went through.\n\nSome did, with tears and shouting and a great hurry. Some stayed on the threshold, looking back at the town, the road, the black hill gone green. {w1} stood there a long time, with one hand on the frame of the great door, and listened to the sounds behind: a market, a fiddle, a baker shouting.\n\n“You coming?” said {w2}.\n\n“In a minute.”\n\nThe window opened one last time in the air, small and polite. *DO YOU WISH TO LEAVE?* it asked. And {w1}, who had been asking themselves the same thing for a season, looked at the world they had saved, and for the first time in a long time, smiled.\n\nThey pressed *NOT YET*." }
+      ]
+    }
+  ]
+}

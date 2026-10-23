@@ -1,0 +1,10 @@
+import { chromium } from "playwright-core";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+const b = await chromium.launch({ channel: "chrome", headless: true, args: ["--allow-file-access-from-files"] });
+const p = await (await b.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 })).newPage();
+await p.goto(pathToFileURL(path.resolve("mograph/banner.html")).href, { waitUntil: "load" });
+await p.evaluate("document.fonts.ready"); await p.waitForTimeout(1500);
+await p.screenshot({ path: "out/ChogSekai_banner.png" });
+await p.screenshot({ path: "out/ChogSekai_banner.jpg", type: "jpeg", quality: 92 });
+await b.close();

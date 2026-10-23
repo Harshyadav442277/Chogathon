@@ -1,0 +1,72 @@
+{
+  "nodes": [
+    {
+      "id": "misfits.premise", "arc": "misfits", "trigger": "season_start", "slot": "premise", "title": "The Worst Party in Monadia",
+      "variants": [
+        { "text": "The guild clerk looked at the three slips of paper on the counter, then at the three Chogs standing in front of them, then at the slips again.\n\n“{w1job},” said the clerk, to {w1}. “{w2job},” to {w2}. “And {w3job}.” They put down the stamp. “Is this a joke?”\n\n“No,” said {w1}.\n\n“It's the combination,” said {w2}. “We got sorted together.”\n\n“Nobody sorts people together like this,” said the clerk. “The system has a *quality check*.”\n\n“It must have been busy,” said {w3}, cheerfully.\n\nThe clerk stamped the form, with the air of one signing a death warrant, and wrote across the top, in letters of lurid red: PARTY OF THREE. CAUTION. Then, after some thought, underneath: *good luck.*" },
+        { "text": "Let us be honest about the party. It was bad.\n\n{w1} the {w1job} could not find the front of a dungeon in broad daylight. {w2} the {w2job} had a fear of heights and a love of cliffs. {w3} the {w3job} was brave, loyal and, regrettably, on fire about once a week. They had been put together by a guild clerk with a sense of humour, and a goose had joined them within the first hour, uninvited, and shown no sign of leaving.\n\n“We'll be fine,” said {w1}.\n\nThe goose honked.\n\n“It says we'll be fine,” translated {w2}.\n\n“That's not what it said,” said {w3}, quietly, with a long, sad look at their hat." }
+      ]
+    },
+    {
+      "id": "misfits.first", "arc": "misfits", "trigger": "season_start", "after": ["misfits.premise"], "title": "The First Quest, Mostly",
+      "variants": [
+        { "text": "The first quest was to retrieve a cart from a ditch.\n\nIt was the easiest thing on the board. It was a cart. It was in a ditch. How hard could it be? {w1} lowered the rope. {w2} (too afraid to look down) held it. {w3} (cheerfully) lit a torch, to see better.\n\nThe cart was covered in straw. The straw was flammable. The ditch was full of oil. The cart, to everyone's amazement, was found not in the ditch but at the bottom of the hill, where it had gone by itself, with a goose on top.\n\n“Quest complete?” said {w1}, hopefully, to the guild clerk.\n\n“Technically,” said the clerk, “you burned down a hill.”\n\n“Is that a no?”\n\n“It's a ‘we've never had to ask that before’.” They stamped the form, resignedly. “Quest complete. Never come back.”" },
+        { "text": "“What's the plan?” said {w2}.\n\nThey were standing at the mouth of a cave, in the rain, at the start of their very first mission, and none of them had thought to bring a map, or a lantern, or any food, but {w3} had brought a small cake.\n\n“The plan,” said {w1}, “is that we go in, we find the thing, we come out.”\n\n“That's not a plan. That's a *direction*.”\n\n“It's what we've got.”\n\nThey went in. The cave was shallow, damp and empty, apart from an old man doing his washing. “Sorry,” said {w1}. “Wrong cave.” The old man waved. The goose, behind them, honked politely, and the three of them set off for the next one." }
+      ]
+    },
+    {
+      "id": "misfits.mascot", "arc": "misfits", "trigger": "progress_10", "after": ["misfits.first"], "slot": "ally", "sets": ["goose"], "title": "The Goose Has a Name",
+      "variants": [
+        { "text": "The goose had been with them for ten days, and nobody had named it.\n\n“It deserves a name,” said {w2}. “It has saved us three times.”\n\n“It has bitten me eleven,” said {w3}.\n\n“Sir Honkalot,” suggested {w1}.\n\nThe goose looked at {w1} with dull contempt and went on eating a boot. “It's not keen,” said {w2}.\n\n“Mrs. Gander?”\n\n“Terrible.”\n\n“The Duke?”\n\nThe goose stopped, raised its head, and honked. “Well,” said {w1}. “That's settled then.” And from that day forward, the Duke was the fourth member of the party, and the only one who ever had a clear sense of what he was doing." }
+      ]
+    },
+    {
+      "id": "misfits.sage", "arc": "misfits", "trigger": "progress_10", "after": ["misfits.first"], "slot": "ally", "sets": ["sage"], "title": "The Sage Who Quit",
+      "variants": [
+        { "text": "They found the old master at the bottom of a well.\n\nNot in a dramatic way; the master had merely gone down for a quiet think, and then lost the rope. “Hello,” said {w1}, peering over the edge. “Do you need a hand?”\n\n“Not at all,” said a voice from below. “I like it here. Go away.”\n\nIt took the party four hours to haul the master up, and a further hour to discover that they were the greatest living teacher of combat in the whole of Monadia. “I retired,” said the master, sourly, dripping on the grass. “Last season. Over the matter of the apprentices.”\n\n“What happened to them?”\n\n“They kept *improving.*” The master looked at {w1}, at {w2}, at {w3}, and sighed. “Well. Perhaps you won't.”" }
+      ]
+    },
+    {
+      "id": "misfits.disaster", "arc": "misfits", "trigger": "progress_20", "after": ["misfits.first"], "title": "The Dungeon, Briefly",
+      "variants": [
+        { "text": "It is a little-known fact that the party broke into the dungeon of {dungeonA} by accident.\n\nIt was a door. It said STAFF ONLY. They had assumed this meant a place with staff, a kitchen, perhaps, or a quiet storeroom. It meant, in fact, the antechamber of {g1}, who was at that moment having tea.\n\n“Oh,” said {g1}.\n\n“Oh,” said {w1}.\n\n“I have *guests*,” said the General, very quietly.\n\nThere followed an event of such stupendous chaos that the guild still has trouble describing it. A chandelier fell. A cake was thrown. The goose bit a cultist. {w3} caught fire again. And at the end of it, by a combination of luck, terror and a freak accident involving a trapdoor, {g1}'s favourite throne was destroyed and the party was out on the road, running, laughing, covered in jam.\n\nThe Demon King's report, later, was a single sentence: *Please send better enemies.*" }
+      ]
+    },
+    {
+      "id": "misfits.rival", "arc": "misfits", "trigger": "progress_30", "after": ["misfits.first"], "slot": "twist", "sets": ["rival_party"], "weight": 2, "title": "The Competent Party",
+      "variants": [
+        { "text": "There is always a competent party.\n\nIn this case it was {cand1}'s, who had four members, a matching uniform, a printed rota, and a sponsored banner. They passed the misfits on the road to {townB} in perfect order, with perfect gear, and said, in perfect politeness: “Good morning. Are you lost?”\n\n“No,” said {w1}, with dignity.\n\n“We are completely lost,” said {w2}, at the same moment.\n\nThe competent party smiled with infinite compassion, and rode on. The misfits watched them go. “One day,” said {w3}, “we will beat them.”\n\n“We will not,” said {w2}, “but it's nice to think so.”\n\nThe goose honked, and bit the passing banner, and tore a small, satisfying hole in it." }
+      ]
+    },
+    {
+      "id": "misfits.luck", "arc": "misfits", "trigger": "progress_30", "after": ["misfits.first"], "slot": "twist", "sets": ["lucky"], "weight": 1, "title": "Everything Goes Right",
+      "variants": [
+        { "text": "The terrifying thing happened in the thirtieth part of the season.\n\nEverything went right.\n\nThe party entered a cave and found a treasure chest. They opened it and found no trap. They took the treasure to the guild and were paid in full. They walked home through a field and nobody set fire to it. It was so unnerving that {w2} sat down on a fence, quivering.\n\n“Something's wrong,” said {w2}.\n\n“Nothing's wrong,” said {w1}. “Things are *fine*.”\n\n“That's what's wrong!”\n\nThe goose, which had not been invited to the conversation, honked, and the fence collapsed, and everything returned abruptly to normal. All three of them sighed with relief." }
+      ]
+    },
+    {
+      "id": "misfits.big", "arc": "misfits", "trigger": "progress_55", "after": ["misfits.first"], "title": "The Plan",
+      "variants": [
+        { "text": "They had a plan. This was alarming.\n\nIt was {w3}'s, devised at three in the morning in a hay-loft, written on the back of a menu in pencil. It involved a distraction, a bag of flour, the goose, and a very large cheese. It had seven steps, of which {w1} understood four, {w2} two and {w3} none, since {w3} had written it half asleep.\n\n“What does step five say?” said {w1}.\n\n“‘Trust the goose,’” read {w2}.\n\n“And step six?”\n\n“‘Run.’”\n\n“That's the best one,” said {w1}, folding the paper and tucking it into their hat. “We're going to be fine.”\n\nThey were not fine. But, by an amazing series of accidents, they were *right*." }
+      ]
+    },
+    {
+      "id": "misfits.save", "arc": "misfits", "trigger": "progress_60", "after": ["misfits.big"], "title": "The Accidental Rescue",
+      "variants": [
+        { "text": "Nobody planned to rescue {townA}.\n\nThey were simply passing through, in disgrace, having been banned from the guild for a minor incident involving a priest, a trampoline and a barrel of pickles. And as they came over the hill, they saw the raiders, a ragged tide of dark knights at the gate, and the people of {townA} huddled behind a wall of barrels, looking exactly as hopeful as you would expect.\n\n“Well,” said {w1}. “We can't just *leave*.”\n\n“Why not?” said {w2}.\n\n“Because it's rude.”\n\nThe goose charged. The rest, as they say, was chaos, and flour, and a very surprised dark knight in a bucket. By dusk, the raiders had fled, and the townspeople were carrying the three misfits round the square on their shoulders, and nobody could quite say how it had happened." }
+      ]
+    },
+    {
+      "id": "misfits.final", "arc": "misfits", "trigger": "hero", "after": ["misfits.big"], "title": "Meanwhile, At the Back",
+      "variants": [
+        { "text": "It was {hero} who struck the blow, as the bards will tell you.\n\nBut it was the misfits who held the door. Nobody asked them to. The great doors of the throne room were closing, the dark knights streaming through, and into the gap, with no thought for safety, charged a {w1job}, a {w2job}, a {w3job}, and a goose.\n\n“HOLD!” roared {w1}, with no real idea what it meant.\n\n“HOLD!” echoed {w2}, in a high, strangled voice.\n\n“Where's the cake?” said {w3}.\n\nIt was the stupidest defence in the history of the war, and it worked for a full minute, which was exactly the minute that {hero} needed. Afterwards, when {king} lay down, and the green came in, the misfits sat in a row on the broken steps, soot-streaked and triumphant, and shared a very small cake." }
+      ]
+    },
+    {
+      "id": "misfits.ending", "arc": "misfits", "trigger": "season_end", "after": ["misfits.final"], "title": "Epilogue: The Worst Party, Remembered",
+      "variants": [
+        { "text": "There is a statue in the market of {townA}.\n\nIt is not a grand statue. It is three small Chogs and a goose, in bronze, in a pose of chaos, with a plaque that reads: *To the Party Nobody Wanted.* On the first day of each season the children come and lay a pickle on it. Nobody knows why. It is simply tradition.\n\nAs for the party themselves, they went back to the guild, and the clerk looked up, and sighed. “Not you three,” said the clerk.\n\n“It's us,” said {w1}.\n\n“Please, anything but you.”\n\n“There's a new quest on the board,” said {w2}, hopefully.\n\nThe clerk closed their eyes. “Fine,” they said. “Fine. What is it this time?”" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+ "duration": 21.2,
+ "items": [
+  {
+   "kind": "lower",
+   "t": [
+    0.9,
+    6.4
+   ],
+   "title": "Monadia",
+   "sub": "Ten regions, one living continent"
+  },
+  {
+   "kind": "region",
+   "t": [
+    2.4,
+    5.27
+   ],
+   "eyebrow": "Region 1",
+   "text": "The Hive Capital"
+  },
+  {
+   "kind": "region",
+   "t": [
+    6.69,
+    9.39
+   ],
+   "eyebrow": "Region 2",
+   "text": "Emberforge Peaks"
+  },
+  {
+   "kind": "region",
+   "t": [
+    10.81,
+    13.51
+   ],
+   "eyebrow": "Region 3",
+   "text": "Tidecry Coast"
+  },
+  {
+   "kind": "region",
+   "t": [
+    14.93,
+    17.63
+   ],
+   "eyebrow": "Region 4",
+   "text": "Prism Expanse"
+  },
+  {
+   "kind": "region",
+   "t": [
+    18.68,
+    20.95
+   ],
+   "eyebrow": "Region 5",
+   "text": "The Hollow"
+  },
+  {
+   "kind": "lower",
+   "t": [
+    13.45,
+    17.65
+   ],
+   "title": "Plays in your browser",
+   "sub": "No install, nothing to download",
+   "style": {
+    "bottom": "250px"
+   }
+  },
+  {
+   "kind": "callout",
+   "t": [
+    16.06,
+    20.95
+   ],
+   "title": "Star Stream",
+   "sub": "The world narrates itself, live",
+   "lx": 640,
+   "ly": 905,
+   "sx": 640,
+   "sy": 950,
+   "x": 560,
+   "y": 960
+  }
+ ]
+}

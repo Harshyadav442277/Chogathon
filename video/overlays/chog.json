@@ -1,0 +1,68 @@
+{
+ "duration": 23.3,
+ "items": [
+  {
+   "kind": "callout",
+   "t": [
+    3.41,
+    8.01
+   ],
+   "title": "Real NFT, real traits",
+   "sub": "Eyes, mouth, head and tier shape the personality",
+   "lx": 860,
+   "ly": 150,
+   "sx": 1400,
+   "sy": 215,
+   "x": 1584,
+   "y": 196
+  },
+  {
+   "kind": "lower",
+   "t": [
+    7.45,
+    13.25
+   ],
+   "title": "Life Story",
+   "sub": "A biography written by the story graph",
+   "style": {
+    "left": "40px",
+    "top": "150px",
+    "bottom": "auto",
+    "minWidth": "0",
+    "maxWidth": "430px"
+   }
+  },
+  {
+   "kind": "lower",
+   "t": [
+    12.68,
+    18.28
+   ],
+   "title": "Bonds, rumours, legacy",
+   "sub": "From this Chog's own history",
+   "style": {
+    "left": "40px",
+    "top": "330px",
+    "bottom": "auto",
+    "minWidth": "0",
+    "maxWidth": "430px"
+   }
+  },
+  {
+   "kind": "lower",
+   "t": [
+    14.39,
+    23.05
+   ],
+   "title": "Past lives",
+   "sub": "Remembered across seasons",
+   "style": {
+    "left": "40px",
+    "top": "510px",
+    "bottom": "auto",
+    "minWidth": "0",
+    "maxWidth": "430px"
+   }
+  }
+ ]
+}

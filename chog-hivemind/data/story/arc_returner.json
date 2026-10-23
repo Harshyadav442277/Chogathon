@@ -1,0 +1,85 @@
+{
+  "nodes": [
+    {
+      "id": "returner.premise", "arc": "returner", "trigger": "season_start", "slot": "premise", "title": "The Bench at the Crossroads",
+      "variants": [
+        { "text": "{w1} wakes on a bench.\n\nThe bench is at a crossroads, under a lantern that has not been lit by anybody, and it is the third thing {w1} knows. The first is the taste: ash, and iron, and something sweet. The second is the pain, which has gone already, like a wave pulling back from the sand. The third is the bench.\n\n“I was dead,” says {w1}, to nobody.\n\nThen the slip of paper in {w1}'s paw says {w1job}, and a few paces away {w2} is sitting up in a nightshirt, and {w3} is rubbing their eyes under the same lantern, and the whole world is brand new and very cold. Nobody else seems to remember dying.\n\n{w1} remembers. {w1} remembers a black hill, a throne of glass, a green dawn that never came. {w1} remembers failing.\n\nThe day begins. It is the first day of Season {season}. It will not, {w1} suspects, be the first time." },
+        { "text": "The thing about waking up is that you assume you were asleep.\n\n{w1} wakes in {w1home}, in a bed that smells of someone else's washing, and the light is falling across the wall exactly the way it fell yesterday. And the day before. And the day before that. For a long moment {w1} lies there with a cold finger tracing down their spine: because yesterday had never happened. Yesterday was the first day. And it was certainly, absolutely, not this.\n\n“Not again,” whispers {w1}, which is a strange thing to whisper to an empty room. Outside, <weather>. A lantern is burning at the crossroads. A crow is circling the same tree it circled in the dream.\n\nThen {w1} sits up, and knows two things at once: that it is Season {season}, and that it is not the first time." },
+        { "text": "A small scratch on the inside of {w1}'s left paw says: *remember.* {w1} does not recall writing it.\n\nThey stare at it for a long while, under the crossroads lantern, in a morning that has begun entirely the way mornings begin in the worst kind of dream. Beside them, {w2} yawns. Beyond, {w3} is checking their slip of paper twice, as if it might change.\n\nIt will say {w3job}. {w1} already knows that. And {w1} knows, with a certainty that has no business in a place so quiet, that in an hour a boy will drop a bucket by the well and cry out, and that in three hours the first demons will cross the north field.\n\n“How do you know?” asks {w2}, later.\n\n{w1} looks at the scratch on their paw. “I've been here before,” says {w1}. And they are not joking." }
+      ]
+    },
+    {
+      "id": "returner.world", "arc": "returner", "trigger": "season_start", "after": ["returner.premise"], "title": "The Rules of the Return",
+      "variants": [
+        { "text": "{w1} works out the rules the way a person works out a cold in the bones.\n\nOne: when {w1} falls, truly falls, the world pulls back and starts again at the crossroads, on the bench, at dawn on the first day. Two: nobody else remembers. Three: each time, something small is lost, a name, a face, the taste of a particular soup. {w1} has already forgotten, for instance, the name of the woman who kept the inn at {townA}. They only know that there was one.\n\nFour is the hardest. Four is that whatever {w1} does, the black hill, the glass throne and {king} are always at the end. The Return does not change the ending. It only lets {w1} try again.\n\nEnough tries, thinks {w1}, and you must learn the way around anything. But there is the rub: every try costs something, and {w1} has already begun to lose count of what." },
+        { "text": "“Say that again,” says {w2}, in the guild hall, over a mug of something hot.\n\n{w1} says it again. They say that they have lived this season before, that the guild will be raided on the third night, that {g1} will wake before the week is out. They say they have died on the black hill more times than they can count, and each time the world puts them back on the bench.\n\n{w2} listens. Then {w2} laughs, kindly, the way you laugh at a friend who has been working too hard. “You need a rest,” says {w2}.\n\nOn the third night, when the demons come over the north field exactly as {w1} said, {w2} stops laughing. Not because {w2} believes. Because it is very hard to laugh at someone who has just pulled you out of the way of a falling beam." }
+      ]
+    },
+    {
+      "id": "returner.believer", "arc": "returner", "trigger": "progress_10", "after": ["returner.world"], "slot": "ally", "sets": ["believer"], "title": "The One Who Listened",
+      "variants": [
+        { "text": "There is a moment, in the loneliest stories, when someone just listens.\n\nFor {w1} it came in a tavern at {townB}, when {cand1}, the {cand1job}, sat down opposite them with a cup of cider and said, “Tell me everything. From the start. I'll know if you're lying.”\n\nIt took three hours. {w1} spoke of black hills, of seals, of generals who made speeches before they struck. {cand1} asked questions: sharp ones, odd ones, the sort that only come from someone who has spent a lifetime listening for the gap between a story and a lie. At the end, {cand1} sat back.\n\n“Well,” said {cand1}. “It's either the truest thing I've ever heard, or you're an extraordinary liar. Either way, I want you on my side.”\n\n{w1}, who had not been believed by anyone for a very long time, did not trust themselves to answer." },
+        { "text": "{cand1} didn't believe a word. They said so, plainly. But they also said: “I'll check it.” And for the next three days, {cand1} the {cand1job} followed {w1} around {townB} with a notebook, marking every prediction.\n\nThe notebook filled up. A dropped bucket at noon. A raven at dusk. A courier with a torn sleeve, arriving from the north at six. Every one correct, and every one in {w1}'s thin, nervous handwriting before it happened.\n\n“All right,” said {cand1}, on the fourth day, closing the book. “I'm a convert. What do we do?”\n\n“Win,” said {w1}. “This time.”" }
+      ]
+    },
+    {
+      "id": "returner.ledger", "arc": "returner", "trigger": "progress_10", "after": ["returner.world"], "slot": "ally", "sets": ["ledger"], "title": "Madame Ledgerwren",
+      "variants": [
+        { "text": "On the outskirts of {townA}, in a house that leaned into the wind, lived a very old Chog called Madame Ledgerwren, who kept a book of mornings.\n\nIt was a huge book, as tall as a child, and every page was a day. Every day she wrote down the weather and who was born and who was buried. “Nobody reads it,” she said, as {w1} stared. “That's rather the point of a book.”\n\n{w1} told her everything. She heard it with her eyes closed. When {w1} finished, she turned back the pages in her great ledger, back and back, and finally put a trembling finger on a line.\n\n“There,” said Madame Ledgerwren. “This morning is written twice. Once in my hand, once in another's. Somebody has been writing it over.” She looked up, and her eyes were kinder than {w1} had expected. “My dear. I think you have been here before. And I think someone is keeping you here.”" }
+      ]
+    },
+    {
+      "id": "returner.warning", "arc": "returner", "trigger": "progress_20", "after": ["returner.world"], "sets": ["warned"], "title": "The Warning Nobody Heeded",
+      "variants": [
+        { "text": "{w1} climbed onto a barrel in the square of {townA} and said, to a market full of listening faces: “Tomorrow, at dusk, the demons will come from the north. Barricade the gate. Fill the buckets. Send the children to the cellar.”\n\nSome of them listened. Most of them smiled politely. A man who sold hats said that he'd heard worse prophecies from better prophets. A woman at the back said she would believe it when she saw it. And {w2}, standing at the edge of the crowd with their arms folded, said nothing at all.\n\nThe demons came at dusk the next day. <demon_pack>. The gate was down in an hour. {w1} sat on the steps of the burning guild hall and thought, quite calmly: *well, that's another one.*\n\n[[raid_held|(There was a faint, bitter irony in it, in fact: the town had held. But it had held in a way {w1} had not planned, and {w1} knew, with a cold pang, that this meant the day had gone off the script, and that nothing, from now on, could be counted on.)]]" },
+        { "text": "“If you had told us,” said the hat-seller, afterwards, standing in the ruins of his shop. “If you'd only said.”\n\n“I did,” said {w1}, very quietly.\n\nIt was the worst thing about the Return. It was not the dying. It was the being right and not being heard. {w1} walked out of {townA} that night with a pack and a burning face and a conviction growing in the middle of the chest: *next time, I will not just warn them. I will make them see.*" }
+      ]
+    },
+    {
+      "id": "returner.cost", "arc": "returner", "trigger": "progress_30", "after": ["returner.world"], "slot": "twist", "sets": ["cost"], "weight": 2, "title": "What the Return Takes",
+      "variants": [
+        { "text": "{w1} woke on the bench, and for a moment could not remember {w2}'s name.\n\nIt was the name of the friend who had stayed up with them through the long nights, the one who had finally, after so many tries, said *I believe you.* It was a plain, short, ordinary name, and it had been taken. In its place was a warm hole, shaped exactly like a name.\n\nIt came back, eventually, in pieces. But it was the first time {w1} understood that the Return was not a gift. It was a trade. Every try bought a chance. Every chance cost a piece of the one who tried.\n\nHow many more tries, thought {w1}, before there's nothing of me left to try with?" },
+        { "text": "It is hard to describe forgetting a face. It is not like losing a coin. It is like finding that a room in your own house has been quietly bricked up.\n\n{w1} forgot the face of {w2} in the third week, between waking and breakfast. They stood in the kitchen of {townB} and looked at their oldest friend with a polite smile, and watched that friend's face go slowly, terribly blank.\n\n“It's me,” said {w2}.\n\n“I know,” said {w1}, who did not. “I just… give me a moment.”\n\nIt was the moment {w1} decided that whatever came next, there would be no more tries. This had to be the last." }
+      ]
+    },
+    {
+      "id": "returner.second", "arc": "returner", "trigger": "progress_30", "after": ["returner.world"], "slot": "twist", "sets": ["second_returner"], "weight": 1, "title": "The Other Who Remembers",
+      "variants": [
+        { "text": "{g3} looked at {w1}, across a hundred yards of dungeon floor, and smiled.\n\nIt was not the smile of a general. It was the smile of an equal. And it said, as clearly as speech: *so you've noticed it too.*\n\n“Oh,” said {w1}, standing very still.\n\n“How many?” called {g3}, pleasantly, as if enquiring after the weather.\n\n“I've lost count,” said {w1}.\n\n“Ah,” said {g3}. “Me too.” And {g3} lifted a hand, and the whole dungeon went dark. When the light came back, {g3} was gone, and on the floor, scratched into the stone in a very neat hand, were three words: *We should talk.*" }
+      ]
+    },
+    {
+      "id": "returner.edge", "arc": "returner", "trigger": "progress_55", "after": ["returner.world"], "title": "The Worst Morning",
+      "variants": [
+        { "text": "Sometimes, in a loop, there is a day that is worse than all the others. For {w1}, it came on the fifty-fifth part of the season, in a morning that began like any other.\n\n{w1} woke on the bench. They did not remember how they had died. That was new. For the first time, the ending had been taken, and {w1} had been given only the aftermath: a blank, a white hush, the taste of nothing at all.\n\n“Something has changed,” said {w1}, aloud, to the lantern, which did not answer.\n\n[[cost|And it was true. The cost of the Returns had finally come due. {w1} had forgotten what they had been trying to save.]][[second_returner|And at the crossroads, leaning on the post with folded arms, a tall dark figure was waiting: {g3}, who said, “I wouldn't. Not this time.”]]" },
+        { "text": "The morning came, and with it came the old familiar chill. {w1} knew the day. It was the day the capital fell, in every loop but one, to a night attack from the east. They had stopped it once. Only once. They did not remember how.\n\nThat was the worst of it: to have won, and to have forgotten the winning.\n\n<dread_line> {w1} stood on the capital wall, with a thin dawn breaking and a thousand demon torches along the horizon, and said what one says at such times: “I'll think of something.”\n\nBehind them, very softly, {w2} said: “We will.” And {w1}, who had forgotten so much, remembered that *we* was the thing they had been missing." }
+      ]
+    },
+    {
+      "id": "returner.break", "arc": "returner", "trigger": "progress_60", "after": ["returner.edge"], "title": "The Loop Breaks",
+      "variants": [
+        { "text": "The thing about a loop is that it needs you to stay on the path.\n\nFor weeks {w1} had been walking it, again and again, trying to be the only hero, the only one who knew. And when {w1} finally stopped, and told {w2}, and {w3}, and {cand1}, and the old baker, everything, and said *I cannot do this alone,* the lantern at the crossroads flickered.\n\nAnd then, for the first time all season, the morning came differently. A bird sang a note {w1} had not heard before. A cart passed the wrong way. A boy dropped a bucket, and did not cry out.\n\n“That's not in the script,” said {w1}, in wonder.\n\n“Good,” said {w2}, and took their hand." },
+        { "text": "“Stop trying to win,” said Madame Ledgerwren, or {cand1}, or the voice in the dream, whichever it was. “Try to be *with*.”\n\nIt sounded like nonsense. It sounded like the kind of thing a bard says to fill a verse. But {w1} was very tired, and out of other ideas, so {w1} tried it. They stopped running ahead. They stopped hoarding what they knew. They sat down in the kitchen at {townB} with everyone they trusted and put the whole map on the table.\n\nThe loop shuddered. It did not break at once. But it loosened, the way a knot loosens when you stop pulling on it, and in the loosening, {w1} saw a way through." }
+      ]
+    },
+    {
+      "id": "returner.march", "arc": "returner", "trigger": "phase_3", "title": "Towards the Glass",
+      "variants": [
+        { "text": "For the first time, {w1} walked the black hill without knowing what was at the top.\n\nIt was terrifying. It was also, they discovered, rather wonderful. Every step was new. Every turn of the path was a surprise. They kept looking over their shoulder for the shadows of earlier attempts, and finding only friends: {w2} with a pack, {w3} whistling out of tune, and {cand1}, the {cand1job}, humming a song nobody had taught them.\n\n“It's almost like living,” said {w1}.\n\n“It *is* living,” said {w2}. “Keep walking.”" }
+      ]
+    },
+    {
+      "id": "returner.final", "arc": "returner", "trigger": "hero", "after": ["returner.march"], "title": "The Last Morning",
+      "variants": [
+        { "text": "Maybe it was {hero} who landed the blow. Maybe it was {w1}, in a way. Maybe it was all of them, a hundred small hands on a hundred small hilts, in a throne room full of green.\n\nAll that is certain is that the Demon King, {king}, went down in the end, and as he fell he looked at {w1}, and there was no hatred in it, only a vast and terrible weariness. “So,” said {king}. “That's the way out.”\n\n“It was the only one,” said {w1}.\n\n“I know,” said {king}. “I have been looking for it for a very long time.”\n\nThe glass cracked. The light came in. And the morning that followed was a morning with a future in it." },
+        { "text": "{hero} struck the blow, and for a moment the world held its breath. Then the glass throne rang, a long, clear note that did not fade, and {w1}, standing at the foot of the stair, felt the Return let go of them like a hand that has finally unclenched.\n\nIt was the lightest thing {w1} had ever felt.\n\n“It's over,” whispered {w2}.\n\n“No,” said {w1}, smiling for the first time in a long time. “It's morning.”" }
+      ]
+    },
+    {
+      "id": "returner.ending", "arc": "returner", "trigger": "season_end", "after": ["returner.final"], "title": "Epilogue: The Bench, Empty",
+      "variants": [
+        { "text": "A bench stands at a crossroads, under a lantern that nobody lit.\n\nIt is empty now. The lantern still burns, but it is smaller, and the light has a rest in it, the way a tired person's voice has a rest. Children sometimes sit on the bench to eat their lunch. They do not know why it is called the Returner's Bench. They do not know why, at the end of every season, someone leaves a small bunch of flowers on it.\n\n{w1} remembers. {w1} always will. But the remembering has stopped being a weight, and become a kind of gift: because only {w1} knows how precious an ordinary morning is.\n\n{w1} wakes in {w1home}, and it is a Tuesday, and the sky is blue, and nothing has happened before." }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>banner</title>
+<link rel="stylesheet" href="common.css">
+<style>
+ .bg{position:absolute;inset:0;background:url(assets/shot_world.jpg) center/cover;filter:brightness(.55) saturate(1.15) blur(2px)}
+ .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,14,9,.92) 0%,rgba(4,14,9,.55) 46%,rgba(4,14,9,.15) 100%)}
+ .frame{position:absolute;inset:26px;border:4px solid var(--gold);border-radius:10px;box-shadow:inset 0 0 0 10px rgba(6,18,12,.7),inset 0 0 0 12px rgba(227,189,85,.5),0 0 60px rgba(227,189,85,.25)}
+ .corner{position:absolute;width:46px;height:46px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 20px rgba(242,207,99,.7)}
+ #title{left:90px;top:150px;font-size:122px;font-weight:900;color:var(--gold-soft);line-height:1}
+ #tag{left:96px;top:300px;font-size:46px;font-weight:700;color:var(--cream);letter-spacing:.02em}
+ #tag b{color:var(--gold-soft);text-shadow:0 0 24px rgba(255,226,138,.9)}
+ #sub{left:98px;top:380px;width:740px;font-size:29px;line-height:1.5;color:var(--cream)}
+ .chips{left:98px;top:600px;width:740px}
+ .chips .chip{margin:0 10px 14px 0;font-size:26px}
+ .hearts{left:98px;top:850px;font-size:54px;color:#ff5d5d;letter-spacing:.12em;text-shadow:0 0 14px rgba(255,93,93,.6)}
+ .hearts i{color:#6b2a2a;font-style:normal}
+ .stat{display:inline-block;margin-right:44px;text-align:left}
+ .stat b{display:block;font-family:Cinzel,serif;font-size:62px;color:var(--gold-soft);line-height:1}
+ .stat span{font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+ #stats{left:98px;top:925px}
+ .card{position:absolute;width:250px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#0e2a1a,#071a10);border:4px solid var(--gold);box-shadow:0 14px 40px rgba(0,0,0,.6),0 0 30px rgba(227,189,85,.25)}
+ .card img.p{width:100%;border-radius:8px;display:block;border:2px solid rgba(227,189,85,.6)}
+ .card .n{margin-top:10px;font-family:Cinzel,serif;font-weight:700;font-size:21px;color:var(--cream)}
+ .card .j{font-size:16px;color:var(--gold);letter-spacing:.14em;text-transform:uppercase}
+ .shot{position:absolute;border:4px solid var(--gold);border-radius:10px;overflow:hidden;box-shadow:0 14px 44px rgba(0,0,0,.65),0 0 30px rgba(227,189,85,.2)}
+ .shot img{display:block;width:100%}
+ .lbl{position:absolute;padding:6px 18px;background:var(--gold);color:#1a1405;font-family:Cinzel,serif;font-weight:900;font-size:22px;letter-spacing:.12em;border-radius:6px}
+ .ring{position:absolute;left:1180px;top:520px;width:640px;height:640px;border-radius:50%;border:2px solid rgba(227,189,85,.35)}
+</style></head>
+<body><div class="stage">
+ <div class="bg"></div><div class="shade"></div>
+ <canvas id="stars" width="1920" height="1080" style="position:absolute;inset:0"></canvas>
+ <div class="abs serif glow" id="title">ChogSekai</div>
+ <div class="abs serif" id="tag">Be the <b>god</b> in their story.</div>
+ <div class="abs" id="sub">Every one of the 1,969 Chog Genesis NFTs lives as an AI agent on a fantasy continent: working, loving, fighting, remembered. You are a Constellation. You can only nudge your own.</div>
+ <div class="abs chips">
+  <span class="chip">1,969 living Chogs</span><span class="chip violet">Star Pulls: 1 of 4 cards</span><span class="chip sky">A new novel every season</span><span class="chip">Life stories</span>
+ </div>
+ <div class="abs hearts">&#9829;&#9829;&#9829;&#9829;&#9829;&#9829;<i>&#9829;&#9829;</i></div>
+ <div class="abs" id="stats"><div class="stat"><b>8</b><span>premises</span></div><div class="stat"><b>191</b><span>story beats</span></div><div class="stat"><b>24 h</b><span>seasons</span></div><div class="stat"><b>Play now</b><span>chogsekai.vercel.app</span></div></div>
+
+ <div class="shot" style="left:1000px;top:70px;width:800px;transform:rotate(1.5deg)"><img src="assets/shot_pulls.jpg"></div>
+ <div class="lbl" style="left:1030px;top:50px;transform:rotate(1.5deg)">STAR PULLS</div>
+ <div class="shot" style="left:1290px;top:560px;width:520px;transform:rotate(-2deg)"><img src="assets/shot_chronicle.jpg"></div>
+ <div class="lbl" style="left:1310px;top:540px;transform:rotate(-2deg)">THE CHRONICLE</div>
+ <div class="shot" style="left:870px;top:690px;width:380px;transform:rotate(-3deg)"><img src="assets/shot_life.jpg"></div>
+ <div class="lbl" style="left:890px;top:670px;transform:rotate(-3deg)">LIFE STORIES</div>
+
+ <div class="card" style="left:900px;top:330px;transform:rotate(-6deg);width:180px"><img class="p" src="assets/c173.webp"><div class="n">Nova the Loud</div><div class="j">Shopkeeper</div></div>
+ <div class="card" style="left:1650px;top:360px;transform:rotate(7deg);width:200px"><img class="p" src="assets/c1420.webp"><div class="n">Your Chog</div><div class="j">Adventurer</div></div>
+
+ <div class="frame"></div>
+ <div class="corner" style="left:14px;top:14px"></div><div class="corner" style="right:14px;top:14px"></div>
+ <div class="corner" style="left:14px;bottom:14px"></div><div class="corner" style="right:14px;bottom:14px"></div>
+ <div class="vignette"></div>
+</div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>window.makeStars(document.getElementById("stars"),{count:140,seed:7});</script>
+</body></html>

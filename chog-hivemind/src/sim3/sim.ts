@@ -244,10 +244,11 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
       ? `Rose in the demon realm as ${article(a.job.name)}, serving the Demon King from ${placeName(a.work)}.`
       : `Summoned to Monadia as ${article(a.job.name)} of ${placeName(a.home)}.`, null, a.job.id);
   }
-  const say = (kind: string, a: Agent | null, vars: Record<string, string | number>, toLog = true) => {
-    const text = narrate(kind, hash(`${kind}:${tick}:${a?.id ?? 0}:${lines.length}`), { a: a?.name ?? "", ...vars });
+  const say = (kind: string, a: Agent | null, vars: Record<string, string | number>, toLog = true): string => {
+    const text = narrate(kind, hash(`${kind}:${tick}:${a?.id ?? 0}:${lines.length}`), { a: a?.name ?? "", track: a?.job.track, jobid: a?.job.id, ...vars });
     lines.push({ kind, chog: a?.id ?? null, text });
     if (a && toLog) a.log = [`${tick}: ${text}`, ...a.log].slice(0, 8);
+    return text;
   };
   const progress = (now - st.started) / seasonMs();
   const sig = emptySignals();
@@ -280,6 +281,46 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
     }
   }
   if (gifts.length) await batch(gifts.map((g) => ({ sql: `UPDATE gifts SET status = 'done' WHERE id = ?`, args: [g.id] })));
+
+  // 1b. Fate: every two pull periods the stars touch each Chog once (a random skill, or a fitting quest), so Chogs
+  // nobody plays still grow a story. Each Chog has its own phase and is due when its boundary fell between the last
+  // tick and this one. Player gifts win: a Chog gifted within the period is skipped. Fate is not a gift (no gifts row),
+  // so sponsors, Star-Touched and the Hero's patrons are unchanged.
+  if (lastAt && !st.hero) {
+    const FP = seasonMs() * 0.4;
+    const phase = (a: Agent) => hash(`fate:${a.id}`) % FP;
+    const due = agents.filter((a) => !isDemon(a) && Math.floor((now - phase(a)) / FP) !== Math.floor((lastAt - phase(a)) / FP));
+    if (due.length) {
+      const gifted = new Set((await all<any>(`SELECT DISTINCT chog_id FROM gifts WHERE created_at > ?`, [now - FP])).map((g) => Number(g.chog_id)));
+      const RAR = [40, 28, 18, 10, 4];
+      let told = 0;
+      for (const a of due) {
+        if (gifted.has(a.id)) continue;
+        const fr = mulberry32(hash(`fate:${a.id}:${Math.floor(now / FP)}`));
+        const giveSkill = () => {
+          const pool = SKILLS.filter((k) => !a.skills.includes(k.id));
+          if (!pool.length || a.skills.length >= MAX_SKILLS) return false;
+          let t = fr() * pool.reduce((n, k) => n + (RAR[k.tier - 1] ?? 1), 0), k = pool[pool.length - 1];
+          for (const c of pool) if ((t -= RAR[c.tier - 1] ?? 1) <= 0) { k = c; break; }
+          a.skills.push(k.id);
+          remember(a, "fate_skill", `The stars stirred and left the skill "${k.name}".`, null, k.id);
+          if (told++ < 3) say("fate_skill", a, { skill: k.name });
+          return true;
+        };
+        const giveQuest = () => {
+          if (a.quest || a.until > tick) return false;
+          const q = chooseQuest(a, st, progress, fr);
+          if (!q) return false;
+          startQuest(a, q, st, null);
+          a.hp = Math.max(a.hp, Math.round(a.maxhp * 0.5));
+          remember(a, "fate_quest", `The stars stirred and set the quest "${q.name}".`, null, q.id);
+          if (told++ < 3) say("fate_quest", a, { quest: q.name, qkind: q.kind });
+          return true;
+        };
+        if (fr() < 0.5) { if (!giveSkill()) giveQuest(); } else if (!giveQuest()) giveSkill();
+      }
+    }
+  }
 
   // 2. Director: phase, last stand.
   const generalsUp = st.generals.filter((g) => !g.down).length;
@@ -363,6 +404,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
   // 4. Agents.
   const free: Agent[] = [];
   let narrated = 0;
+  let flavored = 0;
   for (const a of agents) {
     const r = mulberry32((tick * 7919 + a.id * 104729) >>> 0);
     if (isDemon(a)) {
@@ -394,7 +436,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
         const hurt = q.tier * 5 * (0.4 + r()) / (1 + defense(a));
         a.hp = Math.round(a.hp - hurt);
         if (a.hp <= 0) {
-          if (narrated++ < 6) say("quest_fail", a, { quest: q.name });
+          if (narrated++ < 6) say("quest_fail", a, { quest: q.name, qkind: q.kind });
           if (q.boss === "general" && q.region) sig.ko.push({ chog: a.id, region: q.region });
           remember(a, "quest_fail", `Was knocked out during "${q.name}" and carried to the temple.`, null, q.id);
           a.quest = null; a.state = "rest"; a.qgiver = null;
@@ -413,7 +455,7 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
       }
       if (a.qprog >= a.qneed) {
         a.xp += Math.round(q.xp * XM); a.gold += q.gold; a.story += q.story;
-        if (narrated++ < 10 || a.qgiver) say("quest_done", a, { quest: q.name, place: placeName(a.place), n: q.xp });
+        if (narrated++ < 10 || a.qgiver) say("quest_done", a, { quest: q.name, place: placeName(a.place), n: q.xp, qkind: q.kind });
         sig.questDone.push({ chog: a.id, gifted: !!a.qgiver });
         remember(a, "quest_done", q.boss === "general" || q.boss === "king"
           ? `Survived "${q.name}", dealing ${a.dmg} damage.` : `Completed "${q.name}" at ${placeName(a.place)}.`, null, q.id);
@@ -432,12 +474,15 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
       const q = chooseQuest(a, st, progress, r);
       if (q) {
         startQuest(a, q, st, null);
-        if (narrated++ < 8) say("quest_start", a, { quest: q.name, place: placeName(a.place) });
+        if (narrated++ < 8) say("quest_start", a, { quest: q.name, place: placeName(a.place), qkind: q.kind });
         continue;
       }
     }
     if (roll < pQuest + 0.1) { free.push(a); continue; }
-    if (r() < 0.7) { a.state = "work"; a.place = a.work; a.xp += Math.round(2 * XM); a.gold += 1; a.until = tick + 2 + Math.floor(r() * 4); }
+    if (r() < 0.7) {
+      a.state = "work"; a.place = a.work; a.xp += Math.round(2 * XM); a.gold += 1; a.until = tick + 2 + Math.floor(r() * 4);
+      if (flavored < 3 && r() < 0.1) { flavored++; remember(a, "work", say("work", a, { place: placeName(a.work) })); }  // a small scene from the job
+    }
     else { a.state = "idle"; a.place = a.home; a.until = tick + 1 + Math.floor(r() * 3); }
     levelUp(a, say, remember);
   }
@@ -452,24 +497,31 @@ export async function simTick(tick: number, now = Date.now()): Promise<{ lines: 
       const k = rand();
       const vars = { b: b.name, place: placeName(a.home) };
       a.state = "idle"; b.state = "idle"; a.place = a.home; b.place = a.home; a.until = b.until = tick + 2;
-      if (k < 0.3) { sig.spar.push([a.id, b.id]); a.xp += Math.round(6 * XM); b.xp += Math.round(6 * XM); if (social++ < 4) say("train", a, vars); }
-      else if (k < 0.5) { a.gold += 2; b.gold = Math.max(0, b.gold - 1); if (social++ < 4) say("trade", a, vars); }
+      if (k < 0.3) { sig.spar.push([a.id, b.id]); a.xp += Math.round(6 * XM); b.xp += Math.round(6 * XM); if (social++ < 4) { const t = say("train", a, vars); remember(a, "train", t, b.id); remember(b, "train", t, a.id); } }
+      else if (k < 0.5) { a.gold += 2; b.gold = Math.max(0, b.gold - 1); if (social++ < 4) { const t = say("trade", a, vars); remember(a, "trade", t, b.id); remember(b, "trade", t, a.id); } }
       else if (k < 0.75) {
         a.story += 1;
         const g = st.generals.find((x) => !x.down) ?? st.king;
-        if (social++ < 4) say("gossip", a, { ...vars, boss: byId.get(g.chog)?.name ?? "the Demon King" });
+        if (social++ < 4) { const t = say("gossip", a, { ...vars, boss: byId.get(g.chog)?.name ?? "the Demon King" }); remember(a, "gossip", t, b.id); remember(b, "gossip", t, a.id); }
       } else {
         const q = chooseQuest(a, st, progress, rand);
         if (q) {
           startQuest(a, q, st, null);
           startQuest(b, q, st, null);
           b.place = a.place;
-          if (social++ < 4) say("party", a, { ...vars, quest: q.name });
+          if (social++ < 4) say("party", a, { ...vars, quest: q.name, qkind: q.kind });
           remember(a, "party", `Formed a party with ${b.name} for "${q.name}".`, b.id, q.id);
           remember(b, "party", `Joined ${a.name} on "${q.name}".`, a.id, q.id);
         }
       }
     }
+  }
+
+  // A little world colour every few ticks: weather, festivals, odd visitors, rumours.
+  if (tick % 4 === 1) {
+    const spot = P[hash(`world:${tick}`) % P.length];
+    const regionName = WORLD.regions.find((x) => x.id === spot.region)?.name ?? "Monadia";
+    say("world", null, { place: spot.name, region: regionName }, false);
   }
 
   // 6. Story threads: rivals, nemeses, sieges, sponsored Chogs, underdogs.

@@ -4,6 +4,7 @@ extends Node
 const DEV_BASE := "http://localhost:3000"
 
 var base_url: String = DEV_BASE
+var _cookies := {}  # native runs only: the browser keeps cookies on the web, a native client keeps its own (sign-in session)
 
 
 func _ready() -> void:
@@ -16,18 +17,41 @@ func _ready() -> void:
 			base_url = arg.trim_prefix("--api=")
 
 
+## Request headers plus the session cookie (native runs).
+func _hdr(headers: Array = []) -> PackedStringArray:
+	var out := PackedStringArray(headers)
+	if not OS.has_feature("web") and not _cookies.is_empty():
+		var parts := PackedStringArray()
+		for k in _cookies:
+			parts.append("%s=%s" % [k, _cookies[k]])
+		out.append("Cookie: " + "; ".join(parts))
+	return out
+
+
+## Remember Set-Cookie values from a response (native runs).
+func _absorb(res_headers: PackedStringArray) -> void:
+	if OS.has_feature("web"):
+		return
+	for h in res_headers:
+		if h.to_lower().begins_with("set-cookie:"):
+			var kv := h.substr(11).strip_edges().split(";")[0].split("=", true, 1)
+			if kv.size() == 2:
+				_cookies[kv[0]] = kv[1]
+
+
 ## GET a JSON endpoint. Returns the parsed Variant, or null on any failure.
 func get_json(path: String) -> Variant:
 	var req := HTTPRequest.new()
 	req.timeout = 30.0
 	add_child(req)
-	var err := req.request(base_url + path, ["Accept: application/json"])
+	var err := req.request(base_url + path, _hdr(["Accept: application/json"]))
 	if err != OK:
 		req.queue_free()
 		push_warning("GET %s failed to start: %s" % [path, error_string(err)])
 		return null
 	var res: Array = await req.request_completed
 	req.queue_free()
+	_absorb(res[2])
 	var code: int = res[1]
 	if res[0] != HTTPRequest.RESULT_SUCCESS or code < 200 or code >= 300:
 		push_warning("GET %s -> result %s, HTTP %s" % [path, res[0], code])
@@ -91,10 +115,11 @@ func post_json(path: String, body: Dictionary) -> Dictionary:
 	var req := HTTPRequest.new()
 	req.timeout = 30.0
 	add_child(req)
-	var err := req.request(base_url + path, ["Content-Type: application/json"], HTTPClient.METHOD_POST, JSON.stringify(body))
+	var err := req.request(base_url + path, _hdr(["Content-Type: application/json"]), HTTPClient.METHOD_POST, JSON.stringify(body))
 	if err != OK:
 		req.queue_free()
 		return {"status": 0, "data": null}
 	var res: Array = await req.request_completed
 	req.queue_free()
+	_absorb(res[2])
 	return {"status": res[1], "data": JSON.parse_string((res[3] as PackedByteArray).get_string_from_utf8())}

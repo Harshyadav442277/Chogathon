@@ -1,0 +1,85 @@
+{
+  "nodes": [
+    {
+      "id": "seal_{n}_nemesis", "repeat": [1, 2, 3, 4], "trigger": "seals_{n}", "slot": "seal{n}", "requires": "slayerNemesis", "weight": 4, "title": "The {sealOrdCap} Seal: A Debt Paid",
+      "variants": [
+        { "text": "{slayer} had faced {slain} before, twice, and twice been carried out. This time {slayer} walked into the dungeon of {slainRegion} with the dull look of someone who has run out of fear.\n\nThe fight lasted longer than anyone waiting outside could bear. Some swore afterwards they heard a sound from deep underground like a bell that had been waiting a hundred years to be rung. When it was over, the seal lay on the stone floor like a dropped plate, and {slayer}, the {slayerJob}, came out on their own two feet.\n\nNobody said anything. There was nothing to say. <thaw_line> {sealsLeft} seals remained." },
+        { "text": "“Third time,” said somebody on the steps of the dungeon, and somebody else said “Hush.”\n\n{slayer} went in alone, in the end, though forty Chogs stood at the door. Inside, {slain} was waiting, and had been waiting, and was surprised, a little, to find that the thing coming down the corridor was not afraid.\n\nWhen {slayer} came out, there was a long silence on the steps, and then the biggest cheer of the season. The {sealOrd} seal was broken, and {slayer} sat down on the dungeon steps and, for no obvious reason, laughed until they cried. <thaw_line>" },
+        { "text": "A debt, once carried long enough, becomes a kind of strength. {slayer} had been carrying theirs to {slain} for three whole defeats, and on the fourth try they set it down on the dungeon floor of {slainRegion}, and {slain} fell over it.\n\nThe {sealOrd} seal cracked like river ice. <thaw_line> At the dungeon mouth the healers put a blanket on {slayer} and a mug of something hot in their paws. “You look like you've been waiting for this a long time,” said one.\n\n“Not for this,” said {slayer}. “For *that*,” and they pointed at nothing, at the sky, at the way out." }
+      ]
+    },
+    {
+      "id": "seal_{n}_rival", "repeat": [1, 2, 3, 4], "trigger": "seals_{n}", "slot": "seal{n}", "requires": "slayerRival", "weight": 3, "title": "The {sealOrdCap} Seal: A Rival Cheers",
+      "variants": [
+        { "text": "In {slainRegion}, {slain} had held the dungeon for days. Parties went in, parties were carried out, and the temple candles in that country burned day and night. Then {slayer}, the {slayerJob}, went in.\n\nWhen {slayer} came out, the first to cheer was {slayerRival}, loudest of all and only a little bit jealously. “I'd have done it faster,” said {slayerRival}.\n\n“Of course you would,” said {slayer}, grinning.\n\n<thaw_line> The {sealOrd} seal was broken. {sealsLeft} remained." },
+        { "text": "Everyone knew about {slayer} and {slayerRival}. It was a sport in the taverns: who would be first, who would be best, who would be sorry.\n\nIn the end {slayer} was first. It was {slain}, in the dungeon of {slainRegion}, who made the difference, because {slain} had spent a week fighting {slayerRival} and was tired, and then {slayer} arrived, fresh and cross, and finished it.\n\nThey say {slayerRival} stood in the door of the dungeon and clapped for a full minute, and then went off to train twice as hard. <thaw_line>" }
+      ]
+    },
+    {
+      "id": "seal_{n}_sponsor", "repeat": [1, 2, 3, 4], "trigger": "seals_{n}", "slot": "seal{n}", "requires": "slayerSponsor", "weight": 3, "title": "The {sealOrdCap} Seal: A Star Burns Brighter",
+      "variants": [
+        { "text": "{slain} was the cleverest of the generals in {slainRegion}, and the cruellest. It did not matter.\n\n{slayer} stood in the wreckage of the dungeon, breathing hard, while the seal crumbled to dust between their paws. Above them, very high, a single star flared brighter than all the rest. In the towns they had started to call it the star of {slayerSponsor}, because that was the Constellation who had believed in {slayer} first.\n\n<thaw_line> {sealsLeft} seals remained." },
+        { "text": "They say a gift is only a gift until you use it.\n\n{slayer}, the {slayerJob}, had been given something by {slayerSponsor}, high up in the dark, and had not said what. In the dungeon of {slainRegion}, in front of {slain}, they used it. What it was, nobody who was not there will ever know, but the {sealOrd} seal broke with a note like a harp string.\n\n“Thank you,” said {slayer} to the ceiling, which was ridiculous, and which, if you were standing close enough, seemed to answer by flickering. <thaw_line>" }
+      ]
+    },
+    {
+      "id": "seal_{n}_base", "repeat": [1, 2, 3, 4], "trigger": "seals_{n}", "slot": "seal{n}", "weight": 1, "title": "The {sealOrdCap} Seal",
+      "variants": [
+        { "text": "{slain} had held {slainRegion} for days. Parties went in. Parties were carried out. The temple candles in that country burned day and night.\n\nThen {slayer} went in. {slayer} was {slayerJobA}, level {slayerLevel}, and nobody had bet on them. The fight in the dungeon lasted longer than anyone waiting outside could bear. When it was over, the dungeon was quiet, and the {sealOrd} seal lay broken on the stone floor like a dropped plate.\n\n<thaw_line> Far to the south, in the black glass castle, {king} felt something give, and for the first time that season, frowned." },
+        { "text": "<dawn>, a courier came running with the news: {slain} was down, and the {sealOrd} seal was broken. It had been {slayer}, the {slayerJob}, who struck the blow.\n\n“{slayer}?” said somebody. “The {slayerJob}?”\n\n“They went in with the rest,” said the courier, “and they came out when the rest did not.”\n\n<thaw_line> By midday the news had reached the capital, and by evening the bard in <inn_scene> had a verse. It was not a good verse, but it scanned." },
+        { "text": "The {sealOrd} seal broke at dusk. <thaw_line>\n\nIn the dungeon of {slainRegion}, {slayer} stood very still over the remains of {slain}'s great chair, and then, slowly, sat down on it, and was found there some time later by a party of scouts, fast asleep, with a faint smile. They did not wake them. Some victories are best left to sleep through.\n\n{sealsLeft} seals remained." },
+        { "text": "Few songs begin with: “Then they closed the door and had a quiet cry.” But that is what {slayer} did, after {slain} fell in {slainRegion}, in a side room off the dungeon corridor, with the {sealOrd} seal in two halves on the floor.\n\nThen they washed their face in a bucket, picked up their pack, and went out to a hall full of cheering strangers, and let them cheer. <thaw_line>" }
+      ]
+    },
+    {
+      "id": "gift_first", "trigger": "gift_first", "title": "The Peddler of Stars",
+      "variants": [
+        { "text": "<night>, a sleigh came down out of the sky.\n\nIt was pulled by nothing that anybody could see, and it jingled with bells that were not frozen, and it was driven by a tall figure in a coat the colour of the space between stars. The figure stopped in a town square, which should have been impossible, and was not, and opened a pack that seemed to have no bottom.\n\n“I am the Peddler of Stars,” said the figure. “The Constellations who watch over this land have sent me with gifts.”\n\nTo {giftChog} the Peddler gave {giftName}, wrapped in starlight, from {giftSponsor}. “These are tools, not toys,” said the Peddler. “Use them well.”\n\nThen the sleigh was gone, and every Chog who had been given something stood in the dark holding it carefully, the way you hold something you did not know you were waiting for." },
+        { "text": "{giftChog} woke up and found it in their Status Window, like a note slipped under a door: {giftName}. Nothing else. No signature, except a small star in the corner that, if you stared, turned out to be named {giftSponsor}.\n\n“Somebody up there likes me,” said {giftChog}, to the ceiling.\n\nThe Constellations, those distant, patient eyes, had begun to reach down. They could not fight for anybody. They could not walk their roads. But they could, now and then, set a stone in the path or put a tool in a hand, and that, as it turned out, was a great deal.\n\n<hope_line>" },
+        { "text": "The old folk said the stars were only stars, until the first gift came.\n\nIt was a small thing: {giftName}, for {giftChog}, from {giftSponsor}. But it changed how people looked at the night. Children stood on walls and waved. A baker put out a plate of bread for the sky. A bard wrote a song, which was bad, but had the right idea. <hope_line>\n\n“They're watching,” said {giftChog}, and nobody laughed." }
+      ]
+    },
+    {
+      "id": "gift_many", "trigger": "gift_5", "after": ["gift_first"], "title": "Five Stars Answer",
+      "variants": [
+        { "text": "By the end of the week five Chogs had been touched by the stars, and the town gossip could think of nothing else. “It's favouritism,” said one. “It's destiny,” said another. “It's the soup,” said a third, who was not wrong about much.\n\nWhat was certain was that something had changed in the way Chogs spoke about the sky. Nobody looked up any more without a wave. And a very small boy had been heard to say, in earnest, “When I grow up, I'm going to be somebody's favourite.”" },
+        { "text": "Five gifts, five stars, five names whispered in the market. {giftChog} was just the latest. The Constellations were learning, it was said, which Chogs would use a gift well, and which would sit on it like a hen on a stone.\n\nOne thing was clear: the sky had stopped being quiet." }
+      ]
+    },
+    {
+      "id": "quarter", "trigger": "progress_25", "title": "Interlude: A Quarter of the Way",
+      "variants": [
+        { "text": "A quarter of the season has gone. Here is how Monadia stands, as the guild clerks write it in their ledgers.\n\nQuests completed: {questsDone}. Raids held: {raidsHeld}. Raids lost: {raidsLost}. [[mostRaided|The town that has suffered most is {mostRaided}, raided {mostRaidedCount} times.]]\n\nThe names on everyone's lips are {cand1} ({cand1job}), {cand2} ({cand2job}) and {cand3} ({cand3job}).\n\nThe seals hold, but in the orchards outside the capital one gardener swears that a single apple has returned to something like its old self, and a great many people have asked to see it." },
+        { "text": "<dawn>, the guild clerks closed their books on the first quarter. They tallied: {questsDone} quests, {raidsHeld} raids held, {raidsLost} lost.\n\n[[mostRaided|{mostRaided} had borne the worst of it, raided {mostRaidedCount} times. ]]The three names most often heard in taverns were {cand1}, {cand2} and {cand3}.\n\nA clerk wrote a last line: *Morale: improving. Soup: scarce.* They underlined the second part." }
+      ]
+    },
+    {
+      "id": "half", "trigger": "progress_50", "title": "Interlude: Halfway",
+      "variants": [
+        { "text": "Halfway. {seals} of the four seals are broken.\n\nMonadia has completed {questsDone} quests, held its walls {raidsHeld} times and lost them {raidsLost} times. [[siegeTown|{siegeTown} has been besieged so often that its children play “raid” the way other children play tag.]]\n\nThe candidates have changed. Now it is {cand1} ({cand1job}), {cand2} ({cand2job}) and {cand3} ({cand3job}). The bards have started writing whole songs, which is always a bad sign for somebody." },
+        { "text": "It is traditional, at the halfway mark, for somebody to say the worst is over. Nobody said it this time; they all knew better.\n\n{questsDone} quests lay behind them. {seals} seals were gone. [[rivalA|{rivalA} and {rivalB} had stopped keeping score, and started keeping each other's backs.]] In the capital, <elder> was heard to say: “Well. It's not nothing.”\n\nIn the temples, the candles were lit as always. Outside, <weather>." }
+      ]
+    },
+    {
+      "id": "three_quarters", "trigger": "progress_75", "title": "Interlude: Three Quarters",
+      "variants": [
+        { "text": "Three quarters of the season are gone. The Demon King still stands at {kingHp}% of his strength.\n\nThe march goes on. Parties go up the black hill and come back down on stretchers, and go up again. The temple candles burn all night. [[rivalA|{rivalA} and {rivalB} are said to have stopped arguing, which worries everyone.]]\n\nThe candidates now: {cand1}, {cand2} and {cand3}. One of them, or someone nobody has noticed yet, is about to become a legend." },
+        { "text": "{kingHp}%.\n\nThat was the number scratched on the wall of the guild hall in the capital, and nobody had rubbed it out. Every time somebody came in from the black hill the number was changed.\n\nIt was the most watched number in Monadia. Bakers watched it, and priests, and imps, probably, on the other side. <proverb>" }
+      ]
+    },
+    {
+      "id": "king_half", "trigger": "king_hp_50", "title": "The King Staggers",
+      "variants": [
+        { "text": "At half strength, {king} did something nobody had expected: sat down.\n\nIn the throne room of black glass the Demon King, who had stood through every battle of the season, lowered themself onto the steps of the throne and looked at their own hands as if seeing them for the first time. The generals who were left waited, uneasy, for a command that did not come.\n\nThat was how the demon realm learned that {king} could be hurt. It was also how they learned, and this was worse for them, that the Demon King could be afraid." },
+        { "text": "A courier reached the capital with the news at dawn: {king} was at half strength.\n\nNobody cheered. A hush fell on the market, the kind that comes before the end of a story, and a baker stopped kneading, and a child put down a wooden sword, and somebody whispered what everyone was thinking: *we could actually do this.*" }
+      ]
+    },
+    {
+      "id": "king_quarter", "trigger": "king_hp_25", "title": "The Black Throne Cracks",
+      "variants": [
+        { "text": "A quarter. That was all that remained of {king}'s strength, and the throne room knew it. The glass walls of the castle began to sing, a high thin note that set every tooth on edge.\n\nIn the capital the bells began to ring, one at a time, then all together, and nobody had ordered them to. In the dark, the generals who remained gathered close around their king and did not say what they were thinking, which was that this was how it was going to end." },
+        { "text": "The whole of Monadia felt it: a low shudder, from the south, like a great beast turning over.\n\n“That,” said <elder>, with great satisfaction, “is a king in pain.”\n\nThe song of the black glass was changing. It was no longer a hum. It was the sound of something that had begun to fall." }
+      ]
+    }
+  ]
+}

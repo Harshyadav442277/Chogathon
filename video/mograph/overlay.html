@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>overlay</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  html, body { background: transparent !important; }
+  #root { position:absolute; inset:0; }
+  .lower { position:absolute; left:70px; bottom:80px; min-width:560px; max-width:900px; padding:22px 34px 22px 38px; border-radius:6px 16px 16px 6px;
+    background:linear-gradient(90deg, rgba(5,16,10,.94), rgba(5,16,10,.82)); border-left:10px solid var(--gold); box-shadow:0 12px 40px rgba(0,0,0,.6); }
+  .lower h2 { font-family:"Cinzel",serif; font-size:50px; line-height:1.1; color:var(--cream); }
+  .lower p { margin-top:8px; font-size:28px; color:var(--dim); font-weight:500; }
+  .region { position:absolute; left:0; right:0; margin:0 auto; width:max-content; top:60px; text-align:center; padding:14px 56px 16px; border-radius:14px; background:rgba(5,16,10,.88); border:3px solid var(--gold); box-shadow:0 10px 36px rgba(0,0,0,.6); }
+  .region small { display:block; letter-spacing:.34em; font-size:18px; color:var(--gold); font-weight:600; text-transform:uppercase; }
+  .region b { font-family:"Cinzel",serif; font-size:52px; color:var(--cream); }
+  .callout { position:absolute; padding:16px 26px; border-radius:12px; background:rgba(5,16,10,.92); border:3px solid var(--gold-soft); box-shadow:0 10px 30px rgba(0,0,0,.6); max-width:560px; }
+  .callout b { display:block; font-family:"Cinzel",serif; font-size:36px; color:var(--gold-soft); line-height:1.15; }
+  .callout span { display:block; margin-top:6px; font-size:25px; color:var(--cream); line-height:1.35; }
+  .ring { position:absolute; width:64px; height:64px; margin:-32px 0 0 -32px; border-radius:50%; border:4px solid var(--gold-soft); box-shadow:0 0 22px rgba(255,226,138,.9); }
+  svg.ln { position:absolute; inset:0; width:1920px; height:1080px; overflow:visible; }
+  .steps { position:absolute; left:0; right:0; margin:0 auto; width:max-content; bottom:56px; display:flex; gap:14px; padding:16px 20px; border-radius:18px; background:rgba(5,16,10,.9); border:3px solid var(--gold); box-shadow:0 10px 36px rgba(0,0,0,.6); }
+  .step { display:flex; align-items:center; gap:14px; padding:10px 22px 10px 12px; border-radius:12px; font-size:30px; font-weight:700; color:var(--dim); border:2px solid transparent; }
+  .step i { display:flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.1); font-style:normal; color:var(--cream); font-size:28px; }
+  .step.on { color:var(--cream); border-color:var(--gold); background:rgba(227,189,85,.14); }
+  .step.on i { background:var(--gold); color:#1a1405; }
+  .arc { position:absolute; right:70px; top:110px; width:640px; padding:30px 36px 32px; border-radius:16px; background:linear-gradient(180deg, rgba(14,10,30,.95), rgba(8,6,20,.95)); border:3px solid var(--violet); box-shadow:0 14px 44px rgba(0,0,0,.65), 0 0 40px rgba(176,124,232,.25); }
+  .arc small { letter-spacing:.3em; text-transform:uppercase; font-weight:600; font-size:19px; color:var(--violet); }
+  .arc h2 { font-family:"Cinzel",serif; font-size:50px; color:var(--cream); margin:10px 0 12px; line-height:1.12; }
+  .arc p { font-size:27px; line-height:1.4; color:#cfc2e8; }
+  .arc.narrow { right:40px; width:470px; padding:24px 28px 26px; }
+  .arc.narrow h2 { font-size:38px; }
+  .arc.narrow p { font-size:24px; }
+  .badge { position:absolute; padding:12px 28px; border-radius:999px; font-weight:700; font-size:30px; background:rgba(5,16,10,.92); border:3px solid var(--gold); color:var(--gold-soft); box-shadow:0 8px 26px rgba(0,0,0,.6); letter-spacing:.04em; }
+  .badge.violet { border-color:var(--violet); color:#e6d4ff; }
+</style></head>
+<body><div id="root"></div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>
+  const CFG = window.CFG || { items: [] };
+  const root = document.getElementById("root");
+  const tl = gsap.timeline({ paused: true });
+  const el = (cls, html, style = {}) => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html; Object.assign(d.style, style); root.appendChild(d); return d; };
+  const IN = 0.55, OUT = 0.45;
+  const inOut = (node, [a, b], from) => {
+    tl.set(node, { opacity: 0 }, 0);
+    tl.fromTo(node, { opacity: 0, ...from }, { opacity: 1, x: 0, y: 0, scale: 1, duration: IN, ease: "power3.out" }, a);
+    tl.to(node, { opacity: 0, duration: OUT, ease: "power2.in" }, b - OUT);
+  };
+  for (const it of CFG.items) {
+    if (it.kind === "lower") {
+      inOut(el("lower", `<h2>${it.title}</h2>${it.sub ? `<p>${it.sub}</p>` : ""}`, it.style), it.t, { x: -80 });
+    } else if (it.kind === "region") {
+      inOut(el("region", `<small>${it.eyebrow || "Region"}</small><b>${it.text}</b>`, it.style), it.t, { y: -40 });
+    } else if (it.kind === "badge") {
+      inOut(el("badge " + (it.cls || ""), it.text, { left: it.x + "px", top: it.y + "px" }), it.t, { scale: 0.7 });
+    } else if (it.kind === "arc") {
+      inOut(el("arc " + (it.cls || ""), `<small>${it.eyebrow}</small><h2>${it.title}</h2><p>${it.sub}</p>`, it.style), it.t, { x: 120 });
+    } else if (it.kind === "callout") {
+      const box = el("callout", `<b>${it.title}</b>${it.sub ? `<span>${it.sub}</span>` : ""}`, { left: it.lx + "px", top: it.ly + "px" });
+      const ring = el("ring", "", { left: it.x + "px", top: it.y + "px" });
+      const sv = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sv.setAttribute("class", "ln"); root.appendChild(sv);
+      const ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      const sx = it.sx ?? it.lx + 20, sy = it.sy ?? it.ly + 20;
+      Object.entries({ x1: sx, y1: sy, x2: it.x, y2: it.y, stroke: "#f2cf63", "stroke-width": 4, "stroke-linecap": "round" }).forEach(([k, v]) => ln.setAttribute(k, v));
+      sv.appendChild(ln);
+      const len = Math.hypot(it.x - sx, it.y - sy);
+      ln.setAttribute("stroke-dasharray", len); ln.setAttribute("stroke-dashoffset", len);
+      tl.set([box, ring, sv], { opacity: 0 }, 0);
+      tl.fromTo(box, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: IN, ease: "power3.out" }, it.t[0]);
+      tl.set(sv, { opacity: 1 }, it.t[0]);
+      tl.to(ln, { attr: { "stroke-dashoffset": 0 }, duration: 0.5, ease: "power2.out" }, it.t[0] + 0.25);
+      tl.fromTo(ring, { opacity: 0, scale: 2.2 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, it.t[0] + 0.6);
+      tl.to(ring, { scale: 1.3, duration: 0.7, yoyo: true, repeat: 5, ease: "sine.inOut" }, it.t[0] + 1.1);
+      tl.to([box, ring, sv], { opacity: 0, duration: OUT }, it.t[1] - OUT);
+    } else if (it.kind === "steps") {
+      const wrap = el("steps", it.items.map((s, i) => `<div class="step"><i>${i + 1}</i>${s}</div>`).join(""), it.style);
+      inOut(wrap, it.t, { y: 60 });
+      const nodes = wrap.querySelectorAll(".step");
+      for (const [t, idx] of it.active) {
+        tl.call(() => nodes.forEach((n, i) => n.classList.toggle("on", i === idx)), null, t);
+      }
+      // make the on/off state a pure function of time as well (seek backwards works)
+      tl.eventCallback("onUpdate", null);
+      wrap._act = it.active;
+      window.drawers.push((t) => { let on = -1; for (const [ta, idx] of wrap._act) if (t >= ta) on = idx; nodes.forEach((n, i) => n.classList.toggle("on", i === on)); });
+    }
+  }
+  tl.to({}, { duration: 0.01 }, CFG.duration || 1);
+  window.tl = tl;
+</script></body></html>

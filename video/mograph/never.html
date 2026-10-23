@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>never</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { background: radial-gradient(ellipse at 50% 40%, #12301f 0%, #08160e 60%, #040b07 100%); }
+  canvas { position:absolute; inset:0; }
+  #wall { position:absolute; inset:0; opacity:.16; }
+  .tile { position:absolute; width:150px; height:150px; border-radius:16px; border:3px solid var(--gold); overflow:hidden; }
+  .tile img { width:100%; height:100%; object-fit:cover; display:block; }
+  .card { position:absolute; top:250px; width:520px; height:380px; padding:36px 30px; text-align:center; }
+  .card b { display:block; font-family:"Cinzel",serif; font-size:170px; line-height:1; color:var(--gold-soft); text-shadow:0 0 30px rgba(227,189,85,.4); }
+  .card span { display:block; margin-top:18px; font-size:40px; font-weight:600; color:var(--cream); }
+  .card small { display:block; margin-top:10px; font-size:26px; color:var(--dim); }
+  #tag { top:742px; left:0; width:1920px; text-align:center; font-family:"Cinzel",serif; font-size:84px; font-weight:700; color:var(--cream); }
+  #tag em { font-style:normal; color:var(--gold-soft); }
+  #rule { left:560px; top:850px; width:800px; height:4px; background:linear-gradient(90deg, transparent, var(--gold), transparent); transform-origin:50% 50%; }
+</style></head>
+<body><div class="stage">
+  <canvas id="stars" width="1920" height="1080"></canvas>
+  <div id="wall"></div>
+  <div class="abs eyebrow" id="eb" style="left:0;width:1920px;text-align:center;top:90px">Every season is a new novel</div>
+  <div class="abs panel card" id="c1" style="left:110px"><b data-to="8">0</b><span>story premises</span><small>a lantern winter, a loop, a locked gate...</small></div>
+  <div class="abs panel card" id="c2" style="left:700px"><b data-to="191">0</b><span>story beats</span><small>raids, rivals, betrayals, a hero from anywhere</small></div>
+  <div class="abs panel card" id="c3" style="left:1290px"><b data-to="1969">0</b><span>life stories</span><small>one for every Chog, from their own NFT</small></div>
+  <div class="abs glow" id="tag">No two seasons <em>read alike</em></div>
+  <div class="abs" id="rule"></div>
+</div>
+<script src="gsap.min.js"></script><script src="common.js"></script>
+<script>
+  window.drawers.push(window.makeStars(document.getElementById("stars"), { count: 220, seed: 41 }));
+  const ids = [681,173,875,1007,1420,2,19,33,57,88,101,140,177,203,260,299,321,350,402,444,481,520,555,600,641,700,733,780,812,860,901,950,1010,1060,1100,1160,1213,1260,1320,1370,1400,1450];
+  const wall = document.getElementById("wall");
+  ids.forEach((id, i) => { const t = document.createElement("div"); t.className = "tile"; t.style.left = (i % 11) * 176 - 20 + "px"; t.style.top = Math.floor(i / 11) * 176 + 90 + "px"; t.innerHTML = `<img src="../../chog-hivemind/public/chogs/${id}.webp">`; wall.appendChild(t); });
+  const tl = gsap.timeline({ paused: true });
+  tl.set(["#eb", ".card", "#tag", "#rule"], { opacity: 0 });
+  tl.fromTo("#wall", { opacity: 0 }, { opacity: 0.16, duration: 1.2 }, 0);
+  tl.fromTo("#wall", { y: 0 }, { y: -60, duration: 12.7, ease: "none" }, 0);
+  tl.fromTo("#eb", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.1);
+  const card = (id, at) => {
+    const b = document.querySelector(id + " b"), to = Number(b.dataset.to), o = { v: 0 };
+    tl.fromTo(id, { y: 70, opacity: 0, scale: 0.9, rotateX: 18 }, { y: 0, opacity: 1, scale: 1, rotateX: 0, duration: 0.7, ease: "back.out(1.6)" }, at);
+    tl.to(o, { v: to, duration: 1.4, ease: "power2.out", onUpdate: () => (b.textContent = Math.round(o.v).toLocaleString("en-US")) }, at + 0.05);
+  };
+  card("#c1", 0.55); card("#c2", 2.85); card("#c3", 5.85);
+  tl.fromTo("#tag", { y: 40, opacity: 0, letterSpacing: "0.2em" }, { y: 0, opacity: 1, letterSpacing: "0.02em", duration: 0.9, ease: "power3.out" }, 8.95);
+  tl.fromTo("#rule", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.9, ease: "power2.out" }, 9.5);
+  tl.to(["#tag", "#rule", ".card", "#eb"], { opacity: 0, duration: 0.5 }, 12.2);
+  tl.to({}, { duration: 0.01 }, 12.7);
+  window.tl = tl;
+</script></body></html>
